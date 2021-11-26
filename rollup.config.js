@@ -9,6 +9,7 @@ const config = {
     plugins: [
         babel({ babelHelpers: 'bundled' }),
     ],
+    
 };
 
 export default config;

@@ -192,17 +192,17 @@ var DLViewItem = /*#__PURE__*/function (_DLEvent) {
   return DLViewItem;
 }(DLEvent);
 
-evaluateDLEvent('id');
-
 function evaluateDLEvent(dlEventId) {
   var dlEventObect = dataLayer.find(function (dlEvent) {
     return dlEvent['gtm.uniqueEventId'] === dlEventId;
   });
+  debugger;
+  console.log("Found event object:" + dlEventId);
+  console.log(dlEventObect);
   var dlEventName = dlEventObect.event;
 
   switch (dlEventName) {
     case 'dl_view_item':
-      // Find the object based on id in the DLEvent object
       Logger$1.logToConsole(dlEventName);
       var dlViewItem = new DLViewItem(dlEventObject);
       dlViewItem.verify();
@@ -220,4 +220,7 @@ function evaluateDLEvent(dlEventId) {
       console.log(dlEventName);
       break;
   }
-}
+} // Each time the tag fires pass event name + event object
+
+
+evaluateDLEvent('id'); // evaluateDLEvent({{dlv - DL Verifier - GTM unique event ID}});

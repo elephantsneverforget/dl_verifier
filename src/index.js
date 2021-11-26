@@ -4,16 +4,14 @@
 import { Logger } from './logger'
 import { DLViewItem } from './dataLayerEvent';
 
-// Each time the tag fires pass event name + event object
-evaluateDLEvent('id')
-
 function evaluateDLEvent(dlEventId) {
     const dlEventObect = dataLayer.find((dlEvent) => dlEvent['gtm.uniqueEventId'] === dlEventId);
+    debugger;
+    console.log("Found event object:" + dlEventId)
+    console.log(dlEventObect);
     const dlEventName = dlEventObect.event;
     switch (dlEventName) {
         case 'dl_view_item':
-            // Find the object based on id in the DLEvent object
-
             Logger.logToConsole(dlEventName)
             const dlViewItem = new DLViewItem(dlEventObject);
             dlViewItem.verify();
@@ -31,3 +29,7 @@ function evaluateDLEvent(dlEventId) {
             break;
     }
 }
+
+// Each time the tag fires pass event name + event object
+evaluateDLEvent('id')
+// evaluateDLEvent({{dlv - DL Verifier - GTM unique event ID}});
