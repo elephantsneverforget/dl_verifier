@@ -1,35 +1,24 @@
 {/* <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"> */ }
 {/* <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script> */ }
 
-import { Logger } from './logger'
-import { DLViewItem } from './dataLayerEvent';
+import { Logger } from './logger.js'
+import { DLViewItem } from './dataLayerObjectFormats/dlViewItem.js';
 
 function evaluateDLEvent(dlEventId) {
     const dlEventObect = dataLayer.find((dlEvent) => dlEvent['gtm.uniqueEventId'] === dlEventId);
-    debugger;
-    console.log("Found event object:" + dlEventId)
-    console.log(dlEventObect);
     const dlEventName = dlEventObect.event;
-    switch (dlEventName) {
-        case 'dl_view_item':
-            Logger.logToConsole(dlEventName)
-            const dlViewItem = new DLViewItem(dlEventObject);
-            dlViewItem.verify();
-            break;
-        case 'dl_add_to_cart':
-            console.log(dlEventName);
-            break;
-        case 'dl_login':
-            console.log(dlEventName);
-            break;
-        case 'dl_user_data':
-            console.log(dlEventName);
-            break;
-        default:
-            break;
+    if (dlEventName in dlEventMap) {
+        const dlEvent = eventMap[dlEventName](dlEventObect);
+        dlEvent.verify()
     }
 }
 
-// Each time the tag fires pass event name + event object
+const dlEventMap = {
+    'dl_view_item': DLViewItem,
+    // 'dl_add_to_cart': DLAddToCart,
+}
+
 evaluateDLEvent('id')
+const dlViewItem = new DLViewItem({ event: 'dl_view_item', id: '3qwr' });
+console.log(dlViewItem.verify());
 // evaluateDLEvent({{dlv - DL Verifier - GTM unique event ID}});

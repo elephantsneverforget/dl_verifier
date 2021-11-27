@@ -1,3 +1,5 @@
+import Joi from 'joi';
+
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -170,6 +172,37 @@ var DLEvent = /*#__PURE__*/function () {
 
   return DLEvent;
 }();
+
+var products = Joi.array().items(Joi.object({
+  name: Joi.string().alphanum().min(1).required(),
+  id: Joi.string().alphanum().min(10).required().messages({
+    'any.required': "\"id\" is a required field on the ecommerce object and should represent the product SKU"
+  }),
+  product_id: Joi.string().alphanum().min(10).required().messages({
+    'any.required': "\"product_id\" is a required field on the ecommerce object and should represent the product ID."
+  }),
+  variant_id: Joi.string().alphanum().min(2).required().messages({
+    'any.required': "\"product_id\" is a required field on the ecommerce object and should represent the Shopify variant ID."
+  }),
+  image: Joi.string().alphanum().required().messages({
+    'any.required': "\"image\" is a required field on the ecommerce object and should be a valid URL."
+  }),
+  price: Joi.string().alphanum().required().messages({
+    'any.required': "\"price\" is a required field on the ecommerce object."
+  })
+}).min(1).required() // Must match
+);
+
+try {
+  console.log(products.validate([{
+    name: 'h'
+  }], {
+    abortEarly: false
+  }));
+} catch (e) {
+  console.log(e.error); // console.log(e);
+}
+
 var DLViewItem = /*#__PURE__*/function (_DLEvent) {
   _inherits(DLViewItem, _DLEvent);
 
@@ -185,6 +218,22 @@ var DLViewItem = /*#__PURE__*/function (_DLEvent) {
   _createClass(DLViewItem, [{
     key: "verify",
     value: function verify() {
+      var Joi = require('joi');
+
+      var dlViewItemSchema = Joi.object({
+        event: Joi.string('dl_view_item'),
+        event_id: Joi.alphanum().min(5),
+        ecommerce: Joi.object({
+          currencyCode: Joi.string(3),
+          detail: Joi.object({
+            actionField: Joi.object({
+              list: Joi.string()
+            }),
+            products: products
+          })
+        })
+      });
+      dlViewItemSchema.validate(this.dataLayerObject);
       this.logVerificationOutcome();
     }
   }]);
@@ -204,8 +253,11 @@ function evaluateDLEvent(dlEventId) {
   switch (dlEventName) {
     case 'dl_view_item':
       Logger$1.logToConsole(dlEventName);
-      var dlViewItem = new DLViewItem(dlEventObject);
-      dlViewItem.verify();
+
+      var _dlViewItem = new DLViewItem(dlEventObject);
+
+      _dlViewItem.verify();
+
       break;
 
     case 'dl_add_to_cart':
@@ -223,4 +275,9 @@ function evaluateDLEvent(dlEventId) {
 } // Each time the tag fires pass event name + event object
 
 
-evaluateDLEvent('id'); // evaluateDLEvent({{dlv - DL Verifier - GTM unique event ID}});
+evaluateDLEvent('id');
+var dlViewItem = new DLViewItem({
+  event: 'dl_view_item',
+  id: '3qwr'
+});
+console.log(dlViewItem.verify()); // evaluateDLEvent({{dlv - DL Verifier - GTM unique event ID}});
