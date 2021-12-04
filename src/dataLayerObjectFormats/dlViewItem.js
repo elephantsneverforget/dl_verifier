@@ -9,9 +9,8 @@ export class DLViewItem extends DLEvent {
 
     // Should return an array of messages starting with the event type we are verifying + whether it was verified or not.
     verify() {
-        const Joi = require('joi');
-        const dlViewItemSchema = Joi.object({
-            event: Joi.string('dl_view_item'),
+        const dlViewItemSchema = Joi.object.keys({
+            event: Joi.string.valid('dl_view_item').required(),
             event_id: Joi.alphanum().min(5),
             ecommerce: Joi.object({
                 currencyCode: Joi.string(3),

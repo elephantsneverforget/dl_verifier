@@ -22,15 +22,5 @@ export const products = Joi.array().items(
             .messages({
                 'any.required': `"price" is a required field on the ecommerce object.`
             }),
-    }).min(1).required() // Must match
+    }).min(2).required() // Must match
 );
-
-try {
-    console.log(products.validate([{
-        name: 'h'
-    }], { abortEarly: false }),
-    );
-} catch (e) {
-    console.log(e.error)
-    // console.log(e);
-}

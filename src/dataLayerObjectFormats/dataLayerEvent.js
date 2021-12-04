@@ -4,6 +4,7 @@ export class DLEvent {
     }
 
     logVerificationOutcome(messages) {
+        this.errors = messages;
         // Log details in console
         Logger.logToToast(message[0]);
         // Log toast
