@@ -1,10 +1,10 @@
 export class Logger {
-    static logToConsole(messages) {
+    static logToConsole(errors, verificationSummary) {
         console.group(
-            "%cFound dl_view_item",
+            "%c" + verificationSummary,
             "background-color: #e0005a ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
         );
-        console.log("Found dl_view_item");
+        errors.forEach(error => console.log(error))
         console.groupEnd();
     }
 

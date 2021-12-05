@@ -5,8 +5,7 @@
   /* <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script> */
 }
 
-import { Logger } from "./logger.js";
-import { DLViewItem } from "./dataLayerObjectFormats/dlViewItem.js";
+import { DLEventViewItem } from "./eventTypes/dlEventViewItem.js";
 
 function evaluateDLEvent(dlEventId) {
   const dlEventObect = window.dataLayer.find(
@@ -14,7 +13,7 @@ function evaluateDLEvent(dlEventId) {
   );
   const dlEventName = dlEventObect.event;
   if (dlEventName in dlEventMap) {
-    const dlEvent = eventMap[dlEventName](dlEventObect);
+    const dlEvent = dlEventMap[dlEventName](dlEventObect);
     dlEvent.verify();
   } else {
     console.log("Event name: " + dlEventName + " not in available data layer verifiers");
@@ -22,15 +21,6 @@ function evaluateDLEvent(dlEventId) {
 }
 
 const dlEventMap = {
-  'dl_view_item': DLViewItem,
+  'dl_view_item': DLEventViewItem,
   // 'dl_add_to_cart': DLAddToCart,
 };
-
-const window = {
-  dataLayer: []
-}
-// evaluateDLEvent("id");
-
-const dlViewItem = new DLViewItem({ event: "dl_view_item", id: "3qwr" });
-console.log(dlViewItem.verify());
-// evaluateDLEvent({{dlv - DL Verifier - GTM unique event ID}});

@@ -1,85 +1,46 @@
 import Joi from 'joi';
 
-class DLEvent {
-    constructor(dataLayerObject) {
-        this.dataLayerObject = dataLayerObject;
-    }
-
-    logVerificationOutcome(messages) {
-        // Log details in console
-        Logger.logToToast(message[0]);
-        // Log toast
-        Logger.logToConsole(messages);
-    }
-}
+Joi.string().min(7).required().messages({
+    "any.required": `"event_id" is a required field. It should be a UUID like value.`,
+});
 
 const products = Joi.array().items(
     Joi.object({
-        name: Joi.string().alphanum().min(1).required(),
-        id: Joi.string().alphanum().min(10).required()
+        name: Joi.string().min(1).required(),
+        id: Joi.string().min(10).required()
             .messages({
                 'any.required': `"id" is a required field on the ecommerce object and should represent the product SKU`
             }),
-        product_id: Joi.string().alphanum().min(10).required()
+        product_id: Joi.string().min(10).required()
             .messages({
                 'any.required': `"product_id" is a required field on the ecommerce object and should represent the product ID.`
             }),
-        variant_id: Joi.string().alphanum().min(2).required()
+        variant_id: Joi.string().min(2).required()
             .messages({
                 'any.required': `"product_id" is a required field on the ecommerce object and should represent the Shopify variant ID.`
             }),
-        image: Joi.string().alphanum().required()
+        image: Joi.string().required()
             .messages({
                 'any.required': `"image" is a required field on the ecommerce object and should be a valid URL.`
             }),
-        price: Joi.string().alphanum().required()
+        price: Joi.string().required()
             .messages({
                 'any.required': `"price" is a required field on the ecommerce object.`
             }),
-    }).min(2).required() // Must match
-);
+    }) // Must match
+).min(1).required().messages({
+    'any.required': `"ecommerce" is a required field on object.`
+});
 
-try {
-    const {error} = products.validate([{
-        name: 'h'
-    }], { abortEarly: false });
-    console.log(error.details);
-    // console.log(products.validate([{
-    //     name: 'h'
-    // }], { abortEarly: false }),
-    // );
-} catch (e) {
-    console.log(e.error);
-    // console.log(e);
-}
-
-class DLViewItem extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject);
-    }
-
-    // Should return an array of messages starting with the event type we are verifying + whether it was verified or not.
-    verify() {
-        const dlViewItemSchema = Joi.object({
-            event: Joi.string('dl_view_item'),
-            event_id: Joi.alphanum().min(5),
-            ecommerce: Joi.object({
-                currencyCode: Joi.string(3),
-                detail: Joi.object({
-                    actionField: Joi.object({
-                        list: Joi.string()
-                    }),
-                    products: products,
-                })
-            })
-        });
-        dlViewItemSchema.validate(this.dataLayerObject);
-        this.logVerificationOutcome();
-    }
-}
-
-// evaluateDLEvent("id");
-
-const dlViewItem = new DLViewItem({ event: "dl_view_item", id: "3qwr" });
-console.log(dlViewItem.verify());
-// evaluateDLEvent({{dlv - DL Verifier - GTM unique event ID}});
+Joi.object().keys({
+    currencyCode: Joi.string().min(3).max(3).required(),
+    detail: Joi.object().keys({
+        actionField: Joi.object().keys({
+            list: Joi.string().required().error(() => new Error("The action field must have a list property that contains a string.")),
+            action: Joi.string().required(),
+        }).required(),
+        products: products
+    }).required()
+}).required().messages({
+    'any.required': `"ecommerce" is a required field.`
+});
