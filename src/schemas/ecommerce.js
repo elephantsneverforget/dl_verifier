@@ -1,11 +1,11 @@
-import Joi from 'joi';
+import joi from 'joi';
 import { products } from "./products"
-export const ecommerce = Joi.object().keys({
-    currencyCode: Joi.string().min(3).max(3).required(),
-    detail: Joi.object().keys({
-        actionField: Joi.object().keys({
-            list: Joi.string().required().error(() => new Error("The action field must have a list property that contains a string.")),
-            action: Joi.string().required(),
+export const ecommerce = joi.object().keys({
+    currencyCode: joi.string().min(3).max(3).required(),
+    detail: joi.object().keys({
+        actionField: joi.object().keys({
+            list: joi.string().required().error(() => new Error("The action field must have a list property that contains a string.")),
+            action: joi.string().required(),
         }).required(),
         products: products
     }).required()

@@ -1,4 +1,4 @@
-import Joi from "joi";
+import joi from "joi";
 export const getEventNameSchema = function (eventName) {
-    return Joi.string().valid(eventName).required();
+    return joi.string().valid(eventName).required();
 };

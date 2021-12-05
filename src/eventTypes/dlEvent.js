@@ -1,52 +1,58 @@
 import { Logger } from "../logger";
 import { getEventNameSchema } from "../schemas/event";
 import { eventId } from "../schemas/eventId.js";
-import Joi from "joi";
+import joi from "joi";
 
 export class DLEvent {
     constructor(dataLayerObject) {
         this.dataLayerObject = dataLayerObject;
-        this.verified = false;
-        this.errors;
-        this.verificationSummary;
-        this.valid;
+        this._verified = false;
+        this._errors;
+        this._verificationSummary;
+        this._isValid;
     }
 
     verify(schemas, eventName) {
-        if (this.verified === true)
+        if (this._verified === true)
             throw new Error("Can't call verify more than once.");
-        const dlEventSchema = Joi.object().keys({
+        const dlEventSchema = joi.object().keys({
             event: getEventNameSchema(eventName),
             event_id: eventId,
             ...schemas,
         });
         const validation = dlEventSchema.validate(this.dataLayerObject, {
             abortEarly: false,
+            allowUnknown: true
         });
 
         if (validation.error) {
-            this.valid = false;
-            this.error = validation.error;
+            this._isValid = false;
+            this._errors = validation.error;
+            this._verificationSummary = `${eventName} event with event_id ${this.dataLayerObject.event_id} is invalid`
         } else {
-            this.valid = true;
-            this.verificationSummary = `${eventName} event with event_id: ${this.dataLayerObject.event_id} is valid.`
+            this._isValid = true;
+            this._verificationSummary = `${eventName} event with event_id: ${this.dataLayerObject.event_id} is valid.`
         }
         return validation;
     }
 
     getErrors() {
-        return this.errors;
+        return this._errors;
+    }
+
+    isValid() {
+        return this._isValid;
     }
 
     getVerificationSummary() {
-        return this.verificationSummary;
+        return this._verificationSummary;
     }
 
     logVerificationOutcome(messages) {
-        this.errors = messages;
+        this._errors = messages;
         // Log details in console
-        Logger.logToToast(this.verificationSummary);
+        Logger.logToToast(this._verificationSummary);
         // Log toast
-        Logger.logToConsole(this.errors, this.verificationSummary);
+        Logger.logToConsole(this._errors, this._verificationSummary);
     }
 }
