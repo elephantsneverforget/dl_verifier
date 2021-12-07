@@ -33,5 +33,5 @@ export const products = joi
     .min(1)
     .required()
     .messages({
-        "any.required": `"ecommerce" is a required field on object.`,
+        "any.required": `You must have at least one product in the "products" array.`,
     });

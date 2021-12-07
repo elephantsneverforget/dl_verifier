@@ -4,10 +4,9 @@ const config = {
     input: 'src/index.js',
     output: {
         file: 'dist/main.js',
-        format: 'esm',
     },
     plugins: [
-        // babel({ babelHelpers: 'bundled' }),
+        babel({ babelHelpers: 'bundled' }),
     ],
 };
 

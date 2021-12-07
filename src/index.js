@@ -6,6 +6,8 @@
 }
 
 import { DLEventViewItem } from "./eventTypes/dlEventViewItem.js";
+export { DLEventViewItem };
+export { evaluateDLEvent };
 
 function evaluateDLEvent(dlEventId) {
   const dlEventObect = window.dataLayer.find(
@@ -13,8 +15,9 @@ function evaluateDLEvent(dlEventId) {
   );
   const dlEventName = dlEventObect.event;
   if (dlEventName in dlEventMap) {
-    const dlEvent = dlEventMap[dlEventName](dlEventObect);
+    const dlEvent = new dlEventMap[dlEventName](dlEventObect);
     dlEvent.verify();
+    dlEvent.logVerificationOutcome();
   } else {
     console.log("Event name: " + dlEventName + " not in available data layer verifiers");
   }

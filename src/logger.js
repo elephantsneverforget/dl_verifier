@@ -4,7 +4,7 @@ export class Logger {
             "%c" + verificationSummary,
             "background-color: #e0005a ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
         );
-        errors.forEach(error => console.log(error))
+        if (errors) errors.forEach(error => console.log(error))
         console.groupEnd();
     }
 

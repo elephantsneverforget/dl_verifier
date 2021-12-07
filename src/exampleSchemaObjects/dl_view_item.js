@@ -10,8 +10,8 @@ export const dl_view_item_schema_example = {
             },
             "products": [
                 {
-                    "id": "CHESS-SET",
-                    "name": "Arena Chess",
+                    "id": "CHESS-SET", // SKU
+                    "name": "Gold Chess Set",
                     "brand": "Chess Inc.",
                     "category": "Games",
                     "variant": "Large Board",

@@ -16,9 +16,11 @@ describe("dl_view_item shape verifier", () => {
 
 describe("dl_view_item invalid creates errors", () => {
     test("A improperly formatted object throws errors", () => {
-        const dlEventViewItem = new DLEventViewItem({ecommerce: {}, event: 'dl_view_item', event_id: 'lkjalkjasl'});
+        const dlEventViewItem = new DLEventViewItem({ecommerce: { detail: {}}, });
         dlEventViewItem.verify();
+        console.log(dlEventViewItem.getErrors());
         expect(dlEventViewItem.getErrors()).toBeDefined();
+        console.log(dlEventViewItem.getErrors());
         expect(dlEventViewItem.isValid()).toBe(false);
         expect(dlEventViewItem.getVerificationSummary()).toContain('invalid');
     });

@@ -1,5 +1,5 @@
-import { Logger } from "../logger";
-import { getEventNameSchema } from "../schemas/event";
+import { Logger } from "../logger.js";
+import { getEventNameSchema } from "../schemas/event.js";
 import { eventId } from "../schemas/eventId.js";
 import joi from "joi";
 
@@ -48,8 +48,7 @@ export class DLEvent {
         return this._verificationSummary;
     }
 
-    logVerificationOutcome(messages) {
-        this._errors = messages;
+    logVerificationOutcome() {
         // Log details in console
         Logger.logToToast(this._verificationSummary);
         // Log toast
