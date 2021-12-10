@@ -1,5 +1,5 @@
 import { DLEvent } from "./dlEvent.js";
-import { ecommerce } from "../schemas/ecommerce.js";
+import { ecommerce } from "../schemas.js";
 import { dl_view_item_schema_example } from "../exampleSchemaObjects/dl_view_item.js";
 export class DLEventViewItem extends DLEvent {
     constructor(dataLayerObject) {

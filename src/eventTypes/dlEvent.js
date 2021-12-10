@@ -1,6 +1,6 @@
 import { Logger } from "../logger.js";
-import { getEventNameSchema } from "../schemas/event.js";
-import { eventId } from "../schemas/eventId.js";
+import { getEventNameSchema } from "../schemas.js";
+import { eventId } from "../schemas.js";
 import joi from "joi";
 
 export class DLEvent {
