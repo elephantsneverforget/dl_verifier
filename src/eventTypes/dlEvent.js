@@ -6,14 +6,14 @@ import joi from "joi";
 export class DLEvent {
     constructor(dataLayerObject) {
         this.dataLayerObject = dataLayerObject;
-        this._verified = false;
+        this._verificationRun = false;
         this._errors;
         this._verificationSummary;
         this._isValid;
     }
 
     verify(schemas, eventName) {
-        if (this._verified === true)
+        if (this._verificationRun === true)
             throw new Error("Can't call verify more than once.");
         const dlEventSchema = joi.object().keys({
             event: getEventNameSchema(eventName),

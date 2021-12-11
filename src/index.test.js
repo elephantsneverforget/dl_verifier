@@ -16,7 +16,7 @@ describe("dl_view_item shape verifier", () => {
 
 describe("dl_view_item invalid creates errors", () => {
     test("A improperly formatted object throws errors", () => {
-        const dlEventViewItem = new DLEventViewItem({ecommerce: { detail: {}}, });
+        const dlEventViewItem = new DLEventViewItem({});
         dlEventViewItem.verify();
         console.log(dlEventViewItem.getErrors());
         expect(dlEventViewItem.getErrors()).toBeDefined();
