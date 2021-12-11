@@ -28,6 +28,9 @@ export const products = joi
             price: joi.string().required().messages({
                 "any.required": `"price" is a required field on the ecommerce object.`,
             }),
+            inventory: joi.string().messages({
+                "any.required": `"inventory" is an optional field on the ecommerce object.`,
+            }),
         }) // Must match
     )
     .min(1)
@@ -40,26 +43,93 @@ export const eventId = joi.string().min(7).required().messages({
     "any.required": `"event_id" is a required field. It should be a UUID like value.`,
 });
 
+export const cartTotal = joi.string().min(2).required().messages({
+    "any.required": `"cart_total" is a required field. It should contain the total value of the cart.`,
+});
+
 export const getEventNameSchema = function (eventName) {
     return joi.string().valid(eventName).required().messages({
-        "any.required": `"event" is a required field on the data layer object and should contain and event name such as dl_view_item, dl_add_to_cart etc...`, })
+        "any.required": `"event" is a required field on the data layer object and should contain and event name such as dl_view_item, dl_add_to_cart etc...`,
+    });
 };
 
-export const ecommerce = joi.object().keys({
-    currencyCode: joi.string().min(3).max(3).required().messages({
-        "any.required": `"currencyCode" is a required field on the ecommerce object and should contain a currency code such as "USD".`,
-    }),
-    detail: joi.object().keys({
-        actionField: joi.object().keys({
-            list: joi.string().required().messages({
-                "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product.`,
+export const ecommerce = (action) => joi
+    .object()
+    .keys({
+        currencyCode: joi.string().min(3).max(3).required().messages({
+            "any.required": `"currencyCode" is a required field on the ecommerce object and should contain a currency code such as "USD".`,
+        }),
+        detail: joi
+            .object()
+            .keys({
+                actionField: actionField(action),
+                products: products,
+            })
+            .required(),
+    })
+    .required()
+    .messages({
+        "any.required": `"ecommerce" is a required field on the data layer object.`,
+    });
+
+export const actionField = (action) => joi
+    .object()
+    .keys({
+        list: joi.string().required().messages({
+            "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product.`,
+        }),
+        action: joi.string().required().messages({
+            "any.required": `"action" is a required field on the actionField object and should contain the string '${action}'`,
+        }),
+    })
+    .required();
+
+export const user_properties_logged_in = joi
+    .object()
+    .keys({
+        visitor_type: joi
+            .string()
+            .pattern(new RegExp("^logged in$"))
+            .required()
+            .messages({
+                "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest".`,
             }),
-            action: joi.string().required().messages({
-                "any.required": `"action" is a required field on the actionField object and should contain the string 'detail'`,
+        customer_id: joi.string().required().messages({
+            "any.required": `"customer_id" is a required field on the user_properties object and should contain the Shopify customer id.`,
+        }),
+        customer_email: joi.string().email().required().messages({
+            "any.required": `"customer_email" is a required field on the user_properties object and should contain the customer email.`,
+        }),
+        customer_order_count: joi.string().email().required().messages({
+            "any.required": `"customer_order_count" is a required field on the user_properties object and should contain the order count for the customer.`,
+        }),
+        customer_total_spent: joi.string().email().required().messages({
+            "any.required": `"customer_total_spent" is a required field on the user_properties object and should contain the total spent by the customer.`,
+        }),
+    })
+    .required()
+    .messages({
+        "any.required": `"user_properties" is a required field on the data layer object`,
+    });
+
+export const user_properties = joi
+    .object()
+    .keys({
+        visitor_type: joi
+            .string()
+            .pattern(new RegExp("^guest$"))
+            .required()
+            .messages({
+                "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest".`,
             }),
-        }).required(),
-        products: products
-    }).required()
-}).required().messages({
-    'any.required': `"ecommerce" is a required field on the data layer object.`
-});
+        user_id: joi.string().required().messages({
+            "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify customer id.`,
+        }),
+        user_consent: joi.string().required().messages({
+            "any.required": `"user_consent" is a required field on the user_properties object and should contain an empty string if not consent is present.`,
+        }),
+    })
+    .required()
+    .messages({
+        "any.required": `"user_properties" is a required field on the data layer object`,
+    });
