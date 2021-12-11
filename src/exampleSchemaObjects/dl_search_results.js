@@ -1,8 +1,11 @@
-export const dl_view_item_list_schema_example = {
-    event: "dl_view_item_list",
-    event_id: "2b0c5796-7abe-4465-8e24-0ffade4699df",
+export const dl_search_results_schema_example = {
+    event: "dl_search_results",
+    event_id: "ee8eb7ca-8db2-4cc6-b875-2398b66b8ffe",
     ecommerce: {
         currencyCode: "USD",
+        actionField: {
+            list: "search results",
+        },
         impressions: [
             {
                 id: "4-AUDUBON-BIRDCALL",

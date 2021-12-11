@@ -1,17 +1,16 @@
-export const dl_add_to_cart_schema_example = {
-    event: "dl_add_to_cart",
-    event_id: "887cb1e5-27ea-47c3-95a3-fdca8299e719",
+export const dl_remove_from_cart_schema_example = {
+    event: "dl_remove_from_cart",
+    event_id: "07df1ccc-7a89-4be2-a863-b0a238080280",
     ecommerce: {
         currencyCode: "USD",
-        add: {
+        remove: {
             actionField: {
                 list: "/collections/puzzles",
-                action: "add",
             },
             products: [
                 {
                     id: "0A-CLUE-BOX",
-                    name: "Clue Puzzle",
+                    name: "Cluebox",
                     brand: "iDVENTURE",
                     category: "Puzzles",
                     variant: null,

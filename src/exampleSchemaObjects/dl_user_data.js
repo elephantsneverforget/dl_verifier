@@ -7,5 +7,4 @@ export const dl_user_data_schema_example = {
         user_consent: "",
         user_id: "208765e8-4f21-4168-bd20-cb799e0afddd",
     },
-    "gtm.uniqueEventId": 6,
 };

@@ -17,3 +17,20 @@ export class DLEventViewItem extends DLEvent {
         );
     }
 }
+
+export class DLEventAddToCart extends DLEvent {
+    constructor(dataLayerObject) {
+        super(dataLayerObject);
+        this.schemaExample = dl_add_to_cart_schema_example;
+    }
+
+    // Add anything additional to 'event_id' and 'event' that requires verification.
+    verify() {
+        return super.verify(
+            {
+                ecommerce: ecommerce,
+            },
+            "dl_add_to_cart"
+        );
+    }
+}

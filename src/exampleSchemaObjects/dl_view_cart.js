@@ -1,8 +1,12 @@
-export const dl_view_item_list_schema_example = {
-    event: "dl_view_item_list",
-    event_id: "2b0c5796-7abe-4465-8e24-0ffade4699df",
+export const dl_view_cart_schema_example = {
+    event: "dl_view_cart",
+    event_id: "e06ba901-57c9-41ee-89f0-28ea91258230",
+    cart_total: "26.99",
     ecommerce: {
         currencyCode: "USD",
+        actionField: {
+            list: "Shopping Cart",
+        },
         impressions: [
             {
                 id: "4-AUDUBON-BIRDCALL",
@@ -10,10 +14,11 @@ export const dl_view_item_list_schema_example = {
                 brand: "American Bird Products, Inc.",
                 category: "Toys",
                 price: "8.0",
-                position: 9,
+                position: 0,
                 list: "/collections/toys",
                 product_id: "4400067903625",
                 variant_id: "31410300551305",
+                quantity: 1,
             },
             {
                 id: "5-FLIPBOOK-KIT-BLANK",
@@ -21,22 +26,12 @@ export const dl_view_item_list_schema_example = {
                 brand: "Art of Play",
                 category: "Toys",
                 price: "35.0",
-                position: 10,
+                position: 1,
                 list: "/collections/toys",
                 product_id: "7846286032",
                 variant_id: "41275883683992",
+                quantity: 2,
             },
-            {
-                id: "5-MYSTERY-TOP",
-                name: "Mystery Top",
-                brand: "Art of Play",
-                category: "Toys",
-                price: "12.0",
-                position: 11,
-                list: "/collections/toys",
-                product_id: "1856914849850",
-                variant_id: "18298859880506",
-            }
         ],
     },
 };
