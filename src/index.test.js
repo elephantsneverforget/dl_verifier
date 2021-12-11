@@ -8,7 +8,7 @@ describe("dl_view_item shape verifier", () => {
     test("A properly formatted object should not throw any errors", () => {
         const dlEventViewItem = new DLEventViewItem(dl_view_item_schema_example);
         dlEventViewItem.verify();
-        expect(dlEventViewItem.getErrors()).toBeUndefined();
+        expect(dlEventViewItem.getErrors()).toHaveLength(0);
         expect(dlEventViewItem.isValid()).toBe(true);
         expect(dlEventViewItem.getVerificationSummary()).toContain('valid');
     });

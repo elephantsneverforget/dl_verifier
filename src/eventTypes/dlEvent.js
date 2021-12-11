@@ -7,19 +7,21 @@ export class DLEvent {
     constructor(dataLayerObject) {
         this.dataLayerObject = dataLayerObject;
         this._verificationRun = false;
-        this._errors;
+        this._errors = [];
         this._verificationSummary;
         this._isValid;
     }
 
     verify(schemas, eventName) {
         if (this._verificationRun === true)
-            throw new Error("Can't call verify more than once.");
-        const dlEventSchema = joi.object().keys({
+            throw new Error("Can't call verify more than once on the same object.");
+
+        const dlEventSchema = joi.object({
             event: getEventNameSchema(eventName),
             event_id: eventId,
             ...schemas,
         });
+
         const validation = dlEventSchema.validate(this.dataLayerObject, {
             abortEarly: false,
             allowUnknown: true
