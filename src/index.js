@@ -5,17 +5,19 @@
     /* <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script> */
 }
 
-import { DLEventViewItem } from "./eventTypes/dlEventViewItem.js";
-export { DLEventViewItem };
-export { evaluateDLEvent };
+import {
+    DLEventViewItem,
+    DLEventAddToCart,
+} from "./eventTypes/dlEventViewItem.js";
+export { DLEventViewItem, DLEventAddToCart, evaluateDLEvent };
 
 function evaluateDLEvent(dlEvent) {
     const dlEventName = dlEvent.event;
     const dlEventMap = {
         dl_view_item: DLEventViewItem,
-        // 'dl_add_to_cart': DLAddToCart,
+        dl_add_to_cart: DLEventAddToCart,
     };
-    if (typeof dlEvent !== 'object') return;
+    if (typeof dlEvent !== "object") return;
     if (dlEventName in dlEventMap) {
         const dlEvent = new dlEventMap[dlEventName](dlEvent);
         dlEvent.verify();

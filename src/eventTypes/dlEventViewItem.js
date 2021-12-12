@@ -13,7 +13,7 @@ export class DLEventViewItem extends DLEvent {
     verify() {
         return super.verify(
             {
-                ecommerce: ecommerce('detail'),
+                ecommerce: ecommerce('detail', 'detail'),
             },
             "dl_view_item"
         );
@@ -30,7 +30,7 @@ export class DLEventAddToCart extends DLEvent {
     verify() {
         return super.verify(
             {
-                ecommerce: ecommerce('add'),
+                ecommerce: ecommerce('add', 'add'),
             },
             "dl_add_to_cart"
         );

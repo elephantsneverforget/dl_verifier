@@ -1,3 +1,4 @@
+// This file contains all schemas to check dl items against.
 import joi from "joi";
 export const products = joi
     .array()
@@ -23,7 +24,8 @@ export const products = joi
                 "any.required": `"category" is a required field on the ecommerce object.`,
             }),
             variant: joi.string().required().messages({
-                "any.required": `"variant" is a required field on the ecommerce object.`,
+                "string.base": `"variant" should be a descriptive name of the product variant.`,
+                "any.required": `"variant" is a required field on the ecommerce object.`
             }),
             price: joi.string().required().messages({
                 "any.required": `"price" is a required field on the ecommerce object.`,
@@ -53,13 +55,13 @@ export const getEventNameSchema = function (eventName) {
     });
 };
 
-export const ecommerce = (action) => joi
+export const ecommerce = (action, property) => joi
     .object()
     .keys({
         currencyCode: joi.string().min(3).max(3).required().messages({
             "any.required": `"currencyCode" is a required field on the ecommerce object and should contain a currency code such as "USD".`,
         }),
-        detail: joi
+        [property]: joi
             .object()
             .keys({
                 actionField: actionField(action),
@@ -97,13 +99,13 @@ export const user_properties_logged_in = joi
         customer_id: joi.string().required().messages({
             "any.required": `"customer_id" is a required field on the user_properties object and should contain the Shopify customer id.`,
         }),
-        customer_email: joi.string().email().required().messages({
+        customer_email: joi.string().required().messages({
             "any.required": `"customer_email" is a required field on the user_properties object and should contain the customer email.`,
         }),
-        customer_order_count: joi.string().email().required().messages({
+        customer_order_count: joi.string().required().messages({
             "any.required": `"customer_order_count" is a required field on the user_properties object and should contain the order count for the customer.`,
         }),
-        customer_total_spent: joi.string().email().required().messages({
+        customer_total_spent: joi.string().required().messages({
             "any.required": `"customer_total_spent" is a required field on the user_properties object and should contain the total spent by the customer.`,
         }),
     })
