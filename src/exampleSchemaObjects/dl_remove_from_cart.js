@@ -13,7 +13,7 @@ export const dl_remove_from_cart_schema_example = {
                     name: "Cluebox",
                     brand: "iDVENTURE",
                     category: "Puzzles",
-                    variant: null,
+                    variant: "Clue puzzle size large",
                     price: "40",
                     quantity: "1",
                     list: "/collections/puzzles",

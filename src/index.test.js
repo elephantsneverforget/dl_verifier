@@ -1,10 +1,11 @@
 /**
  * @jest-environment jsdom
  */
-import { DLEventViewItem, DLEventAddToCart, DLBeginCheckout } from "./eventTypes/dlEventViewItem.js";
+import { DLEventViewItem, DLEventAddToCart, DLBeginCheckout, DLEventRemoveFromCart} from "./eventTypes/dlEventViewItem.js";
 import { dl_view_item_schema_example } from "./exampleSchemaObjects/dl_view_item.js";
 import { dl_add_to_cart_schema_example } from "./exampleSchemaObjects/dl_add_to_cart.js";
 import { dl_begin_checkout_schema_example } from "./exampleSchemaObjects/dl_begin_checkout.js"
+import { dl_remove_from_cart_schema_example } from "./exampleSchemaObjects/dl_remove_from_cart.js";
 
 describe("dl_view_item shape verifier", () => {
     test("A properly formatted dl_view_item object should not throw any errors", () => {
@@ -57,4 +58,24 @@ describe("dl_begin_checkout shape verifier", () => {
         expect(dlEventViewItem.isValid()).toBe(false);
         expect(dlEventViewItem.getVerificationSummary()).toContain("invalid");
     });
+});
+
+describe("dl_remove_from_cart shape verifier", () => {
+    test("A properly formatted dl_remove_from_cart object should not throw any errors", () => {
+        const dlEventRemoveFromCart = new DLEventRemoveFromCart(
+            dl_remove_from_cart_schema_example
+        );
+        dlEventRemoveFromCart.verify();
+        expect(dlEventRemoveFromCart.verify).toThrow(Error);
+        expect(dlEventRemoveFromCart.getErrors()).toHaveLength(0);
+        expect(dlEventRemoveFromCart.isValid()).toBe(true);
+        expect(dlEventRemoveFromCart.getVerificationSummary()).toContain("valid");
+    });
+    // test("A improperly formatted object throws errors", () => {
+    //     const dlEventViewItem = new DLEventViewItem({});
+    //     dlEventViewItem.verify();
+    //     expect(dlEventViewItem.getErrors()).toBeDefined();
+    //     expect(dlEventViewItem.isValid()).toBe(false);
+    //     expect(dlEventViewItem.getVerificationSummary()).toContain("invalid");
+    // });
 });
