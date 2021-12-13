@@ -55,16 +55,17 @@ export const getEventNameSchema = function (eventName) {
     });
 };
 
-export const ecommerce = (action, property) => joi
+
+export const ecommerce = (conts) => joi
     .object()
     .keys({
         currencyCode: joi.string().min(3).max(3).required().messages({
             "any.required": `"currencyCode" is a required field on the ecommerce object and should contain a currency code such as "USD".`,
         }),
-        [property]: joi
+        [conts['ecommerceField']]: joi
             .object()
             .keys({
-                actionField: actionField(action),
+                actionField: actionField(conts['action']),
                 products: products,
             })
             .required(),
