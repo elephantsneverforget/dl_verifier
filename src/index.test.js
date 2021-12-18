@@ -51,12 +51,18 @@ describe("dl_begin_checkout shape verifier", () => {
         expect(dlEventBeginCheckout.isValid()).toBe(true);
         expect(dlEventBeginCheckout.getVerificationSummary()).toContain("valid");
     });
-    test("A improperly formatted object throws errors", () => {
-        const dlEventViewItem = new DLEventViewItem({});
-        dlEventViewItem.verify();
-        expect(dlEventViewItem.getErrors()).toBeDefined();
-        expect(dlEventViewItem.isValid()).toBe(false);
-        expect(dlEventViewItem.getVerificationSummary()).toContain("invalid");
+});
+
+describe("dl_remove_from_cart shape verifier", () => {
+    test("A properly formatted dl_remove_from_cart object should not throw any errors", () => {
+        const dlEventRemoveFromCart = new DLEventRemoveFromCart(
+            dl_remove_from_cart_schema_example
+        );
+        dlEventRemoveFromCart.verify();
+        expect(dlEventRemoveFromCart.verify).toThrow(Error);
+        expect(dlEventRemoveFromCart.getErrors()).toHaveLength(0);
+        expect(dlEventRemoveFromCart.isValid()).toBe(true);
+        expect(dlEventRemoveFromCart.getVerificationSummary()).toContain("valid");
     });
 });
 
@@ -71,11 +77,4 @@ describe("dl_remove_from_cart shape verifier", () => {
         expect(dlEventRemoveFromCart.isValid()).toBe(true);
         expect(dlEventRemoveFromCart.getVerificationSummary()).toContain("valid");
     });
-    // test("A improperly formatted object throws errors", () => {
-    //     const dlEventViewItem = new DLEventViewItem({});
-    //     dlEventViewItem.verify();
-    //     expect(dlEventViewItem.getErrors()).toBeDefined();
-    //     expect(dlEventViewItem.isValid()).toBe(false);
-    //     expect(dlEventViewItem.getVerificationSummary()).toContain("invalid");
-    // });
 });

@@ -11,22 +11,22 @@ import {
 } from "./eventTypes/dlEventViewItem.js";
 export { DLEventViewItem, DLEventAddToCart, evaluateDLEvent };
 
-function evaluateDLEvent(dlEvent) {
-    const dlEventName = dlEvent.event;
+function evaluateDLEvent(dlEventObject) {
+    const dlEventName = dlEventObject.event;
     const dlEventMap = {
         dl_view_item: DLEventViewItem,
         dl_add_to_cart: DLEventAddToCart,
     };
-    if (typeof dlEvent !== "object") return;
+    if (typeof dlEventObject !== "object") return;
     if (dlEventName in dlEventMap) {
-        const dlEvent = new dlEventMap[dlEventName](dlEvent);
+        const dlEvent = new dlEventMap[dlEventName](dlEventObject);
         dlEvent.verify();
-        dlEvent.logVerificationOutcome();
+        dlEvent.logVerificationOutcome()
     } else {
-        console.log(
-            "Event name: " +
-                dlEventName +
-                " not in available data layer verifiers"
-        );
+        // console.log(
+        //     "Event name: " +
+        //         dlEventName +
+        //         " not in available data layer verifiers"
+        // );
     }
 }
