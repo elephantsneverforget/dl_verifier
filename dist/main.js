@@ -1,30 +1,37 @@
-import joi from 'joi';
+import joi from "joi";
 
 class Logger {
     static logToConsole(errors, verificationSummary) {
-        console.group(
-            "%c" + verificationSummary,
-            "background-color: #e0005a ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
-        );
-        if (errors) errors.forEach(error => console.log(error));
-        console.groupEnd();
+        if (!errors) {
+            console.log(
+                "%c" + verificationSummary,
+                "background-color: #e0005a ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
+            );
+        } else {
+            console.group(
+                "%c" + verificationSummary,
+                "background-color: #e0005a ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
+            );
+            errors.forEach((error) => console.log(error));
+            console.groupEnd();
+        }
     }
 
     // static logToToast(message) {
-        // Toastify({
-        //     text: message,
-        //     // duration: 5000,
-        //     destination: "https://github.com/apvarun/toastify-js",
-        //     newWindow: true,
-        //     close: true,
-        //     gravity: "top", // `top` or `bottom`
-        //     position: "left", // `left`, `center` or `right`
-        //     stopOnFocus: true, // Prevents dismissing of toast on hover
-        //     style: {
-        //         background: "linear-gradient(to right, #00b09b, #96c93d)",
-        //     },
-        //     onClick: function () { } // Callback after click
-        // }).showToast();
+    // Toastify({
+    //     text: message,
+    //     // duration: 5000,
+    //     destination: "https://github.com/apvarun/toastify-js",
+    //     newWindow: true,
+    //     close: true,
+    //     gravity: "top", // `top` or `bottom`
+    //     position: "left", // `left`, `center` or `right`
+    //     stopOnFocus: true, // Prevents dismissing of toast on hover
+    //     style: {
+    //         background: "linear-gradient(to right, #00b09b, #96c93d)",
+    //     },
+    //     onClick: function () { } // Callback after click
+    // }).showToast();
     // }
 }
 
@@ -91,7 +98,7 @@ const ecommerce = (conts) =>
             currencyCode: joi.string().min(3).max(3).required().messages({
                 "any.required": `"currencyCode" is a required field on the ecommerce object and should contain a currency code such as "USD".`,
             }),
-            [conts["ecommerceSubField"]]: joi
+            [conts["ecommerceSubFieldWrapper"]]: joi
                 .object()
                 .keys({
                     actionField: actionField(conts["actionField"]),
@@ -115,8 +122,7 @@ const actionField = (action) =>
         .keys({ ...action })
         .required();
 
-joi
-    .object()
+joi.object()
     .keys({
         visitor_type: joi
             .string()
@@ -143,8 +149,7 @@ joi
         "any.required": `"user_properties" is a required field on the data layer object`,
     });
 
-joi
-    .object()
+joi.object()
     .keys({
         visitor_type: joi
             .string()
@@ -176,7 +181,9 @@ class DLEvent {
 
     verify(schemas, eventName) {
         if (this._verificationhasBeenRun === true)
-            throw new Error("Can't call verify more than once on the same object.");
+            throw new Error(
+                "Can't call verify more than once on the same object."
+            );
         const dlEventSchema = joi.object({
             event: getEventNameSchema(eventName),
             event_id: eventId,
@@ -185,7 +192,7 @@ class DLEvent {
 
         const validation = dlEventSchema.validate(this.dataLayerObject, {
             abortEarly: false,
-            allowUnknown: true
+            allowUnknown: true,
         });
 
         if (validation.error) {
@@ -320,7 +327,6 @@ class DLEventAddToCart extends DLEvent {
         );
     }
 }
-
 
 function ecommerceFactory(subField, fields) {
     return {

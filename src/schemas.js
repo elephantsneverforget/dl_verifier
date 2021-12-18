@@ -1,5 +1,43 @@
 // This file contains all schemas to check dl items against.
 import joi from "joi";
+
+export const impressions = joi
+    .array()
+    .items(
+        joi.object({
+            name: joi.string().min(1).required(),
+            id: joi.string().min(2).required().messages({
+                "any.required": `"id" is a required field on the impressions array constituent objects and should represent the product SKU`,
+            }),
+            product_id: joi.string().min(5).required().messages({
+                "any.required": `"product_id" is a required field on the impressions array constituent objects and should represent the product ID.`,
+            }),
+            variant_id: joi.string().min(2).required().messages({
+                "any.required": `"product_id" is a required field on the impressions array constituent objects and should represent the Shopify variant ID.`,
+            }),
+            brand: joi.string().required().messages({
+                "any.required": `"brand" is a required field on the impressions array constituent objects.`,
+            }),
+            category: joi.string().required().messages({
+                "any.required": `"category" is a required field on the impressions array constituent objects.`,
+            }),
+            price: joi.string().required().messages({
+                "any.required": `"price" is a required field on the impressions array constituent objects.`,
+            }),
+            position: joi.number().required().messages({
+                "any.required": `"position" is a required field on the impressions array constituent objects. It should contain the position in the list for each array element. For example, the first element should be have the value 1(integer), the next, 2 etc...`,
+            }),
+            list: joi.string().required().messages({
+                "any.required": `"list" is a required field on the impressions array constituent objects. It should contain the path to the collection. For example "/collections/toys"`,
+            }),
+        }) // Must match
+    )
+    .min(1)
+    .required()
+    .messages({
+        "any.required": `You must have at least one product in the "impressions" array.`,
+    });
+
 export const products = joi
     .array()
     .items(
@@ -62,13 +100,30 @@ export const ecommerce = (conts) =>
             currencyCode: joi.string().min(3).max(3).required().messages({
                 "any.required": `"currencyCode" is a required field on the ecommerce object and should contain a currency code such as "USD".`,
             }),
-            [conts["ecommerceSubField"]]: joi
+            [conts["ecommerceSubFieldWrapper"]]: joi
                 .object()
                 .keys({
                     actionField: actionField(conts["actionField"]),
                     products: products,
                 })
                 .required(),
+        })
+        .required()
+        .messages({
+            "any.required": `"ecommerce" is a required field on the data layer object.`,
+        });
+
+export const ecommerceWithoutWrapper = (actionField) =>
+    joi
+        .object()
+        .keys({
+            currencyCode: joi.string().min(3).max(3).required().messages({
+                "any.required": `"currencyCode" is a required field on the ecommerce object and should contain a currency code such as "USD".`,
+            }),
+            ...(actionField && {
+                actionField: actionField,
+            }),
+            impressions: impressions,
         })
         .required()
         .messages({
