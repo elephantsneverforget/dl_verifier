@@ -8,20 +8,30 @@
 import {
     DLEventViewItem,
     DLEventAddToCart,
+    DLEventBeginCheckout,
+    DLEventRemoveFromCart,
 } from "./eventTypes/dlEventViewItem.js";
-export { DLEventViewItem, DLEventAddToCart, evaluateDLEvent };
+export {
+    DLEventViewItem,
+    DLEventAddToCart,
+    DLEventBeginCheckout,
+    DLEventRemoveFromCart,
+    evaluateDLEvent,
+};
 
 function evaluateDLEvent(dlEventObject) {
     const dlEventName = dlEventObject.event;
     const dlEventMap = {
-        dl_view_item: DLEventViewItem,
         dl_add_to_cart: DLEventAddToCart,
+        dl_begin_checkout: DLEventBeginCheckout,
+        dl_view_item: DLEventViewItem,
+        dl_remove_from_cart: DLEventRemoveFromCart,
     };
     if (typeof dlEventObject !== "object") return;
     if (dlEventName in dlEventMap) {
         const dlEvent = new dlEventMap[dlEventName](dlEventObject);
         dlEvent.verify();
-        dlEvent.logVerificationOutcome()
+        dlEvent.logVerificationOutcome();
     } else {
         // console.log(
         //     "Event name: " +

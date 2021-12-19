@@ -4,6 +4,7 @@ import {
     stringSchema,
     ecommerceWithoutWrapper,
     cartTotal,
+    userProperties,
 } from "../schemas.js";
 import { dl_view_item_schema_example } from "../exampleSchemaObjects/dl_view_item.js";
 import { dl_add_to_cart_schema_example } from "../exampleSchemaObjects/dl_add_to_cart.js";
@@ -12,7 +13,22 @@ import { dl_remove_from_cart_schema_example } from "../exampleSchemaObjects/dl_r
 import { dl_search_results_schema_example } from "../exampleSchemaObjects/dl_search_results.js";
 import { dl_view_cart_schema_example } from "../exampleSchemaObjects/dl_view_cart.js";
 import { dl_view_item_list_schema_example } from "../exampleSchemaObjects/dl_view_item_list.js";
+import { dl_select_item_schema_example } from "../exampleSchemaObjects/dl_select_item.js";
+import { dl_user_data } from "../exampleSchemaObjects/dl_user_data.js";
 
+export class DLEventUserData extends DLEvent {
+    constructor(dataLayerObject) {
+        super(dataLayerObject);
+        this.schemaExample = dl_user_data;
+    }
+
+    verify() {
+        return super.verify(
+            { cart_total: cartTotal, user_properties: userProperties },
+            "dl_user_data"
+        );
+    }
+}
 export class DLEventViewItem extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
@@ -55,7 +71,7 @@ export class DLEventAddToCart extends DLEvent {
     }
 }
 
-export class DLBeginCheckout extends DLEvent {
+export class DLEventBeginCheckout extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this._schemaExample = dl_begin_checkout_schema_example;
@@ -90,6 +106,27 @@ export class DLEventRemoveFromCart extends DLEvent {
                 ),
             }),
             "dl_remove_from_cart"
+        );
+    }
+}
+
+export class DLEventSelectItem extends DLEvent {
+    constructor(dataLayerObject) {
+        super(dataLayerObject);
+        this._schemaExample = dl_select_item_schema_example;
+    }
+
+    verify() {
+        super.verify(
+            ecommerceFactory("click", {
+                list: stringSchema(
+                    `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`
+                ),
+                action: stringSchema(
+                    `"action" is a required field on the actionField object and should contain the string "click"`
+                ),
+            }),
+            "dl_select_item"
         );
     }
 }

@@ -4,11 +4,13 @@
 import {
     DLEventViewItem,
     DLEventAddToCart,
-    DLBeginCheckout,
+    DLEventBeginCheckout,
     DLEventRemoveFromCart,
     DLEventSearchResults,
     DLEventViewCart,
     DLEventViewItemList,
+    DLEventSelectItem,
+    DLEventUserData,
 } from "./eventTypes/dlEventViewItem.js";
 import { dl_view_item_schema_example } from "./exampleSchemaObjects/dl_view_item.js";
 import { dl_add_to_cart_schema_example } from "./exampleSchemaObjects/dl_add_to_cart.js";
@@ -17,6 +19,8 @@ import { dl_remove_from_cart_schema_example } from "./exampleSchemaObjects/dl_re
 import { dl_search_results_schema_example } from "./exampleSchemaObjects/dl_search_results.js";
 import {dl_view_cart_schema_example } from "./exampleSchemaObjects/dl_view_cart.js"
 import { dl_view_item_list_schema_example } from "./exampleSchemaObjects/dl_view_item_list.js";
+import { dl_select_item_schema_example } from "./exampleSchemaObjects/dl_select_item.js";
+import { dl_user_data_schema_example } from "./exampleSchemaObjects/dl_user_data.js";
 
 describe("dl_view_item shape verifier", () => {
     test("A properly formatted dl_view_item object should not throw any errors", () => {
@@ -35,9 +39,7 @@ describe("dl_view_item invalid creates errors", () => {
     test("A improperly formatted object throws errors", () => {
         const dlEventViewItem = new DLEventViewItem({});
         dlEventViewItem.verify();
-        console.log(dlEventViewItem.getErrors());
         expect(dlEventViewItem.getErrors()).toBeDefined();
-        console.log(dlEventViewItem.getErrors());
         expect(dlEventViewItem.isValid()).toBe(false);
         expect(dlEventViewItem.getVerificationSummary()).toContain("invalid");
     });
@@ -57,7 +59,7 @@ describe("dl_add_to_cart shape verifier", () => {
 
 describe("dl_begin_checkout shape verifier", () => {
     test("A properly formatted dl_begin_checkout object should not throw any errors", () => {
-        const dlEventBeginCheckout = new DLBeginCheckout(
+        const dlEventBeginCheckout = new DLEventBeginCheckout(
             dl_begin_checkout_schema_example
         );
         dlEventBeginCheckout.verify();
@@ -159,5 +161,47 @@ describe("dl_view_item_list shape verifier", () => {
         dlEventViewItemList.verify();
         expect(dlEventViewItemList.getErrors()).toBeDefined();
         expect(dlEventViewItemList.isValid()).toBe(false);
+    });
+});
+
+describe("dl_select_item shape verifier", () => {
+    test("A properly formatted dl_select_item object should not throw any errors", () => {
+        const dlEventSelectItem = new DLEventSelectItem(
+            dl_select_item_schema_example
+        );
+        dlEventSelectItem.verify();
+        console.log(dlEventSelectItem.getErrors());
+        expect(dlEventSelectItem.getErrors()).toHaveLength(0);
+        expect(dlEventSelectItem.isValid()).toBe(true);
+        expect(dlEventSelectItem.getVerificationSummary()).toContain("valid");
+    });
+    test("A improperly formatted dl_select_item object should throw errors", () => {
+        const dlEventSelectItem = new DLEventSelectItem(
+            dl_remove_from_cart_schema_example
+        );
+        dlEventSelectItem.verify();
+        expect(dlEventSelectItem.getErrors()).toBeDefined();
+        expect(dlEventSelectItem.isValid()).toBe(false);
+    });
+});
+
+describe("dl_user_data shape verifier", () => {
+    test("A properly formatted dl_user_data object should not throw any errors", () => {
+        const dlEventUserData = new DLEventUserData(
+            dl_user_data_schema_example
+        );
+        dlEventUserData.verify();
+        console.log(dlEventUserData.getErrors());
+        expect(dlEventUserData.getErrors()).toHaveLength(0);
+        expect(dlEventUserData.isValid()).toBe(true);
+        expect(dlEventUserData.getVerificationSummary()).toContain("valid");
+    });
+    test("A improperly formatted dl_select_item object should throw errors", () => {
+        const dlEventUserData = new DLEventUserData(
+            dl_remove_from_cart_schema_example
+        );
+        dlEventUserData.verify();
+        expect(dlEventUserData.getErrors()).toBeDefined();
+        expect(dlEventUserData.isValid()).toBe(false);
     });
 });

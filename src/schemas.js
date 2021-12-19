@@ -52,7 +52,7 @@ export const products = joi
             variant_id: joi.string().min(2).required().messages({
                 "any.required": `"product_id" is a required field on the ecommerce object and should represent the Shopify variant ID.`,
             }),
-            image: joi.string().required().messages({
+            image: joi.string().messages({
                 "any.required": `"image" is a required field on the ecommerce object and should be a valid URL.`,
             }),
             brand: joi.string().required().messages({
@@ -61,7 +61,7 @@ export const products = joi
             category: joi.string().required().messages({
                 "any.required": `"category" is a required field on the ecommerce object.`,
             }),
-            variant: joi.string().required().messages({
+            variant: joi.string().messages({
                 "string.base": `"variant" should be a descriptive name of the product variant.`,
                 "any.required": `"variant" is a required field on the ecommerce object.`,
             }),
@@ -169,7 +169,7 @@ export const user_properties_logged_in = joi
         "any.required": `"user_properties" is a required field on the data layer object`,
     });
 
-export const user_properties = joi
+export const userProperties = joi
     .object()
     .keys({
         visitor_type: joi
@@ -182,8 +182,8 @@ export const user_properties = joi
         user_id: joi.string().required().messages({
             "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify customer id.`,
         }),
-        user_consent: joi.string().required().messages({
-            "any.required": `"user_consent" is a required field on the user_properties object and should contain an empty string if not consent is present.`,
+        user_consent: joi.string().allow("").required().messages({
+            "any.required": `"user_consent" is a required field on the user_properties object and should contain an empty string if no consent is present.`,
         }),
     })
     .required()
