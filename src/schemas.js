@@ -141,12 +141,12 @@ export const actionField = (action) =>
         .keys({ ...action })
         .required();
 
-export const user_properties_logged_in = joi
+export const userPropertiesLoggedIn = joi
     .object()
     .keys({
         visitor_type: joi
             .string()
-            .pattern(new RegExp("^logged in$"))
+            .pattern(new RegExp("^logged_in$"))
             .required()
             .messages({
                 "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest".`,

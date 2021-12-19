@@ -5,6 +5,7 @@ import {
     ecommerceWithoutWrapper,
     cartTotal,
     userProperties,
+    userPropertiesLoggedIn,
 } from "../schemas.js";
 import { dl_view_item_schema_example } from "../exampleSchemaObjects/dl_view_item.js";
 import { dl_add_to_cart_schema_example } from "../exampleSchemaObjects/dl_add_to_cart.js";
@@ -14,12 +15,18 @@ import { dl_search_results_schema_example } from "../exampleSchemaObjects/dl_sea
 import { dl_view_cart_schema_example } from "../exampleSchemaObjects/dl_view_cart.js";
 import { dl_view_item_list_schema_example } from "../exampleSchemaObjects/dl_view_item_list.js";
 import { dl_select_item_schema_example } from "../exampleSchemaObjects/dl_select_item.js";
-import { dl_user_data } from "../exampleSchemaObjects/dl_user_data.js";
+import { dl_user_data_schema_example } from "../exampleSchemaObjects/dl_user_data.js";
+import { dl_login_schema_example } from "../exampleSchemaObjects/dl_login.js";
+import { dl_sign_up_schema_example } from "../exampleSchemaObjects/dl_sign_up.js";
 
 export class DLEventUserData extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
-        this.schemaExample = dl_user_data;
+        this.schemaExample = dl_user_data_schema_example;
+    }
+
+    logVerificationOutcome() {
+        super.logVerificationOutcome("If your user is logged in ensure the user_properties object is using the logged in version with email address, order_count etc...")
     }
 
     verify() {
@@ -29,6 +36,35 @@ export class DLEventUserData extends DLEvent {
         );
     }
 }
+
+export class DLEventLogin extends DLEvent {
+    constructor(dataLayerObject) {
+        super(dataLayerObject);
+        this.schemaExample = dl_login_schema_example;
+    }
+
+    verify() {
+        return super.verify(
+            { user_properties: userPropertiesLoggedIn },
+            "dl_login"
+        );
+    }
+}
+
+export class DLEventSignUp extends DLEvent {
+    constructor(dataLayerObject) {
+        super(dataLayerObject);
+        this.schemaExample = dl_sign_up_schema_example;
+    }
+
+    verify() {
+        return super.verify(
+            { user_properties: userPropertiesLoggedIn },
+            "dl_sign_up"
+        );
+    }
+}
+
 export class DLEventViewItem extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);

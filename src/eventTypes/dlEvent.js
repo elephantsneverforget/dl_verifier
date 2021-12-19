@@ -50,10 +50,10 @@ export class DLEvent {
         return this._verificationSummary;
     }
 
-    logVerificationOutcome() {
+    logVerificationOutcome(additionalText) {
         // Log details in console
         // Logger.logToToast(this._verificationSummary);
         // Log toast
-        Logger.logToConsole(this._errors, this._verificationSummary);
+        Logger.logToConsole(this._errors, this._verificationSummary, additionalText);
     }
 }

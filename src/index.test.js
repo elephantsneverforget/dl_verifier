@@ -11,6 +11,8 @@ import {
     DLEventViewItemList,
     DLEventSelectItem,
     DLEventUserData,
+    DLEventLogin,
+    DLEventSignUp,
 } from "./eventTypes/dlEventViewItem.js";
 import { dl_view_item_schema_example } from "./exampleSchemaObjects/dl_view_item.js";
 import { dl_add_to_cart_schema_example } from "./exampleSchemaObjects/dl_add_to_cart.js";
@@ -21,6 +23,8 @@ import {dl_view_cart_schema_example } from "./exampleSchemaObjects/dl_view_cart.
 import { dl_view_item_list_schema_example } from "./exampleSchemaObjects/dl_view_item_list.js";
 import { dl_select_item_schema_example } from "./exampleSchemaObjects/dl_select_item.js";
 import { dl_user_data_schema_example } from "./exampleSchemaObjects/dl_user_data.js";
+import { dl_login_schema_example } from "./exampleSchemaObjects/dl_login.js";
+import { dl_sign_up_schema_example } from "./exampleSchemaObjects/dl_sign_up.js";
 
 describe("dl_view_item shape verifier", () => {
     test("A properly formatted dl_view_item object should not throw any errors", () => {
@@ -196,12 +200,54 @@ describe("dl_user_data shape verifier", () => {
         expect(dlEventUserData.isValid()).toBe(true);
         expect(dlEventUserData.getVerificationSummary()).toContain("valid");
     });
-    test("A improperly formatted dl_select_item object should throw errors", () => {
+    test("A improperly formatted dl_user_data object should throw errors", () => {
         const dlEventUserData = new DLEventUserData(
             dl_remove_from_cart_schema_example
         );
         dlEventUserData.verify();
         expect(dlEventUserData.getErrors()).toBeDefined();
         expect(dlEventUserData.isValid()).toBe(false);
+    });
+});
+
+describe("dl_login shape verifier", () => {
+    test("A properly formatted dl_login object should not throw any errors", () => {
+        const dlEventLogin = new DLEventLogin(
+            dl_login_schema_example
+        );
+        dlEventLogin.verify();
+        console.log(dlEventLogin.getErrors());
+        expect(dlEventLogin.getErrors()).toHaveLength(0);
+        expect(dlEventLogin.isValid()).toBe(true);
+        expect(dlEventLogin.getVerificationSummary()).toContain("valid");
+    });
+    test("A improperly formatted dl_login object should throw errors", () => {
+        const dlEventLogin = new DLEventLogin(
+            dl_remove_from_cart_schema_example
+        );
+        dlEventLogin.verify();
+        expect(dlEventLogin.getErrors()).toBeDefined();
+        expect(dlEventLogin.isValid()).toBe(false);
+    });
+});
+
+describe("dl_sign_up shape verifier", () => {
+    test("A properly formatted dl_sign_up object should not throw any errors", () => {
+        const dlEventSignUp = new DLEventSignUp(
+            dl_sign_up_schema_example
+        );
+        dlEventSignUp.verify();
+        console.log(dlEventSignUp.getErrors());
+        expect(dlEventSignUp.getErrors()).toHaveLength(0);
+        expect(dlEventSignUp.isValid()).toBe(true);
+        expect(dlEventSignUp.getVerificationSummary()).toContain("valid");
+    });
+    test("A improperly formatted dl_sign_up object should throw errors", () => {
+        const dlEventSignUp = new DLEventSignUp(
+            dl_remove_from_cart_schema_example
+        );
+        dlEventSignUp.verify();
+        expect(dlEventSignUp.getErrors()).toBeDefined();
+        expect(dlEventSignUp.isValid()).toBe(false);
     });
 });
