@@ -1,11 +1,17 @@
 export class Logger {
-    static logToConsole(errors, verificationSummary, additionalText) {
-        if (errors.length > 1) {
+    static logToConsole(errors, verificationSummary, additionalText, dataLayerObject, schemaExample) {
+        if (errors.length > 0) {
             console.group(
-                "%c" + verificationSummary + " " + additionalText,
+                "%c" + verificationSummary,
                 "background-color: #e0005a ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
             );
-            errors.forEach((error) => console.log(error));
+            errors.forEach((error) => console.log(error.message));
+            console.group("Object pushed to datalayer")
+            console.log(dataLayerObject)
+            console.groupEnd()
+            console.group("Reference object with correct shape")
+            console.log(schemaExample)
+            console.groupEnd()
             console.groupEnd();
         } else {
             console.log(

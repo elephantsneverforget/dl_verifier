@@ -173,10 +173,11 @@ export const userProperties = joi
     .object()
     .keys({
         visitor_type: joi
-            .string()
-            .pattern(new RegExp("^guest$"))
+            .any().valid("guest")
+            // .pattern(new RegExp("^guest$"))
             .required()
             .messages({
+                "any.only": `"visitor_type" should be one of "logged in" or "guest".`,
                 "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest".`,
             }),
         user_id: joi.string().required().messages({

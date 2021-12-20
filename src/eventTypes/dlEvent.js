@@ -28,7 +28,7 @@ export class DLEvent {
 
         if (validation.error) {
             this._isValid = false;
-            this._errors = validation.error;
+            this._errors = validation.error.details;
             this._verificationSummary = `${eventName} event with event_id ${this.dataLayerObject.event_id} is invalid`
         } else {
             this._isValid = true;
@@ -54,6 +54,6 @@ export class DLEvent {
         // Log details in console
         // Logger.logToToast(this._verificationSummary);
         // Log toast
-        Logger.logToConsole(this._errors, this._verificationSummary, additionalText);
+        Logger.logToConsole(this._errors, this._verificationSummary, additionalText, this.dataLayerObject, this.schemaExample);
     }
 }
