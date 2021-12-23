@@ -76,7 +76,7 @@ export const products = joi
                 "any.only": `"category" should be a string representing the product's category. For example "Toys".`,
                 "any.required": `"category" is a required field on the ecommerce object.`,
             }),
-            variant: joi.string().messages({
+            variant: joi.string().allow(null).messages({
                 "any.only": `"variant" should be a string representing the product's variant name, for example "Large Shirt".`,
                 "string.base": `"variant" should be a descriptive name of the product variant.`,
                 "any.required": `"variant" is a required field on the ecommerce object.`,

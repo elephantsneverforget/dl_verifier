@@ -15,7 +15,7 @@ export class Logger {
             console.groupEnd();
         } else {
             console.log(
-                "%c" + verificationSummary + " " + additionalText,
+                "%c" + verificationSummary + " " + (additionalText ? additionalText : ""),
                 "background-color: #e0005a ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
             );
         }

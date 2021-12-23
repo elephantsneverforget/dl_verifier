@@ -23,6 +23,11 @@ export class DLEventUserData extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_user_data_schema_example;
+        try {
+            this.loggedIn = dataLayerObject.user_properties.visitor_type === "logged_in";
+        } catch {
+            this.loggedIn = false;
+        }
     }
 
     logVerificationOutcome() {
@@ -31,7 +36,7 @@ export class DLEventUserData extends DLEvent {
 
     verify() {
         return super.verify(
-            { cart_total: cartTotal, user_properties: userProperties },
+            { user_properties: this.loggedIn ? userPropertiesLoggedIn : userProperties},
             "dl_user_data"
         );
     }
@@ -41,11 +46,16 @@ export class DLEventLogin extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_login_schema_example;
+        try {
+            this.loggedIn = dataLayerObject.user_properties.visitor_type === "logged_in";
+        } catch {
+            this.loggedIn = false;
+        }
     }
 
     verify() {
         return super.verify(
-            { user_properties: userPropertiesLoggedIn },
+            { user_properties: this.loggedIn ? userPropertiesLoggedIn : userProperties},
             "dl_login"
         );
     }
@@ -55,11 +65,16 @@ export class DLEventSignUp extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_sign_up_schema_example;
+        try {
+            this.loggedIn = dataLayerObject.user_properties.visitor_type === "logged_in";
+        } catch {
+            this.loggedIn = false;
+        }
     }
 
     verify() {
         return super.verify(
-            { user_properties: userPropertiesLoggedIn },
+            { user_properties: this.loggedIn ? userPropertiesLoggedIn : userProperties},
             "dl_sign_up"
         );
     }
