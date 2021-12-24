@@ -1,6 +1,10 @@
+import { Notyf } from 'notyf';
+
+let notyf = new Notyf();
 export class Logger {
     static logToConsole(errors, verificationSummary, additionalText, dataLayerObject, schemaExample) {
         if (errors.length > 0) {
+            notyf.error({ message: verificationSummary, duration: 0})
             console.group(
                 "%c" + verificationSummary,
                 "background-color: #e0005a ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
@@ -14,27 +18,11 @@ export class Logger {
             console.groupEnd()
             console.groupEnd();
         } else {
+            notyf.success({ message: verificationSummary, duration: 0})
             console.log(
                 "%c" + verificationSummary + " " + (additionalText ? additionalText : ""),
                 "background-color: #e0005a ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
             );
         }
     }
-
-    // static logToToast(message) {
-    // Toastify({
-    //     text: message,
-    //     // duration: 5000,
-    //     destination: "https://github.com/apvarun/toastify-js",
-    //     newWindow: true,
-    //     close: true,
-    //     gravity: "top", // `top` or `bottom`
-    //     position: "left", // `left`, `center` or `right`
-    //     stopOnFocus: true, // Prevents dismissing of toast on hover
-    //     style: {
-    //         background: "linear-gradient(to right, #00b09b, #96c93d)",
-    //     },
-    //     onClick: function () { } // Callback after click
-    // }).showToast();
-    // }
 }
