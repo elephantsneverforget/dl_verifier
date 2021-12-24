@@ -212,7 +212,7 @@ export const userProperties = joi
                 "any.only": `"visitor_type" should be one of "logged in" or "guest".`,
                 "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest".`,
             }),
-        user_id: joi.string().required().messages({
+        user_id: joi.string().messages({
             "any.only": `"user_id" should be the Shopify user ID.`,
             "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify customer id.`,
         }),
