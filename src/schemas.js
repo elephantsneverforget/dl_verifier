@@ -20,11 +20,11 @@ export const impressions = joi
             }),
             brand: joi.string().required().messages({
                 "any.only": `"brand" should be a string representing the product's brand.`,
-                "any.required": `"brand" is a required field on the impressions array constituent objects.`,
+                "any.required": `"brand" is a required field on the impressions array constituent objects. If a brand can't be determined use an empty string.`,
             }),
             category: joi.string().required().messages({
                 "any.only": `"category" should be a string representing the product's category. For example "Toys".`,
-                "any.required": `"category" is a required field on the impressions array constituent objects.`,
+                "any.required": `"category" is a required field on the impressions array constituent objects. This represents the category from which the product is from. A Chess board might have a category of "board_game".`,
             }),
             price: joi.string().required().messages({
                 "any.only": `"price" should be a string representing the product's category price.`,
@@ -36,7 +36,7 @@ export const impressions = joi
             }),
             list: joi.string().required().messages({
                 "any.only": `"list" should be an string representing the collection the product is from, for example "/collections/toys".`,
-                "any.required": `"list" is a required field on the impressions array constituent objects. It should contain the path to the collection. For example "/collections/toys"`,
+                "any.required": `"list" is a required field on the impressions array constituent objects. It should contain the path to the collection to product is from. For example "/collections/toys"`,
             }),
         }) // Must match
     )
@@ -54,30 +54,30 @@ export const products = joi
             name: joi.string().min(1).required(),
             id: joi.string().min(2).required().messages({
                 "any.only": `"id" should be a string representing the Shopify product SKU.`,
-                "any.required": `"id" is a required field on the ecommerce object and should represent the product SKU`,
+                "any.required": `"id" is a required field on the products array constituent objects and should be a string containing the product SKU`,
             }),
             product_id: joi.string().min(5).required().messages({
                 "any.only": `"product_id" should be a string representing the Shopify product ID.`,
-                "any.required": `"product_id" is a required field on the ecommerce object and should represent the product ID.`,
+                "any.required": `"product_id" is a required field on the products array constituent objects and should be a string containing the product ID.`,
             }),
             variant_id: joi.string().min(2).required().messages({
                 "any.only": `"variant_id" should be a string representing the Shopify variant ID.`,
-                "any.required": `"product_id" is a required field on the ecommerce object and should represent the Shopify variant ID.`,
+                "any.required": `"variant_id" is a required field on the products array constituent objects and should represent the Shopify variant ID.`,
             }),
             image: joi.string().messages({
                 "any.only": `"image" should be a URL that links to an image of to product.`,
-                "any.required": `"image" is a required field on the ecommerce object and should be a valid URL.`,
+                "any.required": `"image" is an optional field on the ecommerce object and should be a valid URL.`,
             }),
             brand: joi.string().required().messages({
                 "any.only": `"brand" should be a string representing the product's brand.`,
-                "any.required": `"brand" is a required field on the ecommerce object.`,
+                "any.required": `"brand" is a required field on the products array constituent objects. If a brand can't be determined use an empty string.`,
             }),
             category: joi.string().required().messages({
                 "any.only": `"category" should be a string representing the product's category. For example "Toys".`,
-                "any.required": `"category" is a required field on the ecommerce object.`,
+                "any.required": `"category" is a required field on the products array constituent objects. This represents the category from which the product is from. A Chess board might have a category of "board_game".`,
             }),
             variant: joi.string().allow(null).messages({
-                "any.only": `"variant" should be a string representing the product's variant name, for example "Large Shirt".`,
+                "any.only": `"variant" should be a string representing the product's variant name, for example "Large Shirt", "Blue brush" etc...`,
                 "string.base": `"variant" should be a descriptive name of the product variant.`,
                 "any.required": `"variant" is a required field on the ecommerce object.`,
             }),
@@ -171,12 +171,12 @@ export const userPropertiesLoggedIn = joi
     .object()
     .keys({
         visitor_type: joi
-            .string()
-            .pattern(new RegExp("^logged_in$"))
+            .any()
+            .valid("logged_in")
             .required()
             .messages({
-                "any.only": `"visitor_type" should be one of "logged in" or "guest".`,
-                "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest".`,
+                "any.only": `"visitor_type" should be one of "logged in".`,
+                "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest", depending on whether the user is logged in or not.`,
             }),
         customer_id: joi.string().required().messages({
             "any.only": `"customer_id" should be a string representing the Shopify customer ID.`,
@@ -206,7 +206,6 @@ export const userProperties = joi
     .keys({
         visitor_type: joi
             .any().valid("guest")
-            // .pattern(new RegExp("^guest$"))
             .required()
             .messages({
                 "any.only": `"visitor_type" should be one of "logged in" or "guest".`,
@@ -214,10 +213,10 @@ export const userProperties = joi
             }),
         user_id: joi.string().messages({
             "any.only": `"user_id" should be the Shopify user ID.`,
-            "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify customer id.`,
+            "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify user id.`,
         }),
         user_consent: joi.string().allow("").required().messages({
-            "any.only": `"user_id" should contain the user consent variable from Shopfy. If no value is available use an empty string.`,
+            "any.only": `"user_consent" should contain the user consent variable from Shopfy. If no value is available use an empty string.`,
             "any.required": `"user_consent" is a required field on the user_properties object and should contain an empty string if no consent is present.`,
         }),
     })
