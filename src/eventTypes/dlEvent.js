@@ -6,7 +6,6 @@ import joi from "joi";
 export class DLEvent {
     constructor(dataLayerObject) {
         this.dataLayerObject = dataLayerObject;
-        this._verificationhasBeenRun = false;
         this._errors = [];
         this._verificationSummary;
         this._isValid;
@@ -40,6 +39,10 @@ export class DLEvent {
 
     getErrors() {
         return this._errors;
+    }
+
+    getEventName() {
+        return this._eventName;
     }
 
     isValid() {

@@ -23,6 +23,7 @@ export class DLEventUserData extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_user_data_schema_example;
+        this._eventName = "dl_user_data";
         try {
             this.loggedIn = dataLayerObject.user_properties.visitor_type === "logged_in";
         } catch {
@@ -37,7 +38,7 @@ export class DLEventUserData extends DLEvent {
     verify() {
         return super.verify(
             { user_properties: this.loggedIn ? userPropertiesLoggedIn : userProperties},
-            "dl_user_data"
+            this._eventName,
         );
     }
 }
@@ -46,6 +47,7 @@ export class DLEventLogin extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_login_schema_example;
+        this._eventName = "dl_login";
         try {
             this.loggedIn = dataLayerObject.user_properties.visitor_type === "logged_in";
         } catch {
@@ -56,7 +58,7 @@ export class DLEventLogin extends DLEvent {
     verify() {
         return super.verify(
             { user_properties: this.loggedIn ? userPropertiesLoggedIn : userProperties},
-            "dl_login"
+            this._eventName,
         );
     }
 }
@@ -65,6 +67,7 @@ export class DLEventSignUp extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_sign_up_schema_example;
+        this._eventName = "dl_sign_up";
         try {
             this.loggedIn = dataLayerObject.user_properties.visitor_type === "logged_in";
         } catch {
@@ -75,7 +78,7 @@ export class DLEventSignUp extends DLEvent {
     verify() {
         return super.verify(
             { user_properties: this.loggedIn ? userPropertiesLoggedIn : userProperties},
-            "dl_sign_up"
+            this._eventName
         );
     }
 }
@@ -84,19 +87,24 @@ export class DLEventViewItem extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_view_item_schema_example;
+        this._eventName = "dl_view_item";
     }
 
     verify() {
         return super.verify(
             ecommerceFactory("detail", {
                 list: stringSchema(
-                    `"list" is a required field on the actionField object and should contain the collection path to the product.`
+                    `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`, 
+                    `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
+                    true
                 ),
                 action: stringSchema(
-                    `"action" is a required field on the actionField object and should contain the string "detail"`
+                    `"action" is a required field on the actionField object and should contain the string "detail"`,
+                    `"action" is a required field on the actionField object and should contain the string "detail"`,
+                    true
                 ),
             }),
-            "dl_view_item"
+            this._eventName,
         );
     }
 }
@@ -105,19 +113,24 @@ export class DLEventAddToCart extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_add_to_cart_schema_example;
+        this._eventName = "dl_add_to_cart";
     }
 
     verify() {
         super.verify(
             ecommerceFactory("add", {
                 list: stringSchema(
-                    `"list" is a required field on the actionField object and should contain the collection path to the product.`
+                    `"list" is a required field on the actionField object and should contain the collection path to the product.`,
+                    `"list" is a required field on the actionField object and should contain the collection path to the product.`,
+                    true
                 ),
                 action: stringSchema(
-                    `"action" is a required field on the actionField object and should contain the string "add"`
+                    `"action" is a required field on the actionField object and should contain the string "add"`,
+                    `"action" is a required field on the actionField object and should contain the string "add"`,
+                    false
                 ),
             }),
-            "dl_add_to_cart"
+            this._eventName,
         );
     }
 }
@@ -126,19 +139,24 @@ export class DLEventBeginCheckout extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this._schemaExample = dl_begin_checkout_schema_example;
+        this._eventName = "dl_begin_checkout";
     }
 
     verify() {
         super.verify(
             ecommerceFactory("checkout", {
                 step: stringSchema(
-                    `"step" is a required field on the actionField object and should contain the string "1".`
+                    `"step" is a required field on the actionField object and should contain the string "1".`,
+                    `"step" is a required field on the actionField object and should contain the string "1".`,
+                    false
                 ),
                 action: stringSchema(
-                    `"action" is a required field on the actionField object and should contain the string "checkout"`
+                    `"action" is a required field on the actionField object and should contain the string "checkout"`,
+                    `"action" is a required field on the actionField object and should contain the string "checkout"`,
+                    false
                 ),
             }),
-            "dl_begin_checkout"
+            this._eventName,
         );
     }
 }
@@ -147,16 +165,19 @@ export class DLEventRemoveFromCart extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this._schemaExample = dl_remove_from_cart_schema_example;
+        this._eventName = "dl_remove_from_cart";
     }
 
     verify() {
         super.verify(
             ecommerceFactory("remove", {
                 list: stringSchema(
-                    `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`
+                    `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                    `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                    true
                 ),
             }),
-            "dl_remove_from_cart"
+            this._eventName,
         );
     }
 }
@@ -165,19 +186,24 @@ export class DLEventSelectItem extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this._schemaExample = dl_select_item_schema_example;
+        this._eventName = "dl_select_item";
     }
 
     verify() {
         super.verify(
             ecommerceFactory("click", {
                 list: stringSchema(
-                    `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`
+                    `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                    `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                    true
                 ),
                 action: stringSchema(
-                    `"action" is a required field on the actionField object and should contain the string "click"`
+                    `"action" is a required field on the actionField object and should contain the string "click"`,
+                    `"action" is a required field on the actionField object and should contain the string "click"`,
+                    false
                 ),
             }),
-            "dl_select_item"
+            this._eventName
         );
     }
 }
@@ -186,6 +212,7 @@ export class DLEventSearchResults extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this._schemaExample = dl_search_results_schema_example;
+        this._eventName = "dl_search_results";
     }
 
     verify() {
@@ -193,13 +220,14 @@ export class DLEventSearchResults extends DLEvent {
             {
                 ecommerce: ecommerceWithoutWrapper({
                     actionField: {
-                        list: stringSchema({
-                            "any.required": `"list" is a required field on the action field object. It should contain the string "search results"`,
-                        }),
+                        list: stringSchema(
+                            `"list" is a required field on the action field object. It should contain the string "search results"`,
+                            `"list" is a required field on the action field object. It should contain the string "search results"`
+                        ),
                     },
                 }),
             },
-            "dl_search_results"
+            this._eventName,
         );
     }
 }
@@ -208,6 +236,7 @@ export class DLEventViewCart extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this._schemaExample = dl_view_cart_schema_example;
+        this._eventName = "dl_view_cart";
     }
 
     verify() {
@@ -216,13 +245,14 @@ export class DLEventViewCart extends DLEvent {
                 cart_total: cartTotal,
                 ecommerce: ecommerceWithoutWrapper({
                     actionField: {
-                        list: stringSchema({
-                            "any.required": `"list" is a required field on the action field object. It should contain the string "shopping cart"`,
-                        }),
+                        list: stringSchema(
+                            `"list" is a required field on the action field object. It should contain the string "shopping cart"`,
+                            `"list" is a required field on the action field object. It should contain the string "shopping cart"`
+                        ),
                     },
                 }),
             },
-            "dl_view_cart"
+            this._eventName
         );
     }
 }
@@ -231,6 +261,7 @@ export class DLEventViewItemList extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this._schemaExample = dl_view_item_list_schema_example;
+        this._eventName ="dl_view_item_list";
     }
 
     verify() {
@@ -238,7 +269,7 @@ export class DLEventViewItemList extends DLEvent {
             {
                 ecommerce: ecommerceWithoutWrapper(),
             },
-            "dl_view_item_list"
+            this._eventName
         );
     }
 }

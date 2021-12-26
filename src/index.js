@@ -9,7 +9,7 @@ import {
     DLEventUserData,
     DLEventViewCart,
     DLEventViewItemList,
-    DLEventSignUp
+    DLEventSignUp,
 } from "./eventTypes/dlEventViewItem.js";
 
 function evaluateDLEvent(dlEventObject) {
@@ -27,9 +27,11 @@ function evaluateDLEvent(dlEventObject) {
         dl_view_item_list: DLEventViewItemList,
         dl_view_item: DLEventViewItem,
     };
-    if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap)) return;
-        const dlEvent = new dlEventMap[dlEventName](dlEventObject);
-        dlEvent.verify();
-        dlEvent.logVerificationOutcome();
+    if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
+        return null;
+    const dlEvent = new dlEventMap[dlEventName](dlEventObject);
+    dlEvent.verify();
+    dlEvent.logVerificationOutcome();
+    return dlEvent;
 }
-console.log(evaluateDLEvent)
+console.log(evaluateDLEvent);
