@@ -1,2 +1,3 @@
-## A GTM tag to verify the Elevar data layer for headless sites
-- Build `$npm run build`
+## A Chrome extension for data layer verification.
+- To build chrome extension `$npm run build`
+- To test library `$ npm test`

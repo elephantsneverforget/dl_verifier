@@ -12,6 +12,8 @@ import {
     DLEventSignUp,
 } from "./eventTypes/dlEvents.js";
 
+import { DB } from "./db"
+
 function evaluateDLEvent(dlEventObject) {
     const dlEventName = dlEventObject.event;
     const dlEventMap = {
@@ -34,4 +36,18 @@ function evaluateDLEvent(dlEventObject) {
     dlEvent.logVerificationOutcome();
     return dlEvent;
 }
-console.log(evaluateDLEvent);
+
+let db = new DB();
+let lastIndexProcessed = 0;
+window.dataLayer = window.dataLayer || [];
+setInterval(function () {
+    for (; lastIndexProcessed < window.dataLayer.length; lastIndexProcessed++) {
+        const dlEvent = evaluateDLEvent(window.dataLayer[lastIndexProcessed]);
+        if (!dlEvent) continue;
+        try {
+            db.setProperty({[dlEvent.getEventName()]: dlEvent.isValid() ? 1 : 0})
+        } catch (e) {
+            console.log(e);
+        }
+    }
+}, 1000);

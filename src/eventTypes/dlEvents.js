@@ -1,5 +1,7 @@
 import joi from "joi";
-import { DLEvent } from "./dlEvent.js";
+import { Logger } from "../logger.js";
+import { eventId } from "../schemas.js";
+import { getEventNameSchema } from "../schemas.js";
 import {
     ecommerce,
     stringSchema,
@@ -19,6 +21,65 @@ import { dl_select_item_schema_example } from "../exampleSchemaObjects/dl_select
 import { dl_user_data_schema_example } from "../exampleSchemaObjects/dl_user_data.js";
 import { dl_login_schema_example } from "../exampleSchemaObjects/dl_login.js";
 import { dl_sign_up_schema_example } from "../exampleSchemaObjects/dl_sign_up.js";
+
+class DLEvent {
+    constructor(dataLayerObject) {
+        this.dataLayerObject = dataLayerObject;
+        this._errors = [];
+        this._verificationSummary;
+        this._isValid;
+    }
+
+    verify(schemas, eventName) {
+        if (this._verificationhasBeenRun === true)
+            throw new Error("Can't call verify more than once on the same object.");
+        const dlEventSchema = joi.object({
+            event: getEventNameSchema(eventName),
+            event_id: eventId,
+            ...schemas,
+        });
+
+        const validation = dlEventSchema.validate(this.dataLayerObject, {
+            abortEarly: false,
+            allowUnknown: true
+        });
+
+        if (validation.error) {
+            this._isValid = false;
+            this._errors = validation.error.details;
+            this._verificationSummary = `${eventName} event with event_id ${this.dataLayerObject.event_id} is invalid`
+        } else {
+            this._isValid = true;
+            this._verificationSummary = `${eventName} event with event_id: ${this.dataLayerObject.event_id} is valid.`
+        }
+        this._verificationhasBeenRun = true;
+        return validation;
+    }
+
+    getErrors() {
+        return this._errors;
+    }
+
+    getEventName() {
+        return this._eventName;
+    }
+
+    isValid() {
+        return this._isValid;
+    }
+
+    getVerificationSummary() {
+        return this._verificationSummary;
+    }
+
+    logVerificationOutcome(additionalText) {
+        // Log details in console
+        // Logger.logToToast(this._verificationSummary);
+        // Log toast
+        Logger.logToConsole(this._errors, this._verificationSummary, additionalText, this.dataLayerObject, this.schemaExample);
+    }
+}
+
 
 export class DLEventUserData extends DLEvent {
     constructor(dataLayerObject) {

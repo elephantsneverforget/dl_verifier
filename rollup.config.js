@@ -4,7 +4,7 @@ import commonjs from '@rollup/plugin-commonjs';
 const config = {
     input: 'src/index.js',
     output: {
-        file: 'dist/chrome_extension/verifier.js',
+        file: 'dist/chrome_extension/index.js',
     },
     plugins: [
         nodeResolve({

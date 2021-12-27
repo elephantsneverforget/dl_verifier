@@ -174,7 +174,6 @@ describe("dl_select_item shape verifier", () => {
             dl_select_item_schema_example
         );
         dlEventSelectItem.verify();
-        console.log(dlEventSelectItem.getErrors());
         expect(dlEventSelectItem.getErrors()).toHaveLength(0);
         expect(dlEventSelectItem.isValid()).toBe(true);
         expect(dlEventSelectItem.getVerificationSummary()).toContain("valid");
@@ -195,7 +194,6 @@ describe("dl_user_data shape verifier", () => {
             dl_user_data_schema_example
         );
         dlEventUserData.verify();
-        console.log(dlEventUserData.getErrors());
         expect(dlEventUserData.getErrors()).toHaveLength(0);
         expect(dlEventUserData.isValid()).toBe(true);
         expect(dlEventUserData.getVerificationSummary()).toContain("valid");
@@ -216,7 +214,6 @@ describe("dl_login shape verifier", () => {
             dl_login_schema_example
         );
         dlEventLogin.verify();
-        console.log(dlEventLogin.getErrors());
         expect(dlEventLogin.getErrors()).toHaveLength(0);
         expect(dlEventLogin.isValid()).toBe(true);
         expect(dlEventLogin.getVerificationSummary()).toContain("valid");
@@ -237,7 +234,6 @@ describe("dl_sign_up shape verifier", () => {
             dl_sign_up_schema_example
         );
         dlEventSignUp.verify();
-        console.log(dlEventSignUp.getErrors());
         expect(dlEventSignUp.getErrors()).toHaveLength(0);
         expect(dlEventSignUp.isValid()).toBe(true);
         expect(dlEventSignUp.getVerificationSummary()).toContain("valid");
