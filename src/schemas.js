@@ -86,8 +86,8 @@ export const products = joi
                 "any.required": `"price" is a required field on the ecommerce object.`,
             }),
             inventory: joi.string().messages({
-                "any.only": `"inventory" should be a string representing the quantity in stock for the product.`,
-                "any.required": `"inventory" is an optional field on the ecommerce object.`,
+                "any.only": `"inventory" should be a string representing the quantity in stock for the product. For example: "22"`,
+                "any.required": `"inventory" is an optional field on the ecommerce object, it should be a string representing inventory quantity, for example: "22".`,
             }),
         }) // Must match
     )

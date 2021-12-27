@@ -10,7 +10,7 @@ import {
     DLEventViewCart,
     DLEventViewItemList,
     DLEventSignUp,
-} from "./eventTypes/dlEventViewItem.js";
+} from "./eventTypes/dlEvents.js";
 
 function evaluateDLEvent(dlEventObject) {
     const dlEventName = dlEventObject.event;
