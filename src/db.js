@@ -2,6 +2,8 @@
 import { eventList } from "./eventList.js"
 export class DB {
     constructor() {
+        if (DB._instance) return DB._instance;
+        DB._instance = this; 
         this._dbName = "_verifier_db";
         this._eventList = eventList;
         this._initDB();

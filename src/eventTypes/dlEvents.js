@@ -47,10 +47,10 @@ class DLEvent {
         if (validation.error) {
             this._isValid = false;
             this._errors = validation.error.details;
-            this._verificationSummary = `${eventName} event with event_id ${this.dataLayerObject.event_id} is invalid`
+            this._verificationSummary = `${eventName} event_id ${this.formatEventID(this.dataLayerObject.event_id)} is invalid`
         } else {
             this._isValid = true;
-            this._verificationSummary = `${eventName} event with event_id: ${this.dataLayerObject.event_id} is valid.`
+            this._verificationSummary = `${eventName} event_id: ${this.formatEventID(this.dataLayerObject.event_id)} is valid.`
         }
         this._verificationhasBeenRun = true;
         return validation;
@@ -77,6 +77,11 @@ class DLEvent {
         // Logger.logToToast(this._verificationSummary);
         // Log toast
         Logger.logToConsole(this._errors, this._verificationSummary, additionalText, this.dataLayerObject, this.schemaExample);
+    }
+
+    formatEventID(eventID) {
+        const length = eventID.length;
+        return `${eventID.slice(0,3)}..${eventID.slice(length-4,length-1)}`
     }
 }
 
@@ -231,7 +236,7 @@ export class DLEventBeginCheckout extends DLEvent {
 export class DLEventRemoveFromCart extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
-        this._schemaExample = dl_remove_from_cart_schema_example;
+        this.schemaExample = dl_remove_from_cart_schema_example;
         this._eventName = "dl_remove_from_cart";
     }
 
@@ -252,7 +257,7 @@ export class DLEventRemoveFromCart extends DLEvent {
 export class DLEventSelectItem extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
-        this._schemaExample = dl_select_item_schema_example;
+        this.schemaExample = dl_select_item_schema_example;
         this._eventName = "dl_select_item";
     }
 
@@ -278,7 +283,7 @@ export class DLEventSelectItem extends DLEvent {
 export class DLEventSearchResults extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
-        this._schemaExample = dl_search_results_schema_example;
+        this.schemaExample = dl_search_results_schema_example;
         this._eventName = "dl_search_results";
     }
 
@@ -302,7 +307,7 @@ export class DLEventSearchResults extends DLEvent {
 export class DLEventViewCart extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
-        this._schemaExample = dl_view_cart_schema_example;
+        this.schemaExample = dl_view_cart_schema_example;
         this._eventName = "dl_view_cart";
     }
 
@@ -327,7 +332,7 @@ export class DLEventViewCart extends DLEvent {
 export class DLEventViewItemList extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
-        this._schemaExample = dl_view_item_list_schema_example;
+        this.schemaExample = dl_view_item_list_schema_example;
         this._eventName = "dl_view_item_list";
     }
 

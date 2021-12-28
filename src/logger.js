@@ -16,7 +16,7 @@ export class Logger {
             });
             console.group(
                 "%c" + verificationSummary,
-                "background-color: #e0005a ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
+                "background-color: #ed3d3d ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
             );
             errors.forEach((error) => console.log(error.message));
             console.group("Object pushed to datalayer");
@@ -37,7 +37,7 @@ export class Logger {
                     verificationSummary +
                     " " +
                     (additionalText ? additionalText : ""),
-                "background-color: #e0005a ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
+                "background-color: #3dc763 ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
             );
         }
     }

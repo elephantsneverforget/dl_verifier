@@ -15,6 +15,9 @@ describe("db retrieves and stores objects", () => {
         db.setProperty("dl_add_to_cart", 1);
         expect(db.getDB()["dl_add_to_cart"]).toBe(1);
     });
-    test("Setting a property that isn't defined throws an error", () => {
+    test("Can only create one instance of the DB", () => {
+        const db = new DB();
+        const db_second = new DB();
+        expect(db).toEqual(db_second);
     }); 
 });
