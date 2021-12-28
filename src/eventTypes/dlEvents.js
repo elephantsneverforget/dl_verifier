@@ -73,13 +73,11 @@ class DLEvent {
     }
 
     logVerificationOutcome(additionalText) {
-        // Log details in console
-        // Logger.logToToast(this._verificationSummary);
-        // Log toast
         Logger.logToConsole(this._errors, this._verificationSummary, additionalText, this.dataLayerObject, this.schemaExample);
     }
 
     formatEventID(eventID) {
+        if (eventID === undefined) return 'N/A'
         const length = eventID.length;
         return `${eventID.slice(0,3)}..${eventID.slice(length-4,length-1)}`
     }

@@ -34,9 +34,9 @@ export const impressions = joi
                 "any.only": `"position" should be an integer representing the product's position in the impressions array, indexed from 1.`,
                 "any.required": `"position" is a required field on the impressions array constituent objects. It should contain the position in the list for each array element. For example, the first element should be have the value 1(integer), the next, 2 etc...`,
             }),
-            list: joi.string().allow("").required().messages({
+            list: joi.string().allow("").messages({
                 "any.only": `"list" should be an string representing the collection the product is from, for example "/collections/toys".`,
-                "any.required": `"list" is a required field on the impressions array constituent objects. It should contain the path to the collection to product is from. For example "/collections/toys"`,
+                "any.required": `"list" is a required field on the impressions array constituent objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
             }),
         }) // Must match
     )

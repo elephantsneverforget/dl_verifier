@@ -13,6 +13,7 @@ export class Logger {
                 message: verificationSummary,
                 duration: 0,
                 dismissible: true,
+                position: {x:'left',y:'bottom'}
             });
             console.group(
                 "%c" + verificationSummary,
@@ -31,6 +32,7 @@ export class Logger {
                 message: verificationSummary,
                 duration: 0,
                 dismissible: true,
+                position: {x:'left',y:'bottom'}
             });
             console.log(
                 "%c" +
