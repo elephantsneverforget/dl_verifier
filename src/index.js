@@ -12,7 +12,7 @@ import {
     DLEventSignUp,
 } from "./eventTypes/dlEvents.js";
 
-import { DB } from "./db"
+import { DB } from "./db";
 
 const dlEventMap = {
     dl_add_to_cart: DLEventAddToCart,
@@ -36,8 +36,12 @@ function evaluateDLEvent(dlEventObject) {
     const dlEvent = new dlEventMap[dlEventName](dlEventObject);
     dlEvent.verify();
     dlEvent.logVerificationOutcome();
+    chrome.runtime.sendMessage("dejpfpicgiekldbefecjjeeelekeoaoa", {greeting: "hello"}, function(response) {
+        console.log(response.farewell);
+      });
     try {
-        db.setProperty(dlEvent.getEventName(), dlEvent.isValid() ? 1 : 0)
+        db.setProperty(dlEvent.getEventName(), dlEvent.isValid() ? 1 : 0);
+
     } catch (e) {
         console.log(e);
     }

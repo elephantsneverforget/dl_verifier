@@ -32,7 +32,9 @@ class DLEvent {
 
     verify(schemas, eventName) {
         if (this._verificationhasBeenRun === true)
-            throw new Error("Can't call verify more than once on the same object.");
+            throw new Error(
+                "Can't call verify more than once on the same object."
+            );
         const dlEventSchema = joi.object({
             event: getEventNameSchema(eventName),
             event_id: eventId,
@@ -41,16 +43,20 @@ class DLEvent {
 
         const validation = dlEventSchema.validate(this.dataLayerObject, {
             abortEarly: false,
-            allowUnknown: true
+            allowUnknown: true,
         });
 
         if (validation.error) {
             this._isValid = false;
             this._errors = validation.error.details;
-            this._verificationSummary = `${eventName} event_id ${this.formatEventID(this.dataLayerObject.event_id)} is invalid`
+            this._verificationSummary = `${eventName} event_id ${this.formatEventID(
+                this.dataLayerObject.event_id
+            )} is invalid`;
         } else {
             this._isValid = true;
-            this._verificationSummary = `${eventName} event_id: ${this.formatEventID(this.dataLayerObject.event_id)} is valid.`
+            this._verificationSummary = `${eventName} event_id: ${this.formatEventID(
+                this.dataLayerObject.event_id
+            )} is valid.`;
         }
         this._verificationhasBeenRun = true;
         return validation;
@@ -73,16 +79,24 @@ class DLEvent {
     }
 
     logVerificationOutcome(additionalText) {
-        Logger.logToConsole(this._errors, this._verificationSummary, additionalText, this.dataLayerObject, this.schemaExample);
+        Logger.logToConsole(
+            this._errors,
+            this._verificationSummary,
+            additionalText,
+            this.dataLayerObject,
+            this.schemaExample
+        );
     }
 
     formatEventID(eventID) {
-        if (eventID === undefined) return 'N/A'
+        if (eventID === undefined) return "N/A";
         const length = eventID.length;
-        return `${eventID.slice(0,3)}..${eventID.slice(length-4,length-1)}`
+        return `${eventID.slice(0, 3)}..${eventID.slice(
+            length - 4,
+            length - 1
+        )}`;
     }
 }
-
 
 export class DLEventUserData extends DLEvent {
     constructor(dataLayerObject) {
@@ -169,7 +183,7 @@ export class DLEventViewItem extends DLEvent {
     verify() {
         return super.verify(
             ecommerceFactory("detail", {
-                list: joi.string().allow("").required().messages({
+                list: joi.string().allow("").optional().messages({
                     "any.only": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                 }),
@@ -193,7 +207,7 @@ export class DLEventAddToCart extends DLEvent {
     verify() {
         super.verify(
             ecommerceFactory("add", {
-                list: joi.string().allow("").required().messages({
+                list: joi.string().allow("").optional().messages({
                     "any.only": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                 }),
@@ -241,11 +255,10 @@ export class DLEventRemoveFromCart extends DLEvent {
     verify() {
         super.verify(
             ecommerceFactory("remove", {
-                list: stringSchema(
-                    `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                    `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                    true
-                ),
+                list: joi.string().allow("").optional().messages({
+                    "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                    "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                }),
             }),
             this._eventName
         );
@@ -262,11 +275,10 @@ export class DLEventSelectItem extends DLEvent {
     verify() {
         super.verify(
             ecommerceFactory("click", {
-                list: stringSchema(
-                    `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                    `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                    true
-                ),
+                list: joi.string().allow("").optional().messages({
+                    "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                    "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                }),
                 action: stringSchema(
                     `"action" is a required field on the actionField object and should contain the string "click"`,
                     `"action" is a required field on the actionField object and should contain the string "click"`,
@@ -290,10 +302,10 @@ export class DLEventSearchResults extends DLEvent {
             {
                 ecommerce: ecommerceWithoutWrapper({
                     actionField: {
-                        list: stringSchema(
-                            `"list" is a required field on the action field object. It should contain the string "search results"`,
-                            `"list" is a required field on the action field object. It should contain the string "search results"`
-                        ),
+                        list: joi.string().allow("").optional().messages({
+                            "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                            "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                        }),
                     },
                 }),
             },
@@ -315,10 +327,10 @@ export class DLEventViewCart extends DLEvent {
                 cart_total: cartTotal,
                 ecommerce: ecommerceWithoutWrapper({
                     actionField: {
-                        list: stringSchema(
-                            `"list" is a required field on the action field object. It should contain the string "shopping cart"`,
-                            `"list" is a required field on the action field object. It should contain the string "shopping cart"`
-                        ),
+                        list: joi.string().allow("").optional().messages({
+                            "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                            "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                        }),
                     },
                 }),
             },

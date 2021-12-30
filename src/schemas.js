@@ -22,7 +22,7 @@ export const impressions = joi
                 "any.only": `"brand" should be a string representing the product's brand.`,
                 "any.required": `"brand" is a required field on the impressions array constituent objects. If a brand can't be determined use an empty string.`,
             }),
-            category: joi.string().required().messages({
+            category: joi.string().allow("").messages({
                 "any.only": `"category" should be a string representing the product's category. For example "Toys".`,
                 "any.required": `"category" is a required field on the impressions array constituent objects. This represents the category from which the product is from. A Chess board might have a category of "board_game".`,
             }),
@@ -34,7 +34,7 @@ export const impressions = joi
                 "any.only": `"position" should be an integer representing the product's position in the impressions array, indexed from 1.`,
                 "any.required": `"position" is a required field on the impressions array constituent objects. It should contain the position in the list for each array element. For example, the first element should be have the value 1(integer), the next, 2 etc...`,
             }),
-            list: joi.string().allow("").messages({
+            list: joi.string().optional().messages({
                 "any.only": `"list" should be an string representing the collection the product is from, for example "/collections/toys".`,
                 "any.required": `"list" is a required field on the impressions array constituent objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
             }),
@@ -85,7 +85,7 @@ export const products = joi
                 "any.only": `"price" should be a string representing the product's category price.`,
                 "any.required": `"price" is a required field on the ecommerce object.`,
             }),
-            inventory: joi.string().messages({
+            inventory: joi.any().messages({
                 "any.only": `"inventory" should be a string representing the quantity in stock for the product. For example: "22"`,
                 "any.required": `"inventory" is an optional field on the ecommerce object, it should be a string representing inventory quantity, for example: "22".`,
             }),
@@ -225,7 +225,7 @@ export const userProperties = joi
             "any.only": `"user_id" should be the Shopify user ID.`,
             "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify user id.`,
         }),
-        user_consent: joi.string().allow("").required().messages({
+        user_consent: joi.string().allow("").messages({
             "any.only": `"user_consent" should contain the user consent variable from Shopfy. If no value is available use an empty string.`,
             "any.required": `"user_consent" is a required field on the user_properties object and should contain an empty string if no consent is present.`,
         }),
