@@ -1,0 +1,29 @@
+{
+    "name": "Elevar Data Layer Verifier",
+    "description": "Verify your headless data layer events.",
+    "version": "1.0",
+    "manifest_version": 3,
+    "content_scripts": [
+        {
+            "matches": ["http://*/*", "https://*/*"],
+            "js": ["content_script.js", "inject.js"],
+            "css": ["./notyf.css"],
+            "all_frames": true
+        }
+    ],
+    "background": {
+        "service_worker": "./background_script.js"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": ["index.js", "verifier.js", "./notyf.css"],
+            "matches": ["<all_urls>"]
+        }
+    ],
+    "devtools_page": "./devtools_page.html",
+    "icons": {
+        "128": "icons/icon128.png",
+        "48": "icons/icon48.png"
+    },
+    "permissions": ["storage", "debugger", "background", "tabs", "contextMenus"]
+}  
