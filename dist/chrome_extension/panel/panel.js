@@ -3,6 +3,10 @@
 import { h, Component, render } from "./preact.js";
 import htm from "./preact_htm.js";
 // Initialize htm with Preact
+// DevTools page -- devtools.js
+// Create a connection to the background page
+// Create a connection to the background page
+
 const html = htm.bind(h);
 const eventList = [
     "dl_add_to_cart",
@@ -19,25 +23,29 @@ const eventList = [
 ];
 
 function App(props) {
-    console.log(props)
-    return html`
-        <table id="popup">
+    return html` <table id="popup">
         <tr>
             <th>Event</th>
             <th>Status</th>
         </tr>
-        ${eventList.map((event) => html`
-            <tr>
-                <td>
-                <div>${event}</div>
-                </td>
-                <td>
-                <div>${event}</div>
-                </td>
-            </tr>
-        `)}
-        </table>`
+        ${eventList.map(
+            (event) => html`
+                <tr>
+                    <td>
+                        <div>${event}</div>
+                    </td>
+                    <td>
+                        <div>${event}</div>
+                    </td>
+                </tr>
+            `
+        )}
+    </table>`;
 }
 
-render(html`<${App} name="World" eventList="{eventList}" />`, document.body);
+function doRender() {
+    console.log("doRender")
+    render(html`<${App} name="World" eventList="{eventList}" />`, document.body);
+}
 
+doRender();

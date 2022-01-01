@@ -36,12 +36,15 @@ function evaluateDLEvent(dlEventObject) {
     const dlEvent = new dlEventMap[dlEventName](dlEventObject);
     dlEvent.verify();
     dlEvent.logVerificationOutcome();
-    chrome.runtime.sendMessage("dejpfpicgiekldbefecjjeeelekeoaoa", {greeting: "hello"}, function(response) {
-        console.log(response.farewell);
-      });
+
     try {
         db.setProperty(dlEvent.getEventName(), dlEvent.isValid() ? 1 : 0);
-
+        console.log(db.getDB());
+        console.log("Sent message from index.js");
+        window.dispatchEvent(new CustomEvent("__elever_injected_script_message", {
+                detail: { db: db.getDB() },
+            })
+        );
     } catch (e) {
         console.log(e);
     }
