@@ -4,6 +4,7 @@ chrome.devtools.panels.create(
     "./panel/panel.html",
     // code invoked on panel creation
     function (panel) {
+        console.log(panel)
         var _window;
         let data = [];
         var port = chrome.runtime.connect({ name: "panel" });

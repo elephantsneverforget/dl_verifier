@@ -1,4 +1,4 @@
-import joi from "joi";
+import joi, { required } from "joi";
 import { Logger } from "../logger.js";
 import { eventId } from "../schemas.js";
 import { getEventNameSchema } from "../schemas.js";
@@ -183,7 +183,7 @@ export class DLEventViewItem extends DLEvent {
     verify() {
         return super.verify(
             ecommerceFactory("detail", {
-                list: joi.string().allow("").optional().messages({
+                list: joi.string().required().allow("").optional().messages({
                     "any.only": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                 }),
@@ -207,7 +207,7 @@ export class DLEventAddToCart extends DLEvent {
     verify() {
         super.verify(
             ecommerceFactory("add", {
-                list: joi.string().allow("").optional().messages({
+                list: joi.string().required().allow("").optional().messages({
                     "any.only": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                 }),
@@ -255,7 +255,7 @@ export class DLEventRemoveFromCart extends DLEvent {
     verify() {
         super.verify(
             ecommerceFactory("remove", {
-                list: joi.string().allow("").optional().messages({
+                list: joi.string().required().allow("").optional().messages({
                     "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                 }),
@@ -275,7 +275,7 @@ export class DLEventSelectItem extends DLEvent {
     verify() {
         super.verify(
             ecommerceFactory("click", {
-                list: joi.string().allow("").optional().messages({
+                list: joi.string().required().allow("").optional().messages({
                     "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                 }),
@@ -302,7 +302,7 @@ export class DLEventSearchResults extends DLEvent {
             {
                 ecommerce: ecommerceWithoutWrapper({
                     actionField: {
-                        list: joi.string().allow("").optional().messages({
+                        list: joi.string().required().allow("").optional().messages({
                             "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                             "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                         }),
@@ -327,7 +327,7 @@ export class DLEventViewCart extends DLEvent {
                 cart_total: cartTotal,
                 ecommerce: ecommerceWithoutWrapper({
                     actionField: {
-                        list: joi.string().allow("").optional().messages({
+                        list: joi.string().required().allow("").optional().messages({
                             "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                             "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                         }),
