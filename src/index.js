@@ -39,9 +39,8 @@ function evaluateDLEvent(dlEventObject) {
 
     try {
         db.setProperty(dlEvent.getEventName(), dlEvent.isValid() ? 1 : 0);
-        console.log(db.getDB());
-        console.log("Sent message from index.js");
-        window.dispatchEvent(new CustomEvent("__elever_injected_script_message", {
+        window.dispatchEvent(
+            new CustomEvent("__elever_injected_script_message", {
                 detail: { db: db.getDB() },
             })
         );

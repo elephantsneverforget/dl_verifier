@@ -11,9 +11,6 @@
             "all_frames": true
         }
     ],
-    "background": {
-        "service_worker": "./background_script.js"
-    },
     "web_accessible_resources": [
         {
             "resources": ["index.js", "verifier.js", "./notyf.css"],

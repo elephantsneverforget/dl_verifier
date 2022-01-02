@@ -4,7 +4,7 @@
   "description": "A data layer verifier for GTM",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --coverage",
     "build": "rollup --config rollup.config.js"
   },
   "author": "",
