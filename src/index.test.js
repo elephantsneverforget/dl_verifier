@@ -37,10 +37,6 @@ describe("dl_view_item shape verifier", () => {
         expect(dlEventViewItem.isValid()).toBe(true);
         expect(dlEventViewItem.getVerificationSummary()).toContain("valid");
     });
-});
-
-// TODO: Fix same subclass
-describe("dl_view_item invalid creates errors", () => {
     test("A improperly formatted object throws errors", () => {
         const dlEventViewItem = new DLEventViewItem({});
         dlEventViewItem.verify();

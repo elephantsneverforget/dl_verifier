@@ -129,7 +129,10 @@ export const ecommerce = (conts) =>
                     actionField: actionField(conts["actionField"]),
                     products: products,
                 })
-                .required(),
+                .required().messages({
+                    "any.only": `This object should include a "${conts["ecommerceSubFieldWrapper"]}" property. See the documentation for more details.`,
+                    "any.required": `This object should include a "${conts["ecommerceSubFieldWrapper"]}" property. See the documentation for more details`,
+                }),
         })
         .required()
         .messages({
