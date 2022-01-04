@@ -13,7 +13,8 @@ export class Logger {
                 message: verificationSummary,
                 duration: 0,
                 dismissible: true,
-                position: {x:'left',y:'bottom'}
+                position: {x:'left',y:'bottom'},
+                ripple: false
             });
             console.group(
                 "%c" + verificationSummary,
@@ -21,7 +22,18 @@ export class Logger {
             );
             errors.forEach((error) => console.log(error.message));
             console.group("Object pushed to datalayer");
-            console.log(dataLayerObject);
+            // Remove marketing and gtm.uniqueEventId from the object
+            let dataLayerObjectModified = Object.assign({}, dataLayerObject);
+            try {
+                delete dataLayerObjectModified.marketing;
+            // eslint-disable-next-line no-empty
+            } catch(e){}
+            try {
+                delete dataLayerObjectModified['gtm.uniqueEventId'];
+            // eslint-disable-next-line no-empty
+            } catch(e){} 
+
+            console.log(dataLayerObjectModified);
             console.groupEnd();
             console.group("Reference object with correct shape");
             console.log(schemaExample);
@@ -32,7 +44,8 @@ export class Logger {
                 message: verificationSummary,
                 duration: 0,
                 dismissible: true,
-                position: {x:'left',y:'bottom'}
+                position: {x:'left',y:'bottom'},
+                ripple: false,
             });
             console.log(
                 "%c" +
