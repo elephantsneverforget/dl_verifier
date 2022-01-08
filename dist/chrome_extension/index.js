@@ -460,26 +460,34 @@ class Logger {
                 message: verificationSummary,
                 duration: 0,
                 dismissible: true,
-                position: {x:'left',y:'bottom'},
-                ripple: false
+                position: { x: "left", y: "bottom" },
+                ripple: false,
             });
             console.group(
                 "%c" + verificationSummary,
                 "background-color: #ed3d3d ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
             );
-            errors.forEach((error) => console.log(error.message));
+            errors.forEach((error) =>
+                console.log(
+                    "%c" + error.message,
+                    "display: inline-block ; background-color: gold ; color: black ; font-weight: bold ; padding: 3px 7px 3px 7px ; border-radius: 3px 3px 3px 3px ;"
+                )
+            );
             console.group("Object pushed to datalayer");
             // Remove marketing and gtm.uniqueEventId from the object
             let dataLayerObjectModified = Object.assign({}, dataLayerObject);
             try {
                 delete dataLayerObjectModified.marketing;
-            // eslint-disable-next-line no-empty
-            } catch(e){}
+                // eslint-disable-next-line no-empty
+            } catch (e) {}
             try {
-                delete dataLayerObjectModified['gtm.uniqueEventId'];
-            // eslint-disable-next-line no-empty
-            } catch(e){} 
-
+                delete dataLayerObjectModified["gtm.uniqueEventId"];
+                // eslint-disable-next-line no-empty
+            } catch (e) {}
+            try {
+                delete dataLayerObjectModified.event_time;
+                // eslint-disable-next-line no-empty
+            } catch (e) {}
             console.log(dataLayerObjectModified);
             console.groupEnd();
             console.group("Reference object with correct shape");
@@ -491,7 +499,7 @@ class Logger {
                 message: verificationSummary,
                 duration: 0,
                 dismissible: true,
-                position: {x:'left',y:'bottom'},
+                position: { x: "left", y: "bottom" },
                 ripple: false,
             });
             console.log(
