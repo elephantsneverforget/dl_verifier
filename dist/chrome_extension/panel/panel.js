@@ -41,10 +41,6 @@ setTimeout(function () {
     doRender();
 }, 1000);
 
-chrome.storage.onChanged.addListener(function (changes, namespace) {
-    eventList = changes.db.newValue
-    doRender();
-  });
 
 function doRender() {
     render(
@@ -63,5 +59,13 @@ doRender();
 
 // What tab am I?
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    tabId = tabs.id;
+    console.log("What tab am I?: " + tabs[0].id)
+    console.log(tabs)
+    tabId = tabs[0].id;
+    chrome.storage.onChanged.addListener(function (changes, namespace) {
+        console.log(changes)
+        eventList = changes[tabId].newValue
+        doRender();
+      });
+
 });

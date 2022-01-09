@@ -1,9 +1,9 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.msg == "Update") {
+    if (request.msg == "DBUPDATE") {
         let db = Object.assign({}, request.data);
         let tabId = sender.tab.id; 
-        console.log("Saving db to local storage")
-        chrome.storage.local.set({ db: db }, function () {});
+        console.log("Saving db to local storage, tab ID is: " + tabId)
+        chrome.storage.local.set({ [`${tabId}`]: db }, function () {});
         // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         //     // relay finder.js's message to filler.js
         //     chrome.tabs.sendMessage(tabs[0].id, request, (response) => {
