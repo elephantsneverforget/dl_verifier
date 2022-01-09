@@ -3,6 +3,11 @@
     "description": "Verify your headless data layer events.",
     "version": "1.0",
     "manifest_version": 3,
+    "background": {
+        "service_worker": 
+            "./background.js"
+        
+    },
     "content_scripts": [
         {
             "matches": ["http://*/*", "https://*/*"],
