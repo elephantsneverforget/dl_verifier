@@ -12,24 +12,18 @@ let eventList, tabId;
 
 function App(props) {
     return props.eventList
-        ? html`<table id="popup">
-              <tr>
-                  <th>Event</th>
-                  <th>Status</th>
-              </tr>
+        ? html`<div class="container">
               ${Object.keys(props.eventList).map(
                   (event) => html`
-                      <tr>
-                          <td>
-                              <div>${event}</div>
-                          </td>
-                          <td>
-                              <div>${getStatus(props.eventList[event])}</div>
-                          </td>
-                      </tr>
+                      <div>
+                          <div class="event-title">${event}</div>
+                          <div class="event-status ${getStatusCSS(props.eventList[event])}">
+                              ${getStatus(props.eventList[event])}
+                          </div>
+                      </div>
                   `
               )}
-          </table>`
+          </div>`
         : html`<div>Waiting for data. Fire an event.</div>`;
 }
 
@@ -40,7 +34,6 @@ setTimeout(function () {
     });
     doRender();
 }, 1000);
-
 
 function doRender() {
     render(
@@ -55,17 +48,22 @@ function getStatus(value) {
     return "Event Not Seen";
 }
 
+function getStatusCSS(value) {
+    if (value === 1) return "verified";
+    if (value === 0) return "error";
+    return "not-seen";
+}
+
 doRender();
 
 // What tab am I?
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    console.log("What tab am I?: " + tabs[0].id)
-    console.log(tabs)
+    console.log("What tab am I?: " + tabs[0].id);
+    console.log(tabs);
     tabId = tabs[0].id;
     chrome.storage.onChanged.addListener(function (changes, namespace) {
-        console.log(changes)
-        eventList = changes[tabId].newValue
+        console.log(changes);
+        eventList = changes[tabId].newValue;
         doRender();
-      });
-
+    });
 });

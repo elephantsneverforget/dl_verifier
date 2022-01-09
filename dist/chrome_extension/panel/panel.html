@@ -1,31 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>HTML 5 Boilerplate</title>
-    <script type="module" src="./panel.js"> </script>
-    <style>
-      #popup {
-        width: 400px;
-        padding: 20px;
-      }
-      th {
-        text-align: left;
-      }
-      td {
-        padding-top: 10px;
-      }
-      tr:nth-child(even) {background: #CCC}
-      tr:nth-child(odd) {background: #FFF}
-      td {
-        padding-left: 0px;
-        padding-right: 0px;
-      }
-    </style>
-  </head>
-  <body>
-    <div></div>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>HTML 5 Boilerplate</title>
+        <script type="module" src="./panel.js"></script>
+        <style>
+            #popup {
+                width: 400px;
+                padding: 20px;
+            }
+            th {
+                text-align: left;
+            }
+            td {
+                padding-top: 10px;
+            }
+            tr:nth-child(even) {
+                background: #ccc;
+            }
+            tr:nth-child(odd) {
+                background: #fff;
+            }
+            td {
+                padding-left: 0px;
+                padding-right: 0px;
+            }
+
+            .container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 25px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                    Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
+                    "Segoe UI Emoji", "Segoe UI Symbol";
+            }
+
+            .container > div {
+                border: 1px solid #d5d5d5;
+                background-color: white;
+                border-radius: 8px;
+                margin: 10px;
+                font-size: 14px;
+                width: 250px;
+                text-align: center;
+                -webkit-box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.09);
+                box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.09);
+            }
+
+            .event-title {
+                font-weight: 500;
+                padding-bottom: 12px;
+                padding-top: 12px;
+                font-style: italic;
+            }
+
+            .event-status {
+                padding-bottom: 12px;
+                padding-top: 12px;
+                border-bottom-left-radius: 8px;
+                border-bottom-right-radius: 8px;
+                font-weight: 900;
+            }
+
+            .verified {
+                background: rgb(61 199 99 / 34%);
+                color: rgb(61 199 99);
+            }
+
+            .error {
+                background: rgb(237 61 61 / 17%);
+                color: rgb(237 61 61 / 71%);
+            }
+
+            .not-seen {
+                background: #ebebeb;
+                color: black;
+            }
+        </style>
+    </head>
+    <body>
+        <div></div>
+    </body>
 </html>
