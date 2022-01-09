@@ -44,6 +44,7 @@ function evaluateDLEvent(dlEventObject) {
                 detail: { db: db.getDB() },
             })
         );
+        console.log("Sent event from index.js")
     } catch (e) {
         console.log(e);
     }

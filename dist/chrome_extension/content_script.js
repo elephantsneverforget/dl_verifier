@@ -5,6 +5,7 @@ let tabId;
 // What tab am I?
 
 window.addEventListener("__elever_injected_script_message", async function (event) {
+    console.log("Sending message in content_script.js")
     chrome.runtime.sendMessage({ msg: "Update", data: event.detail.db }, (response) => {
         // response will be received from the background script, but originally sent by filler.js
         if (response) {

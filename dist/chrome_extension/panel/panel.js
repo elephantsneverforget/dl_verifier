@@ -32,7 +32,9 @@ function App(props) {
           </table>`
         : html`<div>Waiting for data. Fire an event.</div>`;
 }
-setInterval(function () {
+
+// Get the most recent version of the DB so we don't have to wait for an event to render it.
+setTimeout(function () {
     chrome.storage.local.get(function (result) {
         eventList = result.db;
     });
@@ -40,12 +42,8 @@ setInterval(function () {
 }, 1000);
 
 chrome.storage.onChanged.addListener(function (changes, namespace) {
-    for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-      console.log(
-        `Storage key "${key}" in namespace "${namespace}" changed.`,
-        `Old value was "${oldValue}", new value is "${newValue}".`
-      );
-    }
+    eventList = changes.db.newValue
+    doRender();
   });
 
 function doRender() {

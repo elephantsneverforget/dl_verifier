@@ -37,7 +37,7 @@ export class DB {
 
     clear() {
         // eslint-disable-next-line no-undef
-        this.initDB();
+        this._initDB();
 
     }
 }
