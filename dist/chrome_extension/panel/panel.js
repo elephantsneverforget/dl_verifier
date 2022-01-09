@@ -18,22 +18,14 @@ function App(props) {
                       <div>
                           <div class="event-title">${event}</div>
                           <div class="event-status ${getStatusCSS(props.eventList[event])}">
-                              ${getStatus(props.eventList[event])}
-                          </div>
+                              <span>${getStatus(props.eventList[event])}</span>
+                         </div>
                       </div>
                   `
               )}
           </div>`
         : html`<div>Waiting for data. Fire an event.</div>`;
 }
-
-// Get the most recent version of the DB so we don't have to wait for an event to render it.
-setTimeout(function () {
-    chrome.storage.local.get(function (result) {
-        eventList = result.db;
-    });
-    doRender();
-}, 1000);
 
 function doRender() {
     render(
@@ -61,6 +53,12 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     console.log("What tab am I?: " + tabs[0].id);
     console.log(tabs);
     tabId = tabs[0].id;
+    // Get a copy of the db so you we don't have to wait until the first change.
+    chrome.storage.local.get(function (result) {
+        eventList = result[tabId];
+        doRender();
+    });
+    // Listen to changes on the db object
     chrome.storage.onChanged.addListener(function (changes, namespace) {
         console.log(changes);
         eventList = changes[tabId].newValue;
