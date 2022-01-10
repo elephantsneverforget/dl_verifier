@@ -1456,7 +1456,12 @@ class DB {
 
     clear() {
         // eslint-disable-next-line no-undef
-        this._initDB();
+        const initialDB = {};
+        eventList.forEach((item) => initialDB[item] = 2);
+        window.localStorage.setItem(
+            this._dbName,
+            JSON.stringify(initialDB)
+        );
 
     }
 }
@@ -1491,6 +1496,7 @@ function evaluateDLEvent(dlEventObject) {
                 detail: { db: db.getDB() },
             })
         );
+        console.log("Sent event from index.js");
     } catch (e) {
         console.log(e);
     }

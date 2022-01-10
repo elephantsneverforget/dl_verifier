@@ -37,7 +37,12 @@ export class DB {
 
     clear() {
         // eslint-disable-next-line no-undef
-        this._initDB();
+        const initialDB = {}
+        eventList.forEach((item) => initialDB[item] = 2);
+        window.localStorage.setItem(
+            this._dbName,
+            JSON.stringify(initialDB)
+        );
 
     }
 }

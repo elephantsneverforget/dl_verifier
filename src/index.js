@@ -50,6 +50,15 @@ function evaluateDLEvent(dlEventObject) {
     }
 }
 
+function resetDB() {
+    db.clear();
+    window.dispatchEvent(
+        new CustomEvent("__elever_injected_script_message", {
+            detail: { db: db.getDB() },
+        })
+    );
+}
+
 let lastIndexProcessed = 0;
 window.dataLayer = window.dataLayer || [];
 setInterval(function () {
