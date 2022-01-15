@@ -28,7 +28,11 @@ const dlEventMap = {
     dl_view_item: DLEventViewItem,
 };
 
-let db = new DB();
+if (typeof db === 'undefined') {
+    var db = new DB();
+} else {
+    console.log("No db defined");
+}
 function evaluateDLEvent(dlEventObject) {
     const dlEventName = dlEventObject.event;
     if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))

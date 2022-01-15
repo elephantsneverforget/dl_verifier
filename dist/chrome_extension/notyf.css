@@ -3,6 +3,10 @@
 .notyf__toast {
     max-width: 375px;
     width: 375px;
+    border-radius: 10px;
+    border: 1px solid #f1f1f1;
+    background-color: white !important;
+    color: black;
 }
 
 .notyf__ripple {

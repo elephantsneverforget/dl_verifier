@@ -50,8 +50,6 @@ doRender();
 
 // What tab am I?
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    console.log("What tab am I?: " + tabs[0].id);
-    console.log(tabs);
     tabId = tabs[0].id;
     // Get a copy of the db so you we don't have to wait until the first change.
     chrome.storage.local.get(function (result) {
