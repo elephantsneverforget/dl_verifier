@@ -1,0 +1,24 @@
+.button-dlv {
+    position: fixed;
+    font-weight: 900;
+    color: black;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 14px;
+    background: white;
+    padding: 5px 20px;
+    border-radius: 10px;
+    bottom: 18px;
+    -webkit-box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.09);
+    box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.09);
+    z-index: 1000;
+}
+
+.clear-events {
+    bottom: 20px;
+    left: 400px;
+}
+
+.clear-toasts {
+    bottom: 58px;
+    left: 400px;
+}

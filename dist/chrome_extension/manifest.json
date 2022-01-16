@@ -12,7 +12,7 @@
         {
             "matches": ["http://*/*", "https://*/*"],
             "js": ["content_script.js", "inject.js"],
-            "css": ["./notyf.css"],
+            "css": ["./notyf.css", "./index.css"],
             "all_frames": true
         }
     ],
@@ -27,5 +27,8 @@
         "128": "icons/icon128.png",
         "48": "icons/icon48.png"
     },
-    "permissions": ["storage", "debugger", "background", "tabs", "contextMenus"]
+    "permissions": ["storage", "debugger", "background", "tabs", "contextMenus", "webRequest"],
+    "host_permissions": [
+        "<all_urls>"
+      ]
 }  

@@ -23,7 +23,8 @@ function App(props) {
                       </div>
                   `
               )}
-          </div>`
+          </div>
+          `
         : html`<div>Waiting for data. Fire an event.</div>`;
 }
 
@@ -51,15 +52,27 @@ doRender();
 // What tab am I?
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     tabId = tabs[0].id;
-    // Get a copy of the db so you we don't have to wait until the first change.
+    // Get a copy of the db so you we don't have 
+    // to wait until the first change to display it.
     chrome.storage.local.get(function (result) {
         eventList = result[tabId];
         doRender();
     });
     // Listen to changes on the db object
     chrome.storage.onChanged.addListener(function (changes, namespace) {
+        debugger;
         console.log(changes);
+        if (typeof changes[tabId] === 'undefined') {
+            console.log("Tab undefined")
+            console.log(changes);
+            console.log(namespace);
+            return;
+        }
         eventList = changes[tabId].newValue;
         doRender();
     });
 });
+
+// chrome.devtools.network.onRequestFinished.addListener(function (request) {
+//     console.log(request);
+// });

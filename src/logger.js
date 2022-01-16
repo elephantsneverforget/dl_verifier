@@ -1,6 +1,10 @@
 import { Notyf } from "notyf";
 let notyf = new Notyf();
 export class Logger {
+    clearAllNotifications() {
+        notyf.dismissAll();
+    }
+
     static logToConsole(
         errors,
         verificationSummary,

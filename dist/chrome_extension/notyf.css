@@ -23,3 +23,8 @@
 .notyf__toast--lower {
     margin-top: 5px;
 }
+
+.notyf__wrapper {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}

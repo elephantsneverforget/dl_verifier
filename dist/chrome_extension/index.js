@@ -448,6 +448,10 @@ var Notyf = /** @class */ (function () {
 
 let notyf = new Notyf();
 class Logger {
+    clearAllNotifications() {
+        notyf.dismissAll();
+    }
+
     static logToConsole(
         errors,
         verificationSummary,
@@ -1482,9 +1486,8 @@ const dlEventMap = {
 
 if (typeof db === 'undefined') {
     var db = new DB();
-} else {
-    console.log("No db defined");
 }
+
 function evaluateDLEvent(dlEventObject) {
     const dlEventName = dlEventObject.event;
     if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
@@ -1506,6 +1509,32 @@ function evaluateDLEvent(dlEventObject) {
     }
 }
 
+function resetDB() {
+    db.clear();
+    window.dispatchEvent(
+        new CustomEvent("__elever_injected_script_message", {
+            detail: { db: db.getDB() },
+        })
+    );
+}
+
+function buildInterface(){
+    let body = document.getElementsByTagName("body")[0];
+    let clearVerificationButton = document.createElement("button");
+    clearVerificationButton.classList.add("clear-events", "button-dlv");
+    clearVerificationButton.innerText = "Reset";
+    clearVerificationButton.onclick = () => resetDB();
+    body.appendChild(clearVerificationButton);
+    let clearToastButton = document.createElement("button");
+    clearToastButton.classList.add("clear-toasts", "button-dlv"); 
+    clearToastButton.innerText = "Clear";
+    clearToastButton.onClick = () => console.log('clear');
+    body.appendChild(clearToastButton);
+}
+
+buildInterface();
+
+// Listen for DL updates and push for evaluation
 let lastIndexProcessed = 0;
 window.dataLayer = window.dataLayer || [];
 setInterval(function () {

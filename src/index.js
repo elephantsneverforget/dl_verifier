@@ -13,6 +13,7 @@ import {
 } from "./eventTypes/dlEvents.js";
 
 import { DB } from "./db";
+import { Logger } from "./logger";
 
 const dlEventMap = {
     dl_add_to_cart: DLEventAddToCart,
@@ -30,9 +31,8 @@ const dlEventMap = {
 
 if (typeof db === 'undefined') {
     var db = new DB();
-} else {
-    console.log("No db defined");
 }
+
 function evaluateDLEvent(dlEventObject) {
     const dlEventName = dlEventObject.event;
     if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
@@ -63,6 +63,23 @@ function resetDB() {
     );
 }
 
+function buildInterface(){
+    let body = document.getElementsByTagName("body")[0];
+    let clearVerificationButton = document.createElement("button");
+    clearVerificationButton.classList.add("clear-events", "button-dlv");
+    clearVerificationButton.innerText = "Reset"
+    clearVerificationButton.onclick = () => resetDB();
+    body.appendChild(clearVerificationButton);
+    let clearToastButton = document.createElement("button");
+    clearToastButton.classList.add("clear-toasts", "button-dlv"); 
+    clearToastButton.innerText = "Clear";
+    clearToastButton.onClick = () => console.log('clear');
+    body.appendChild(clearToastButton);
+}
+
+buildInterface();
+
+// Listen for DL updates and push for evaluation
 let lastIndexProcessed = 0;
 window.dataLayer = window.dataLayer || [];
 setInterval(function () {
@@ -70,3 +87,4 @@ setInterval(function () {
         evaluateDLEvent(window.dataLayer[lastIndexProcessed]);
     }
 }, 1000);
+
