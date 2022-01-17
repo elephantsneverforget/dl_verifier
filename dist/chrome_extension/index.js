@@ -1264,7 +1264,7 @@ class DLEventAddToCart extends DLEvent {
 class DLEventBeginCheckout extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
-        this._schemaExample = dl_begin_checkout_schema_example;
+        this.schemaExample = dl_begin_checkout_schema_example;
         this._eventName = "dl_begin_checkout";
     }
 
@@ -1520,6 +1520,8 @@ function resetDB() {
 
 function buildInterface(){
     let body = document.getElementsByTagName("body")[0];
+    // let buttonWrapper = document.createElement("div")
+    // buttonWrapper.classList.add("button-wrapper")
     let clearVerificationButton = document.createElement("button");
     clearVerificationButton.classList.add("clear-events", "button-dlv");
     clearVerificationButton.innerText = "Reset";

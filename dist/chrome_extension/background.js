@@ -1,4 +1,4 @@
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, sender) => {
     if (request.msg == "DBUPDATE") {
         let db = Object.assign({}, request.data);
         let tabId = sender.tab.id;

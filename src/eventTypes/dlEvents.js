@@ -224,7 +224,7 @@ export class DLEventAddToCart extends DLEvent {
 export class DLEventBeginCheckout extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
-        this._schemaExample = dl_begin_checkout_schema_example;
+        this.schemaExample = dl_begin_checkout_schema_example;
         this._eventName = "dl_begin_checkout";
     }
 
