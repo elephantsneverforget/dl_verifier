@@ -7,4 +7,3 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     return true; // Required to keep message port open
 });
-

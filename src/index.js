@@ -88,3 +88,4 @@ setInterval(function () {
     }
 }, 1000);
 
+// window.onload =()=> db.setProperty("dl_user_data", 2);
