@@ -13,4 +13,3 @@ window.addEventListener("__elever_injected_script_message", async function (even
         }
     });
 });
-

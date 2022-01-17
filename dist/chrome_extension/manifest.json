@@ -27,7 +27,7 @@
         "128": "icons/icon128.png",
         "48": "icons/icon48.png"
     },
-    "permissions": ["storage", "debugger", "background", "tabs", "contextMenus", "webRequest"],
+    "permissions": ["storage", "debugger", "background", "tabs", "webRequest"],
     "host_permissions": [
         "<all_urls>"
       ]

@@ -1544,12 +1544,3 @@ setInterval(function () {
         evaluateDLEvent(window.dataLayer[lastIndexProcessed]);
     }
 }, 1000);
-
-window.onload = function() {
-    db.setProperty("dl_user_data", 2);
-    window.dispatchEvent(
-        new CustomEvent("__elever_injected_script_message", {
-            detail: { db: db.getDB() },
-        })
-    );
-};
