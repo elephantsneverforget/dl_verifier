@@ -16,7 +16,7 @@ export class Logger {
             notyf.error({
                 message: verificationSummary,
                 duration: 0,
-                dismissible: true,
+                dismissible: false,
                 position: { x: "left", y: "bottom" },
                 ripple: false,
             });
@@ -55,7 +55,7 @@ export class Logger {
             notyf.success({
                 message: verificationSummary,
                 duration: 0,
-                dismissible: true,
+                dismissible: false,
                 position: { x: "left", y: "bottom" },
                 ripple: false,
             });

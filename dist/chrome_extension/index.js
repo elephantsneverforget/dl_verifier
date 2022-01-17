@@ -463,7 +463,7 @@ class Logger {
             notyf.error({
                 message: verificationSummary,
                 duration: 0,
-                dismissible: true,
+                dismissible: false,
                 position: { x: "left", y: "bottom" },
                 ripple: false,
             });
@@ -502,7 +502,7 @@ class Logger {
             notyf.success({
                 message: verificationSummary,
                 duration: 0,
-                dismissible: true,
+                dismissible: false,
                 position: { x: "left", y: "bottom" },
                 ripple: false,
             });
@@ -1487,7 +1487,7 @@ const dlEventMap = {
 if (typeof db === 'undefined') {
     var db = new DB();
 }
-
+var logger = new Logger();
 function evaluateDLEvent(dlEventObject) {
     const dlEventName = dlEventObject.event;
     if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
@@ -1523,12 +1523,12 @@ function buildInterface(){
     let clearVerificationButton = document.createElement("button");
     clearVerificationButton.classList.add("clear-events", "button-dlv");
     clearVerificationButton.innerText = "Reset";
-    clearVerificationButton.onclick = () => resetDB();
+    clearVerificationButton.onclick = resetDB;
     body.appendChild(clearVerificationButton);
     let clearToastButton = document.createElement("button");
     clearToastButton.classList.add("clear-toasts", "button-dlv"); 
     clearToastButton.innerText = "Clear";
-    clearToastButton.onClick = () => console.log('clear');
+    clearToastButton.onclick = logger.clearAllNotifications;
     body.appendChild(clearToastButton);
 }
 
