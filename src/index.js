@@ -89,5 +89,3 @@ setInterval(function () {
         evaluateDLEvent(window.dataLayer[lastIndexProcessed]);
     }
 }, 1000);
-
-// window.onload =()=> db.setProperty("dl_user_data", 2);

@@ -7,3 +7,7 @@ chrome.runtime.onMessage.addListener((request, sender) => {
     }
     return true; // Required to keep message port open
 });
+
+chrome.webRequest.onCompleted.addListener(function(val){
+    console.log(val)
+}, {urls: ["<all_urls>"]})
