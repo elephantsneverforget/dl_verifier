@@ -13,6 +13,7 @@ import {
     DLEventUserData,
     DLEventLogin,
     DLEventSignUp,
+    DLEventRouteChange
 } from "./eventTypes/dlEvents.js";
 import { dl_view_item_schema_example } from "./exampleSchemaObjects/dl_view_item.js";
 import { dl_add_to_cart_schema_example } from "./exampleSchemaObjects/dl_add_to_cart.js";
@@ -25,6 +26,7 @@ import { dl_select_item_schema_example } from "./exampleSchemaObjects/dl_select_
 import { dl_user_data_schema_example } from "./exampleSchemaObjects/dl_user_data.js";
 import { dl_login_schema_example } from "./exampleSchemaObjects/dl_login.js";
 import { dl_sign_up_schema_example } from "./exampleSchemaObjects/dl_sign_up.js";
+import { dl_route_change_schema_example } from "./exampleSchemaObjects/dl_route_change.js";
 
 describe("dl_view_item shape verifier", () => {
     test("A properly formatted dl_view_item object should not throw any errors", () => {
@@ -242,5 +244,25 @@ describe("dl_sign_up shape verifier", () => {
         dlEventSignUp.verify();
         expect(dlEventSignUp.getErrors()).toBeDefined();
         expect(dlEventSignUp.isValid()).toBe(false);
+    });
+});
+
+describe("dl_route_change shape verifier", () => {
+    test("A properly formatted dl_route_change object should not throw any errors", () => {
+        const dlEventRouteChange = new DLEventRouteChange(
+            dl_route_change_schema_example
+        );
+        dlEventRouteChange.verify();
+        expect(dlEventRouteChange.getErrors()).toHaveLength(0);
+        expect(dlEventRouteChange.isValid()).toBe(true);
+        expect(dlEventRouteChange.getVerificationSummary()).toContain("valid");
+    });
+    test("A improperly formatted dl_route_change object should throw errors", () => {
+        const dlEventRouteChange = new DLEventRouteChange(
+            dl_remove_from_cart_schema_example
+        );
+        dlEventRouteChange.verify();
+        expect(dlEventRouteChange.getErrors()).toBeDefined();
+        expect(dlEventRouteChange.isValid()).toBe(false);
     });
 });

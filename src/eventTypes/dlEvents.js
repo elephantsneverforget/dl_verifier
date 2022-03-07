@@ -21,6 +21,7 @@ import { dl_select_item_schema_example } from "../exampleSchemaObjects/dl_select
 import { dl_user_data_schema_example } from "../exampleSchemaObjects/dl_user_data.js";
 import { dl_login_schema_example } from "../exampleSchemaObjects/dl_login.js";
 import { dl_sign_up_schema_example } from "../exampleSchemaObjects/dl_sign_up.js";
+import { dl_route_change_schema_example } from "../exampleSchemaObjects/dl_route_change";
 
 class DLEvent {
     constructor(dataLayerObject) {
@@ -353,6 +354,18 @@ export class DLEventViewItemList extends DLEvent {
             },
             this._eventName
         );
+    }
+}
+
+export class DLEventRouteChange extends DLEvent {
+    constructor(dataLayerObject) {
+        super(dataLayerObject);
+        this.schemaExample = dl_route_change_schema_example;
+        this._eventName = "dl_route_change";
+    }
+
+    verify() {
+        super.verify({}, this._eventName);
     }
 }
 

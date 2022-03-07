@@ -115,3 +115,6 @@ out
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+.DS_store
+.DS_store?

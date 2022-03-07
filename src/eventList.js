@@ -9,5 +9,6 @@ export const eventList = [
     "dl_user_data",
     "dl_view_cart",
     "dl_view_item_list",
-    "dl_view_item"
+    "dl_view_item",
+    "dl_route_change"
 ]

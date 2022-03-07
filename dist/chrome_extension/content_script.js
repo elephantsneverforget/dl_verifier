@@ -1,8 +1,5 @@
 // Content script acts as a relay.
 // Can't communicate directly from injected script to background page
-// console.log("content script loaded")
-let tabId;
-// What tab am I?
 
 window.addEventListener("__elever_injected_script_message", async function (event) {
     console.log("Sending message in content_script.js")
