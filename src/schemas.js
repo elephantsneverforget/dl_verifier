@@ -60,8 +60,6 @@ export const userConsent = joi.string().allow("").messages({
     "any.required": `"user_consent" is a required field on the user_properties object and should contain an empty string if no consent is present.`,
 });
 
-
-
 const customerId = joi.string().required().messages({
     "any.required": `"customer_id" is a required field on the user_properties object when the customer is logged in, it should contain the Shopify customer id.`,
 });
@@ -186,11 +184,9 @@ export const products = joi
 
 export const getEventNameSchema = function (eventName) {
     return joi.string().valid(eventName).required().messages({
-        "any.only": `"event" should be a string representing the event name, for example "dl_add_to_cart".`,
         "any.required": `"event" is a required field on the data layer object and should contain and event name such as dl_view_item, dl_add_to_cart etc...`,
     });
 };
-
 
 export const ecommerce = (conts) =>
     joi
@@ -205,7 +201,6 @@ export const ecommerce = (conts) =>
                 })
                 .required()
                 .messages({
-                    "any.only": `This object should include a "${conts["ecommerceSubFieldWrapper"]}" property. See the documentation for more details.`,
                     "any.required": `This object should include a "${conts["ecommerceSubFieldWrapper"]}" property. See the documentation for more details`,
                 }),
         })
@@ -271,6 +266,18 @@ export const userPropertiesLoggedIn = joi
         customer_province: customerProvince,
         customer_province_code: customerProvinceCode,
         customer_zip: customerZip,
+    })
+    .required()
+    .messages({
+        "any.required": `"user_properties" is a required field on the data layer object`,
+    });
+
+export const userPropertiesNotLoggedIn = joi
+    .object()
+    .keys({
+        user_consent: userConsent,
+        user_id: userId,
+        visitor_type: visitorType,
     })
     .required()
     .messages({
