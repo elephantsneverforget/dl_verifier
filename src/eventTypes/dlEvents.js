@@ -1,7 +1,7 @@
 import joi from "joi";
 import { Logger } from "../logger.js";
 import { eventId } from "../schemas.js";
-import { getEventNameSchema } from "../schemas.js";
+import { getEventNameSchema as getSchemaForEventName } from "../schemas.js";
 import {
     ecommerce,
     stringSchema,
@@ -37,10 +37,10 @@ class DLEvent {
         this._isValid;
         this._userIsLoggedIn =
             dataLayerObject.user_properties?.visitor_type === "logged_in";
-        this._eventName = dataLayerObject.event_name;
+        this._dlEventName = dataLayerObject.event_name;
     }
 
-    verify(additionalSchemas, eventName) {
+    verify(additionalSchemas) {
         if (this._verificationhasBeenRun)
             throw new Error(
                 "Can't call verify more than once on the same object."
@@ -48,7 +48,7 @@ class DLEvent {
 
         // Build the schema for the event
         const dlEventSchema = joi.object({
-            event: getEventNameSchema(eventName),
+            event: getSchemaForEventName(this._dlEventName),
             // user_properties only required on dl_user_data, dl_login, dl_signup
             ...(this.eventRequiresUserProperties() && {
                 user_properties: this.getUserPropertiesSchema(),
@@ -68,12 +68,16 @@ class DLEvent {
         if (validation.error) {
             this._isValid = false;
             this._errors = validation.error.details;
-            this._verificationSummary = `${eventName} event_id ${this.formatEventID(
+            this._verificationSummary = `${
+                this._dlEventName
+            } event_id ${this.formatEventID(
                 this._dataLayerObject.event_id
             )} is invalid`;
         } else {
             this._isValid = true;
-            this._verificationSummary = `${eventName} event_id: ${this.formatEventID(
+            this._verificationSummary = `${
+                this._dlEventName
+            } event_id: ${this.formatEventID(
                 this._dataLayerObject.event_id
             )} is valid.`;
         }
@@ -87,7 +91,7 @@ class DLEvent {
 
     eventRequiresUserProperties() {
         return (
-            eventsRequiringUserPropertiesSchema.includes(this._eventName) ===
+            eventsRequiringUserPropertiesSchema.includes(this._dlEventName) ===
             true
         );
     }
@@ -99,7 +103,7 @@ class DLEvent {
     }
 
     getEventName() {
-        return this._eventName;
+        return this._dlEventName;
     }
 
     isValid() {
@@ -138,27 +142,14 @@ export class DLEventUserData extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_user_data_schema_example;
-        this._eventName = "dl_user_data";
-        this.loggedIn =
-            dataLayerObject.user_properties?.visitor_type === "logged_in";
-    }
-
-    verify() {
-        return super.verify({}, this._eventName);
+        this._dlEventName = "dl_user_data";
     }
 }
 
 export class DLEventLogin extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
-        this.schemaExample = dl_login_schema_example;
-        this._eventName = "dl_login";
-        this.loggedIn =
-            dataLayerObject.user_properties?.visitor_type === "logged_in";
-    }
-
-    verify() {
-        return super.verify({}, this._eventName);
+        this._dlEventName = "dl_login";
     }
 }
 
@@ -166,13 +157,7 @@ export class DLEventSignUp extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_sign_up_schema_example;
-        this._eventName = "dl_sign_up";
-        this.loggedIn =
-            dataLayerObject.user_properties?.visitor_type === "logged_in";
-    }
-
-    verify() {
-        return super.verify({}, this._eventName);
+        this._dlEventName = "dl_sign_up";
     }
 }
 
@@ -180,7 +165,7 @@ export class DLEventViewItem extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_view_item_schema_example;
-        this._eventName = "dl_view_item";
+        this._dlEventName = "dl_view_item";
     }
 
     verify() {
@@ -192,8 +177,7 @@ export class DLEventViewItem extends DLEvent {
                 action: joi.string().allow("detail").required().messages({
                     "any.required": `"action" is a required field on the actionField object and should contain the string "detail"`,
                 }),
-            }),
-            this._eventName
+            })
         );
     }
 }
@@ -202,7 +186,7 @@ export class DLEventAddToCart extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_add_to_cart_schema_example;
-        this._eventName = "dl_add_to_cart";
+        this._dlEventName = "dl_add_to_cart";
     }
 
     verify() {
@@ -214,8 +198,7 @@ export class DLEventAddToCart extends DLEvent {
                 action: joi.string().allow("add").required().messages({
                     "any.required": `"action" is a required field on the actionField object and should contain the string "add"`,
                 }),
-            }),
-            this._eventName
+            })
         );
     }
 }
@@ -224,7 +207,7 @@ export class DLEventBeginCheckout extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_begin_checkout_schema_example;
-        this._eventName = "dl_begin_checkout";
+        this._dlEventName = "dl_begin_checkout";
     }
 
     verify() {
@@ -236,8 +219,7 @@ export class DLEventBeginCheckout extends DLEvent {
                 action: joi.string().allow("checkout").required().messages({
                     "any.required": `"action" is a required field on the actionField object and should contain the string "checkout"`,
                 }),
-            }),
-            this._eventName
+            })
         );
     }
 }
@@ -246,7 +228,7 @@ export class DLEventRemoveFromCart extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_remove_from_cart_schema_example;
-        this._eventName = "dl_remove_from_cart";
+        this._dlEventName = "dl_remove_from_cart";
     }
 
     verify() {
@@ -255,8 +237,7 @@ export class DLEventRemoveFromCart extends DLEvent {
                 list: joi.string().required().allow("").optional().messages({
                     "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                 }),
-            }),
-            this._eventName
+            })
         );
     }
 }
@@ -265,7 +246,7 @@ export class DLEventSelectItem extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_select_item_schema_example;
-        this._eventName = "dl_select_item";
+        this._dlEventName = "dl_select_item";
     }
 
     verify() {
@@ -279,8 +260,7 @@ export class DLEventSelectItem extends DLEvent {
                     `"action" is a required field on the actionField object and should contain the string "click"`,
                     false
                 ),
-            }),
-            this._eventName
+            })
         );
     }
 }
@@ -289,28 +269,25 @@ export class DLEventSearchResults extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_search_results_schema_example;
-        this._eventName = "dl_search_results";
+        this._dlEventName = "dl_search_results";
     }
 
     verify() {
-        super.verify(
-            {
-                ecommerce: ecommerceWithoutWrapper({
-                    actionField: {
-                        list: joi
-                            .string()
-                            .required()
-                            .allow("")
-                            .optional()
-                            .messages({
-                                "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                                "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                            }),
-                    },
-                }),
-            },
-            this._eventName
-        );
+        super.verify({
+            ecommerce: ecommerceWithoutWrapper({
+                actionField: {
+                    list: joi
+                        .string()
+                        .required()
+                        .allow("")
+                        .optional()
+                        .messages({
+                            "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                            "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                        }),
+                },
+            }),
+        });
     }
 }
 
@@ -318,29 +295,26 @@ export class DLEventViewCart extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_view_cart_schema_example;
-        this._eventName = "dl_view_cart";
+        this._dlEventName = "dl_view_cart";
     }
 
     verify() {
-        super.verify(
-            {
-                cart_total: cartTotal,
-                ecommerce: ecommerceWithoutWrapper({
-                    actionField: {
-                        list: joi
-                            .string()
-                            .required()
-                            .allow("")
-                            .optional()
-                            .messages({
-                                "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                                "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                            }),
-                    },
-                }),
-            },
-            this._eventName
-        );
+        super.verify({
+            cart_total: cartTotal,
+            ecommerce: ecommerceWithoutWrapper({
+                actionField: {
+                    list: joi
+                        .string()
+                        .required()
+                        .allow("")
+                        .optional()
+                        .messages({
+                            "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                            "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
+                        }),
+                },
+            }),
+        });
     }
 }
 
@@ -348,16 +322,13 @@ export class DLEventViewItemList extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_view_item_list_schema_example;
-        this._eventName = "dl_view_item_list";
+        this._dlEventName = "dl_view_item_list";
     }
 
     verify() {
-        super.verify(
-            {
-                ecommerce: ecommerceWithoutWrapper(),
-            },
-            this._eventName
-        );
+        super.verify({
+            ecommerce: ecommerceWithoutWrapper(),
+        });
     }
 }
 
@@ -365,11 +336,7 @@ export class DLEventRouteChange extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_route_change_schema_example;
-        this._eventName = "dl_route_change";
-    }
-
-    verify() {
-        super.verify({}, this._eventName);
+        this._dlEventName = "dl_route_change";
     }
 }
 

@@ -519,49 +519,157 @@ class Logger {
 
 // This file contains all schemas to check dl items against.
 
+const category = joi.string().allow("").required().messages({
+    "any.required": `"category" is a required field on the impressions and products array constituent objects. This represents the category from which the product is from. A Chess board might have a category of "board_game".`,
+});
+
+const name = joi.string().min(1).required().messages({
+    "any.required": `"name" is a required field and should on the impressions and products array constituent objects. It should represent the name of the product.`,
+});
+
+const id = joi.string().allow("").required().messages({
+    "any.required": `"id" is a required field on the impressions and products array constituent objects. It should be a string containing the product SKU`,
+});
+
+const productId = joi.string().min(5).required().messages({
+    "any.required": `"product_id" is a required field on the impressions and products array constituent objects. It should be a string containing the product ID.`,
+});
+
+const variantId = joi.string().min(2).required().messages({
+    "any.required": `"variant_id" is a required field on the impressions and products array constituent objects. It should be a string representing the Shopify variant ID.`,
+});
+
+const brand = joi.string().allow("").required().messages({
+    "any.required": `"brand" is a required field on the impressions and products array constituent objects. If a brand can't be determined use an empty string.`,
+});
+
+const price = joi.string().required().messages({
+    "any.required": `"price" is a required field on the impressions and products array constituent objects. It should be a string representing the price of the product, for example "125.99"`,
+});
+
+const position = joi.number().required().messages({
+    "any.required": `"position" is a required field on the impressions array constituent objects. It should contain the position in the list for each array element. For example, the first element should be have the value 1(integer), the next, 2 etc...`,
+});
+
+const list = joi.string().required().optional().messages({
+    "any.required": `"list" is a required field on the impressions array constituent objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
+});
+
+const image = joi.string().allow("").messages({
+    "any.required": `"image" is an optional field on the ecommerce object and should be a valid URL.`,
+});
+
+const variant = joi.string().allow("").messages({
+    "string.base": `"variant" should be a descriptive name of the product variant, for example "Blue shirt"`,
+    "any.required": `"variant" is a required field on the ecommerce object.`,
+});
+
+const inventory = joi.string().allow("").messages({
+    "any.required": `"inventory" should be a string representing the quantity in stock for the product. For example: "22"`,
+});
+
+const userId = joi.string().messages({
+    "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify user id.`,
+});
+
+const userConsent = joi.string().allow("").messages({
+    "any.required": `"user_consent" is a required field on the user_properties object and should contain an empty string if no consent is present.`,
+});
+
+const customerId = joi.string().required().messages({
+    "any.required": `"customer_id" is a required field on the user_properties object when the customer is logged in, it should contain the Shopify customer id.`,
+});
+const customerEmail = joi.string().required().messages({
+    "any.required": `"customer_email" is a required field on the user_properties object when the customer is logged in, it should contain the customer email.`,
+});
+const customerOrderCount = joi.string().required().messages({
+    "any.required": `"customer_order_count" is a required field on the user_properties object when the customer is logged in, it should contain the order count for the customer.`,
+});
+const customerTotalSpent = joi.string().required().messages({
+    "any.required": `"customer_total_spent" is a required field on the user_properties object when the customer is logged in, it should be a string containing the total spent by the customer.`,
+});
+const customerAddress1 = joi.string().required().messages({
+    "any.required": `"customer_address_1" is a required field on the user_properties object when the user is logged in and should be a string containing the first line of the customer's address.`,
+});
+const customerAddress2 = joi.string().allow(null, "").required().messages({
+    "any.required": `"customer_address_2" is a required field on the user_properties object when the user is logged in and should be a string containing the second line of the customer's address.`,
+});
+const customerCity = joi.string().required().messages({
+    "any.required": `"customer_city" is a required field on the user_properties object when the user is logged in and should be a string containing the customer's city.`,
+});
+const customerCountry = joi.string().required().messages({
+    "any.required": `"customer_country" is a required field on the user_properties object when the user is logged in and should be a string containing the customer's country.`,
+});
+const customerFirstName = joi.string().required().messages({
+    "any.required": `"customer_first_name" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's first name.`,
+});
+const customerLastName = joi.string().required().messages({
+    "any.required": `"customer_last_name" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's last name.`,
+});
+const customerPhone = joi.string().required().messages({
+    "any.required": `"customer_phone" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's phone number.`,
+});
+const customerProvince = joi.string().required().messages({
+    "any.required": `"customer_province" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's province or state.`,
+});
+const customerProvinceCode = joi.string().required().messages({
+    "any.required": `"customer_province_code" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's province code for example SC or AB.`,
+});
+const customerZip = joi.string().required().messages({
+    "any.required": `"customer_zip" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's zip or postal code.`,
+});
+
+const visitorType = joi
+    .any()
+    .valid("guest", "logged_in")
+    .required()
+    .messages({
+        "any.only": `"visitor_type" should be one of "logged_in" or "guest".`,
+        "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest".`,
+    });
+
+const eventId = joi.string().min(5).required().messages({
+    "any.required": `"event_id" is a required field. It should be a UUID like value.`,
+});
+
+const cartTotal = joi.string().min(2).required().messages({
+    "any.required": `"cart_total" is a required field. It should be a string representing the total value of the cart, for example "26.99".`,
+});
+
+const currencyCode = joi.string().min(3).max(3).required().messages({
+    "any.required": `"currencyCode" is a required field on the ecommerce object, it should be 3 characters long and contain a currency code such as "USD".`,
+});
+
+joi
+    .object()
+    .keys({
+        visitor_type: visitorType,
+        user_id: userId,
+        user_consent: userConsent,
+    })
+    .required()
+    .messages({
+        "any.required": `"user_properties" should be an object representing the Shopify user properties. See documentation for more details.`,
+    });
+
 const impressions = joi
     .array()
     .items(
         joi.object({
-            name: joi.string().min(1).required(),
-            id: joi.string().min(2).required().messages({
-                "any.only": `"id" should be a string representing the Shopify product SKU.`,
-                "any.required": `"id" is a required field on the impressions array constituent objects and should be a string containing the product SKU`,
-            }),
-            product_id: joi.string().min(5).required().messages({
-                "any.only": `"product_id" should be a string representing the Shopify product ID.`,
-                "any.required": `"product_id" is a required field on the impressions array constituent objects and should be a string containing the product ID.`,
-            }),
-            variant_id: joi.string().min(2).required().messages({
-                "any.only": `"variant_id" should be a string representing the Shopify variant ID.`,
-                "any.required": `"variant_id" is a required field on the impressions array constituent objects and should represent the Shopify variant ID.`,
-            }),
-            brand: joi.string().required().messages({
-                "any.only": `"brand" should be a string representing the product's brand.`,
-                "any.required": `"brand" is a required field on the impressions array constituent objects. If a brand can't be determined use an empty string.`,
-            }),
-            category: joi.string().allow("").messages({
-                "any.only": `"category" should be a string representing the product's category. For example "Toys".`,
-                "any.required": `"category" is a required field on the impressions array constituent objects. This represents the category from which the product is from. A Chess board might have a category of "board_game".`,
-            }),
-            price: joi.string().required().messages({
-                "any.only": `"price" should be a string representing the product's category price.`,
-                "any.required": `"price" is a required field on the impressions array constituent objects.`,
-            }),
-            position: joi.number().required().messages({
-                "any.only": `"position" should be an integer representing the product's position in the impressions array, indexed from 1.`,
-                "any.required": `"position" is a required field on the impressions array constituent objects. It should contain the position in the list for each array element. For example, the first element should be have the value 1(integer), the next, 2 etc...`,
-            }),
-            list: joi.string().required().optional().messages({
-                "any.only": `"list" should be an string representing the collection the product is from, for example "/collections/toys".`,
-                "any.required": `"list" is a required field on the impressions array constituent objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
-            }),
-        }) // Must match
+            name: name,
+            id: id,
+            product_id: productId,
+            variant_id: variantId,
+            brand: brand,
+            category: category,
+            price: price,
+            position: position,
+            list: list,
+        })
     )
     .min(1)
     .required()
     .messages({
-        "any.only": `"impressions" should be an array representing a collection of products, see documentation for details.`,
         "any.required": `You must have at least one product in the "impressions" array.`,
     });
 
@@ -569,66 +677,26 @@ const products = joi
     .array()
     .items(
         joi.object({
-            name: joi.string().min(1).required(),
-            id: joi.string().min(2).required().messages({
-                "any.only": `"id" should be a string representing the Shopify product SKU.`,
-                "any.required": `"id" is a required field on the products array constituent objects and should be a string containing the product SKU`,
-            }),
-            product_id: joi.string().min(5).required().messages({
-                "any.only": `"product_id" should be a string representing the Shopify product ID.`,
-                "any.required": `"product_id" is a required field on the products array constituent objects and should be a string containing the product ID.`,
-            }),
-            variant_id: joi.string().min(2).required().messages({
-                "any.only": `"variant_id" should be a string representing the Shopify variant ID.`,
-                "any.required": `"variant_id" is a required field on the products array constituent objects and should represent the Shopify variant ID.`,
-            }),
-            image: joi.string().messages({
-                "any.only": `"image" should be a URL that links to an image of to product.`,
-                "any.required": `"image" is an optional field on the ecommerce object and should be a valid URL.`,
-            }),
-            brand: joi.string().required().messages({
-                "any.only": `"brand" should be a string representing the product's brand.`,
-                "any.required": `"brand" is a required field on the products array constituent objects. If a brand can't be determined use an empty string.`,
-            }),
-            category: joi.string().allow("").required().messages({
-                "any.only": `"category" should be a string representing the product's category. For example "Toys".`,
-                "any.required": `"category" is a required field on the products array constituent objects. This represents the category from which the product is from. A Chess board might have a category of "board_game".`,
-            }),
-            variant: joi.string().allow(null).messages({
-                "any.only": `"variant" should be a string representing the product's variant name, for example "Large Shirt", "Blue brush" etc...`,
-                "string.base": `"variant" should be a descriptive name of the product variant.`,
-                "any.required": `"variant" is a required field on the ecommerce object.`,
-            }),
-            price: joi.string().required().messages({
-                "any.only": `"price" should be a string representing the product's category price.`,
-                "any.required": `"price" is a required field on the ecommerce object.`,
-            }),
-            inventory: joi.any().messages({
-                "any.only": `"inventory" should be a string representing the quantity in stock for the product. For example: "22"`,
-                "any.required": `"inventory" is an optional field on the ecommerce object, it should be a string representing inventory quantity, for example: "22".`,
-            }),
-        }) // Must match
+            name: name,
+            id: id,
+            product_id: productId,
+            variant_id: variantId,
+            image: image,
+            brand: brand,
+            category: category,
+            variant: variant,
+            price: price,
+            inventory: inventory,
+        })
     )
     .min(1)
     .required()
     .messages({
-        "any.only": `"products" should be an array representing a collection of products, see documentation for details.`,
         "any.required": `You must have at least one product in the "products" array.`,
     });
 
-const eventId = joi.string().min(5).required().messages({
-    "any.only": `"event_id" should be a UUID.`,
-    "any.required": `"event_id" is a required field. It should be a UUID like value.`,
-});
-
-const cartTotal = joi.string().min(2).required().messages({
-    "any.only": `"cart_total" should be a string representing the value of the cart. For example "26.99".`,
-    "any.required": `"cart_total" is a required field. It should be a string representing the total value of the cart, for example "26.99".`,
-});
-
 const getEventNameSchema = function (eventName) {
     return joi.string().valid(eventName).required().messages({
-        "any.only": `"event" should be a string representing the event name, for example "dl_add_to_cart".`,
         "any.required": `"event" is a required field on the data layer object and should contain and event name such as dl_view_item, dl_add_to_cart etc...`,
     });
 };
@@ -637,10 +705,7 @@ const ecommerce = (conts) =>
     joi
         .object()
         .keys({
-            currencyCode: joi.string().min(3).max(3).required().messages({
-                "any.only": `"currencyCode" should be a string representing the currency, for example "USD".`,
-                "any.required": `"currencyCode" is a required field on the ecommerce object and should contain a currency code such as "USD".`,
-            }),
+            currencyCode: currencyCode,
             [conts["ecommerceSubFieldWrapper"]]: joi
                 .object()
                 .keys({
@@ -649,13 +714,11 @@ const ecommerce = (conts) =>
                 })
                 .required()
                 .messages({
-                    "any.only": `This object should include a "${conts["ecommerceSubFieldWrapper"]}" property. See the documentation for more details.`,
                     "any.required": `This object should include a "${conts["ecommerceSubFieldWrapper"]}" property. See the documentation for more details`,
                 }),
         })
         .required()
         .messages({
-            "any.only": `"ecommerce" is a required field on the event object. See documentation for the required fields.`,
             "any.required": `"ecommerce" is a required field on the data layer object.`,
         });
 
@@ -663,10 +726,7 @@ const ecommerceWithoutWrapper = (actionField) =>
     joi
         .object()
         .keys({
-            currencyCode: joi.string().min(3).max(3).required().messages({
-                "any.only": `"currencyCode" should be a string representing the currency, for example "USD".`,
-                "any.required": `"currencyCode" is a required field on the ecommerce object and should contain a currency code such as "USD".`,
-            }),
+            currencyCode: currencyCode,
             ...(actionField && {
                 actionField: actionField,
             }),
@@ -674,19 +734,16 @@ const ecommerceWithoutWrapper = (actionField) =>
         })
         .required()
         .messages({
-            "any.only": `"ecommerce" is a required field on the event object. See documentation for the required fields.`,
             "any.required": `"ecommerce" is a required field on the data layer object.`,
         });
 
 const stringSchema = (only, required, emptyString) => {
     if (!emptyString) {
         return joi.string().required().messages({
-            "any.only": only,
             "any.required": required,
         });
     } else {
         return joi.string().allow("").required().messages({
-            "any.only": only,
             "any.required": required,
         });
     }
@@ -698,105 +755,41 @@ const actionField = (action) =>
         .keys({ ...action })
         .required();
 
-
-
-const visitorType = joi.any().valid("guest").required().messages({
-    "any.only": `"visitor_type" should be one of "logged in" or "guest".`,
-    "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest".`,
-});
-
-const userId = joi.string().messages({
-    "any.only": `"user_id" should be the Shopify user ID.`,
-    "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify user id.`,
-});
-
-const userConsent = joi.string().allow("").messages({
-    "any.only": `"user_consent" should contain the user consent variable from Shopfy. If no value is available use an empty string.`,
-    "any.required": `"user_consent" is a required field on the user_properties object and should contain an empty string if no consent is present.`,
-});
-
-const userProperties = joi
-    .object()
-    .keys({
-        visitor_type: visitorType,
-        user_id: userId,
-        user_consent: userConsent,
-    })
-    .required()
-    .messages({
-        "any.only": `"user_properties" should be an object representing the Shopify user properties. See documentation for more details.`,
-        "any.required": `"user_properties" is a required field on the data layer object`,
-    });
-
 const userPropertiesLoggedIn$1 = joi
     .object()
     .keys({
-        visitor_type: joi.any().valid("logged_in").required().messages({
-            "any.only": `"visitor_type" should be one of "logged in".`,
-            "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest", depending on whether the user is logged in or not.`,
-        }),
-        customer_id: joi.string().required().messages({
-            "any.only": `"customer_id" should be a string representing the Shopify customer ID.`,
-            "any.required": `"customer_id" is a required field on the user_properties object when the customer is logged in, it should contain the Shopify customer id.`,
-        }),
-        customer_email: joi.string().required().messages({
-            "any.only": `"customer_email" should be a string representing the customers email stored in Shopify.`,
-            "any.required": `"customer_email" is a required field on the user_properties object when the customer is logged in, it should contain the customer email.`,
-        }),
-        customer_order_count: joi.string().required().messages({
-            "any.only": `"customer_order_count" should be a string representing the customers total order count.`,
-            "any.required": `"customer_order_count" is a required field on the user_properties object when the customer is logged in, it should contain the order count for the customer.`,
-        }),
-        customer_total_spent: joi.string().required().messages({
-            "any.only": `"customer_total_spent" should be a string representing the total spent by this customer in the store.`,
-            "any.required": `"customer_total_spent" is a required field on the user_properties object when the customer is logged in, it should be a string containing the total spent by the customer.`,
-        }),
-        customer_address_1: joi.string().required().messages({
-            "any.only": `"customer_address_1" should be a string representing the first line of the customers address.`,
-            "any.required": `"customer_address_1" is a required field on the user_properties object when the user is logged in and should be a string containing the first line of the customer's address.`,
-        }),
-        customer_address_2: joi.string().allow(null, "").required().messages({
-            "any.only": `"customer_address_2" should be a string representing the first line of the customers address.`,
-            "any.required": `"customer_address_2" is a required field on the user_properties object when the user is logged in and should be a string containing the second line of the customer's address.`,
-        }),
-        customer_city: joi.string().required().messages({
-            "any.only": `"customer_city" should be a string representing the customer city.`,
-            "any.required": `"customer_city" is a required field on the user_properties object when the user is logged in and should be a string containing the customer's city.`,
-        }),
-        customer_country: joi.string().required().messages({
-            "any.only": `"customer_country" should be a string representing the customer country.`,
-            "any.required": `"customer_country" is a required field on the user_properties object when the user is logged in and should be a string containing the customer's country.`,
-        }),
-        customer_first_name: joi.string().required().messages({
-            "any.only": `"customer_first_name" should be a string representing the customer's first name.`,
-            "any.required": `"customer_first_name" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's first name.`,
-        }),
-        customer_last_name: joi.string().required().messages({
-            "any.only": `"customer_last_name" should be a string representing the customer's last name.`,
-            "any.required": `"customer_last_name" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's last name.`,
-        }),
-        customer_phone: joi.string().required().messages({
-            "any.only": `"customer_phone" should be a string representing the customer's phone number.`,
-            "any.required": `"customer_phone" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's phone number.`,
-        }),
-        customer_province: joi.string().required().messages({
-            "any.only": `"customer_province" should be a string representing the customer's province or state.`,
-            "any.required": `"customer_province" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's province or state.`,
-        }),
-        customer_province_code: joi.string().required().messages({
-            "any.only": `"customer_province_code" should be a string representing the customer's province or state for example SC or AB.`,
-            "any.required": `"customer_province_code" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's province code for example SC or AB.`,
-        }),
-        customer_zip: joi.string().required().messages({
-            "any.only": `"customer_zip" should be a string representing the customer's zip or postal code.`,
-            "any.required": `"customer_zip" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's zip or postal code.`,
-        }),
         user_consent: userConsent,
         user_id: userId,
+        visitor_type: visitorType,
+        customer_id: customerId,
+        customer_email: customerEmail,
+        customer_order_count: customerOrderCount,
+        customer_total_spent: customerTotalSpent,
+        customer_address_1: customerAddress1,
+        customer_address_2: customerAddress2,
+        customer_city: customerCity,
+        customer_country: customerCountry,
+        customer_first_name: customerFirstName,
+        customer_last_name: customerLastName,
+        customer_phone: customerPhone,
+        customer_province: customerProvince,
+        customer_province_code: customerProvinceCode,
+        customer_zip: customerZip,
     })
     .required()
     .messages({
-        "any.only": `"user_properties" should be an object representing the Shopify user properties. See documentation for more details.`,
+        "any.required": `"user_properties" is a required field on the data layer object`,
+    });
+
+const userPropertiesNotLoggedIn$1 = joi
+    .object()
+    .keys({
+        user_consent: userConsent,
+        user_id: userId,
+        visitor_type: visitorType,
+    })
+    .required()
+    .messages({
         "any.required": `"user_properties" is a required field on the data layer object`,
     });
 
@@ -1104,12 +1097,6 @@ const userPropertiesLoggedIn = {
     visitor_type: "logged_in"
 };
 
-const dl_login_schema_example = {
-    event: "dl_login",
-    event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312", // unique uuid for FB conversion API
-    user_properties: userPropertiesLoggedIn
-};
-
 const dl_sign_up_schema_example = {
     event: "dl_sign_up",
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312", // unique uuid for FB conversion API
@@ -1120,26 +1107,44 @@ const dl_route_change_schema_example = {
     event: "dl_route_change",
 };
 
+const eventsRequiringUserPropertiesSchema = [
+    "dl_user_data",
+    "dl_login",
+    "dl_sign_up",
+];
+
 class DLEvent {
     constructor(dataLayerObject) {
-        this.dataLayerObject = dataLayerObject;
+        this._dataLayerObject = dataLayerObject;
         this._errors = [];
         this._verificationSummary;
         this._isValid;
+        this._userIsLoggedIn =
+            dataLayerObject.user_properties?.visitor_type === "logged_in";
+        this._dlEventName = dataLayerObject.event_name;
     }
 
-    verify(userProperties, eventName) {
-        if (this._verificationhasBeenRun === true)
+    verify(additionalSchemas) {
+        if (this._verificationhasBeenRun)
             throw new Error(
                 "Can't call verify more than once on the same object."
             );
+
+        // Build the schema for the event
         const dlEventSchema = joi.object({
-            event: getEventNameSchema(eventName),
-            ...(this.getEventName() !== "dl_route_change" && {event_id: eventId}),
-            ...userProperties,
+            event: getEventNameSchema(this._dlEventName),
+            // user_properties only required on dl_user_data, dl_login, dl_signup
+            ...(this.eventRequiresUserProperties() && {
+                user_properties: this.getUserPropertiesSchema(),
+            }),
+            // No event_id for dl_route_change
+            ...(this.getEventName() !== "dl_route_change" && {
+                event_id: eventId,
+            }),
+            ...additionalSchemas,
         });
 
-        const validation = dlEventSchema.validate(this.dataLayerObject, {
+        const validation = dlEventSchema.validate(this._dataLayerObject, {
             abortEarly: false,
             allowUnknown: true,
         });
@@ -1147,13 +1152,17 @@ class DLEvent {
         if (validation.error) {
             this._isValid = false;
             this._errors = validation.error.details;
-            this._verificationSummary = `${eventName} event_id ${this.formatEventID(
-                this.dataLayerObject.event_id
+            this._verificationSummary = `${
+                this._dlEventName
+            } event_id ${this.formatEventID(
+                this._dataLayerObject.event_id
             )} is invalid`;
         } else {
             this._isValid = true;
-            this._verificationSummary = `${eventName} event_id: ${this.formatEventID(
-                this.dataLayerObject.event_id
+            this._verificationSummary = `${
+                this._dlEventName
+            } event_id: ${this.formatEventID(
+                this._dataLayerObject.event_id
             )} is valid.`;
         }
         this._verificationhasBeenRun = true;
@@ -1164,8 +1173,21 @@ class DLEvent {
         return this._errors;
     }
 
+    eventRequiresUserProperties() {
+        return (
+            eventsRequiringUserPropertiesSchema.includes(this._dlEventName) ===
+            true
+        );
+    }
+
+    getUserPropertiesSchema() {
+        return this.userIsLoggedIn()
+            ? userPropertiesLoggedIn$1
+            : userPropertiesNotLoggedIn$1;
+    }
+
     getEventName() {
-        return this._eventName;
+        return this._dlEventName;
     }
 
     isValid() {
@@ -1181,9 +1203,13 @@ class DLEvent {
             this._errors,
             this._verificationSummary,
             additionalText,
-            this.dataLayerObject,
+            this._dataLayerObject,
             this.schemaExample
         );
+    }
+
+    userIsLoggedIn() {
+        return this._userIsLoggedIn;
     }
 
     formatEventID(eventID) {
@@ -1200,49 +1226,14 @@ class DLEventUserData extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_user_data_schema_example;
-        this._eventName = "dl_user_data";
-        try {
-            this.loggedIn =
-                dataLayerObject.user_properties.visitor_type === "logged_in";
-        } catch {
-            this.loggedIn = false;
-        }
-    }
-
-    verify() {
-        return super.verify(
-            {
-                user_properties: this.loggedIn
-                    ? userPropertiesLoggedIn$1
-                    : userProperties,
-            },
-            this._eventName
-        );
+        this._dlEventName = "dl_user_data";
     }
 }
 
 class DLEventLogin extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
-        this.schemaExample = dl_login_schema_example;
-        this._eventName = "dl_login";
-        try {
-            this.loggedIn =
-                dataLayerObject.user_properties.visitor_type === "logged_in";
-        } catch {
-            this.loggedIn = false;
-        }
-    }
-
-    verify() {
-        return super.verify(
-            {
-                user_properties: this.loggedIn
-                    ? userPropertiesLoggedIn$1
-                    : userProperties,
-            },
-            this._eventName
-        );
+        this._dlEventName = "dl_login";
     }
 }
 
@@ -1250,24 +1241,7 @@ class DLEventSignUp extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_sign_up_schema_example;
-        this._eventName = "dl_sign_up";
-        try {
-            this.loggedIn =
-                dataLayerObject.user_properties.visitor_type === "logged_in";
-        } catch {
-            this.loggedIn = false;
-        }
-    }
-
-    verify() {
-        return super.verify(
-            {
-                user_properties: this.loggedIn
-                    ? userPropertiesLoggedIn$1
-                    : userProperties,
-            },
-            this._eventName
-        );
+        this._dlEventName = "dl_sign_up";
     }
 }
 
@@ -1275,22 +1249,19 @@ class DLEventViewItem extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_view_item_schema_example;
-        this._eventName = "dl_view_item";
+        this._dlEventName = "dl_view_item";
     }
 
     verify() {
         return super.verify(
             ecommerceFactory("detail", {
                 list: joi.string().required().allow("").optional().messages({
-                    "any.only": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                 }),
                 action: joi.string().allow("detail").required().messages({
-                    "any.only": `"action" is a required field on the actionField object and should contain the string "detail"`,
                     "any.required": `"action" is a required field on the actionField object and should contain the string "detail"`,
                 }),
-            }),
-            this._eventName
+            })
         );
     }
 }
@@ -1299,22 +1270,19 @@ class DLEventAddToCart extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_add_to_cart_schema_example;
-        this._eventName = "dl_add_to_cart";
+        this._dlEventName = "dl_add_to_cart";
     }
 
     verify() {
         super.verify(
             ecommerceFactory("add", {
                 list: joi.string().required().allow("").optional().messages({
-                    "any.only": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                 }),
                 action: joi.string().allow("add").required().messages({
-                    "any.only": `"action" is a required field on the actionField object and should contain the string "add"`,
                     "any.required": `"action" is a required field on the actionField object and should contain the string "add"`,
                 }),
-            }),
-            this._eventName
+            })
         );
     }
 }
@@ -1323,22 +1291,19 @@ class DLEventBeginCheckout extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_begin_checkout_schema_example;
-        this._eventName = "dl_begin_checkout";
+        this._dlEventName = "dl_begin_checkout";
     }
 
     verify() {
         super.verify(
             ecommerceFactory("checkout", {
                 step: joi.string().allow("1").required().messages({
-                    "any.only": `"step" is a required field on the actionField object and should contain the string "1".`,
                     "any.required": `"step" is a required field on the actionField object and should contain the string "1".`,
                 }),
                 action: joi.string().allow("checkout").required().messages({
-                    "any.only": `"action" is a required field on the actionField object and should contain the string "checkout"`,
                     "any.required": `"action" is a required field on the actionField object and should contain the string "checkout"`,
                 }),
-            }),
-            this._eventName
+            })
         );
     }
 }
@@ -1347,18 +1312,16 @@ class DLEventRemoveFromCart extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_remove_from_cart_schema_example;
-        this._eventName = "dl_remove_from_cart";
+        this._dlEventName = "dl_remove_from_cart";
     }
 
     verify() {
         super.verify(
             ecommerceFactory("remove", {
                 list: joi.string().required().allow("").optional().messages({
-                    "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                 }),
-            }),
-            this._eventName
+            })
         );
     }
 }
@@ -1367,14 +1330,13 @@ class DLEventSelectItem extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_select_item_schema_example;
-        this._eventName = "dl_select_item";
+        this._dlEventName = "dl_select_item";
     }
 
     verify() {
         super.verify(
             ecommerceFactory("click", {
                 list: joi.string().required().allow("").optional().messages({
-                    "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                 }),
                 action: stringSchema(
@@ -1382,8 +1344,7 @@ class DLEventSelectItem extends DLEvent {
                     `"action" is a required field on the actionField object and should contain the string "click"`,
                     false
                 ),
-            }),
-            this._eventName
+            })
         );
     }
 }
@@ -1392,23 +1353,25 @@ class DLEventSearchResults extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_search_results_schema_example;
-        this._eventName = "dl_search_results";
+        this._dlEventName = "dl_search_results";
     }
 
     verify() {
-        super.verify(
-            {
-                ecommerce: ecommerceWithoutWrapper({
-                    actionField: {
-                        list: joi.string().required().allow("").optional().messages({
+        super.verify({
+            ecommerce: ecommerceWithoutWrapper({
+                actionField: {
+                    list: joi
+                        .string()
+                        .required()
+                        .allow("")
+                        .optional()
+                        .messages({
                             "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                             "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                         }),
-                    },
-                }),
-            },
-            this._eventName
-        );
+                },
+            }),
+        });
     }
 }
 
@@ -1416,24 +1379,26 @@ class DLEventViewCart extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_view_cart_schema_example;
-        this._eventName = "dl_view_cart";
+        this._dlEventName = "dl_view_cart";
     }
 
     verify() {
-        super.verify(
-            {
-                cart_total: cartTotal,
-                ecommerce: ecommerceWithoutWrapper({
-                    actionField: {
-                        list: joi.string().required().allow("").optional().messages({
+        super.verify({
+            cart_total: cartTotal,
+            ecommerce: ecommerceWithoutWrapper({
+                actionField: {
+                    list: joi
+                        .string()
+                        .required()
+                        .allow("")
+                        .optional()
+                        .messages({
                             "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                             "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                         }),
-                    },
-                }),
-            },
-            this._eventName
-        );
+                },
+            }),
+        });
     }
 }
 
@@ -1441,16 +1406,13 @@ class DLEventViewItemList extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_view_item_list_schema_example;
-        this._eventName = "dl_view_item_list";
+        this._dlEventName = "dl_view_item_list";
     }
 
     verify() {
-        super.verify(
-            {
-                ecommerce: ecommerceWithoutWrapper(),
-            },
-            this._eventName
-        );
+        super.verify({
+            ecommerce: ecommerceWithoutWrapper(),
+        });
     }
 }
 
@@ -1458,11 +1420,7 @@ class DLEventRouteChange extends DLEvent {
     constructor(dataLayerObject) {
         super(dataLayerObject);
         this.schemaExample = dl_route_change_schema_example;
-        this._eventName = "dl_route_change";
-    }
-
-    verify() {
-        super.verify({}, this._eventName);
+        this._dlEventName = "dl_route_change";
     }
 }
 
