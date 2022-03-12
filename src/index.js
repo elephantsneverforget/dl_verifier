@@ -10,6 +10,7 @@ import {
     DLEventViewCart,
     DLEventViewItemList,
     DLEventSignUp,
+    DLEventRouteChange
 } from "./eventTypes/dlEvents.js";
 
 import { DB } from "./db";
@@ -27,12 +28,32 @@ const dlEventMap = {
     dl_view_cart: DLEventViewCart,
     dl_view_item_list: DLEventViewItemList,
     dl_view_item: DLEventViewItem,
+    dl_route_change: DLEventRouteChange,
 };
 
 if (typeof db === 'undefined') {
     var db = new DB();
 }
 var logger = new Logger();
+
+
+function buildInterface(){
+    let body = document.getElementsByTagName("body")[0];
+    // let buttonWrapper = document.createElement("div")
+    // buttonWrapper.classList.add("button-wrapper")
+    let clearVerificationButton = document.createElement("button");
+    clearVerificationButton.classList.add("clear-events", "button-dlv");
+    clearVerificationButton.innerText = "Reset"
+    clearVerificationButton.onclick = resetDB;
+    body.appendChild(clearVerificationButton);
+    let clearToastButton = document.createElement("button");
+    clearToastButton.classList.add("clear-toasts", "button-dlv"); 
+    clearToastButton.innerText = "Clear";
+    clearToastButton.onclick = logger.clearAllNotifications;
+    body.appendChild(clearToastButton);
+}
+
+
 function evaluateDLEvent(dlEventObject) {
     const dlEventName = dlEventObject.event;
     if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
@@ -63,24 +84,6 @@ function resetDB() {
     );
 }
 
-function buildInterface(){
-    let body = document.getElementsByTagName("body")[0];
-    // let buttonWrapper = document.createElement("div")
-    // buttonWrapper.classList.add("button-wrapper")
-    let clearVerificationButton = document.createElement("button");
-    clearVerificationButton.classList.add("clear-events", "button-dlv");
-    clearVerificationButton.innerText = "Reset"
-    clearVerificationButton.onclick = resetDB;
-    body.appendChild(clearVerificationButton);
-    let clearToastButton = document.createElement("button");
-    clearToastButton.classList.add("clear-toasts", "button-dlv"); 
-    clearToastButton.innerText = "Clear";
-    clearToastButton.onclick = logger.clearAllNotifications;
-    body.appendChild(clearToastButton);
-}
-
-buildInterface();
-
 // Listen for DL updates and push for evaluation
 let lastIndexProcessed = 0;
 window.dataLayer = window.dataLayer || [];
@@ -89,3 +92,5 @@ setInterval(function () {
         evaluateDLEvent(window.dataLayer[lastIndexProcessed]);
     }
 }, 1000);
+
+buildInterface();

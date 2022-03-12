@@ -1,0 +1,20 @@
+export const userPropertiesLoggedIn = {
+    customer_address_1: "1 Hills Plantation Drive",
+	customer_address_2: "",
+	customer_city: "Charleston",
+	customer_country: "United States",
+	customer_email: "bill@gmail.com",
+	customer_first_name: "Bill",
+	customer_id: "5928549548188",
+	customer_last_name: "CA",
+	customer_order_count: "1",
+	customer_phone: "999-999-9999",
+	customer_province: "South Carolina",
+	customer_province_code: "SC",
+	customer_tags: "",
+	customer_total_spent: "0.0",
+	customer_zip: "22222",
+    user_consent: "",
+    user_id: "fadee0bb-008a-48d5-a659-983b4b77fbfb",
+    visitor_type: "logged_in"
+}

@@ -1,4 +1,4 @@
-import joi, { required } from "joi";
+import joi from "joi";
 import { Logger } from "../logger.js";
 import { eventId } from "../schemas.js";
 import { getEventNameSchema } from "../schemas.js";
@@ -25,24 +25,24 @@ import { dl_route_change_schema_example } from "../exampleSchemaObjects/dl_route
 
 class DLEvent {
     constructor(dataLayerObject) {
-        this.dataLayerObject = dataLayerObject;
+        this._dataLayerObject = dataLayerObject;
         this._errors = [];
         this._verificationSummary;
         this._isValid;
     }
 
-    verify(schemas, eventName) {
-        if (this._verificationhasBeenRun === true)
+    verify(userProperties, eventName) {
+        if (this._verificationhasBeenRun)
             throw new Error(
                 "Can't call verify more than once on the same object."
             );
         const dlEventSchema = joi.object({
             event: getEventNameSchema(eventName),
-            event_id: eventId,
-            ...schemas,
+            ...(this.getEventName() !== "dl_route_change" && {event_id: eventId}),
+            ...userProperties,
         });
 
-        const validation = dlEventSchema.validate(this.dataLayerObject, {
+        const validation = dlEventSchema.validate(this._dataLayerObject, {
             abortEarly: false,
             allowUnknown: true,
         });
@@ -51,12 +51,12 @@ class DLEvent {
             this._isValid = false;
             this._errors = validation.error.details;
             this._verificationSummary = `${eventName} event_id ${this.formatEventID(
-                this.dataLayerObject.event_id
+                this._dataLayerObject.event_id
             )} is invalid`;
         } else {
             this._isValid = true;
             this._verificationSummary = `${eventName} event_id: ${this.formatEventID(
-                this.dataLayerObject.event_id
+                this._dataLayerObject.event_id
             )} is valid.`;
         }
         this._verificationhasBeenRun = true;
@@ -84,7 +84,7 @@ class DLEvent {
             this._errors,
             this._verificationSummary,
             additionalText,
-            this.dataLayerObject,
+            this._dataLayerObject,
             this.schemaExample
         );
     }
@@ -104,12 +104,7 @@ export class DLEventUserData extends DLEvent {
         super(dataLayerObject);
         this.schemaExample = dl_user_data_schema_example;
         this._eventName = "dl_user_data";
-        try {
-            this.loggedIn =
-                dataLayerObject.user_properties.visitor_type === "logged_in";
-        } catch {
-            this.loggedIn = false;
-        }
+        this.loggedIn = dataLayerObject.user_properties?.visitor_type === "logged_in";
     }
 
     verify() {
@@ -129,12 +124,7 @@ export class DLEventLogin extends DLEvent {
         super(dataLayerObject);
         this.schemaExample = dl_login_schema_example;
         this._eventName = "dl_login";
-        try {
-            this.loggedIn =
-                dataLayerObject.user_properties.visitor_type === "logged_in";
-        } catch {
-            this.loggedIn = false;
-        }
+        this.loggedIn = dataLayerObject.user_properties?.visitor_type === "logged_in";
     }
 
     verify() {
@@ -154,12 +144,7 @@ export class DLEventSignUp extends DLEvent {
         super(dataLayerObject);
         this.schemaExample = dl_sign_up_schema_example;
         this._eventName = "dl_sign_up";
-        try {
-            this.loggedIn =
-                dataLayerObject.user_properties.visitor_type === "logged_in";
-        } catch {
-            this.loggedIn = false;
-        }
+        this.loggedIn = dataLayerObject.user_properties?.visitor_type === "logged_in";
     }
 
     verify() {
@@ -185,11 +170,9 @@ export class DLEventViewItem extends DLEvent {
         return super.verify(
             ecommerceFactory("detail", {
                 list: joi.string().required().allow("").optional().messages({
-                    "any.only": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                 }),
                 action: joi.string().allow("detail").required().messages({
-                    "any.only": `"action" is a required field on the actionField object and should contain the string "detail"`,
                     "any.required": `"action" is a required field on the actionField object and should contain the string "detail"`,
                 }),
             }),
@@ -209,11 +192,9 @@ export class DLEventAddToCart extends DLEvent {
         super.verify(
             ecommerceFactory("add", {
                 list: joi.string().required().allow("").optional().messages({
-                    "any.only": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
                 }),
                 action: joi.string().allow("add").required().messages({
-                    "any.only": `"action" is a required field on the actionField object and should contain the string "add"`,
                     "any.required": `"action" is a required field on the actionField object and should contain the string "add"`,
                 }),
             }),
@@ -233,11 +214,9 @@ export class DLEventBeginCheckout extends DLEvent {
         super.verify(
             ecommerceFactory("checkout", {
                 step: joi.string().allow("1").required().messages({
-                    "any.only": `"step" is a required field on the actionField object and should contain the string "1".`,
                     "any.required": `"step" is a required field on the actionField object and should contain the string "1".`,
                 }),
                 action: joi.string().allow("checkout").required().messages({
-                    "any.only": `"action" is a required field on the actionField object and should contain the string "checkout"`,
                     "any.required": `"action" is a required field on the actionField object and should contain the string "checkout"`,
                 }),
             }),
@@ -257,7 +236,6 @@ export class DLEventRemoveFromCart extends DLEvent {
         super.verify(
             ecommerceFactory("remove", {
                 list: joi.string().required().allow("").optional().messages({
-                    "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                 }),
             }),
@@ -277,7 +255,6 @@ export class DLEventSelectItem extends DLEvent {
         super.verify(
             ecommerceFactory("click", {
                 list: joi.string().required().allow("").optional().messages({
-                    "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                     "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
                 }),
                 action: stringSchema(

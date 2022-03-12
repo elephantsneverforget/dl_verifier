@@ -13,7 +13,8 @@ import {
     DLEventUserData,
     DLEventLogin,
     DLEventSignUp,
-    DLEventRouteChange
+    DLEventRouteChange,
+
 } from "./eventTypes/dlEvents.js";
 import { dl_view_item_schema_example } from "./exampleSchemaObjects/dl_view_item.js";
 import { dl_add_to_cart_schema_example } from "./exampleSchemaObjects/dl_add_to_cart.js";
@@ -27,6 +28,29 @@ import { dl_user_data_schema_example } from "./exampleSchemaObjects/dl_user_data
 import { dl_login_schema_example } from "./exampleSchemaObjects/dl_login.js";
 import { dl_sign_up_schema_example } from "./exampleSchemaObjects/dl_sign_up.js";
 import { dl_route_change_schema_example } from "./exampleSchemaObjects/dl_route_change.js";
+
+// describe("Anonymous and logged in users and user_properties", () => {
+//     test("The user_properties object for not logged in users should have the correct formatting.", () => {
+//         const dlEventUserData = new DLEventUserData(
+//             dl_user_data_schema_example
+//         );
+//         dlEventUserData.verify();
+//         expect(dlEventUserData.verify).toThrow(Error);
+//         expect(dlEventUserData.getErrors()).toHaveLength(0);
+//         expect(dlEventUserData.isValid()).toBe(true);
+//         expect(dlEventUserData.getVerificationSummary()).toContain("valid");
+//     });
+//     test("The user_properties object for logged in users should have the correct formatting", () => {
+//         const dlEventUserData = new DLEventUserData(
+//             dl_user_data_schema_example
+//         );
+//         dlEventUserData.verify();
+//         expect(dlEventUserData.verify).toThrow(Error);
+//         expect(dlEventUserData.getErrors()).toHaveLength(0);
+//         expect(dlEventUserData.isValid()).toBe(true);
+//         expect(dlEventUserData.getVerificationSummary()).toContain("valid");
+//     });
+// });
 
 describe("dl_view_item shape verifier", () => {
     test("A properly formatted dl_view_item object should not throw any errors", () => {

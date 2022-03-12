@@ -590,7 +590,7 @@ const products = joi
                 "any.only": `"brand" should be a string representing the product's brand.`,
                 "any.required": `"brand" is a required field on the products array constituent objects. If a brand can't be determined use an empty string.`,
             }),
-            category: joi.string().required().messages({
+            category: joi.string().allow("").required().messages({
                 "any.only": `"category" should be a string representing the product's category. For example "Toys".`,
                 "any.required": `"category" is a required field on the products array constituent objects. This represents the category from which the product is from. A Chess board might have a category of "board_game".`,
             }),
@@ -647,7 +647,8 @@ const ecommerce = (conts) =>
                     actionField: actionField(conts["actionField"]),
                     products: products,
                 })
-                .required().messages({
+                .required()
+                .messages({
                     "any.only": `This object should include a "${conts["ecommerceSubFieldWrapper"]}" property. See the documentation for more details.`,
                     "any.required": `This object should include a "${conts["ecommerceSubFieldWrapper"]}" property. See the documentation for more details`,
                 }),
@@ -687,9 +688,8 @@ const stringSchema = (only, required, emptyString) => {
         return joi.string().allow("").required().messages({
             "any.only": only,
             "any.required": required,
-        }); 
+        });
     }
-
 };
 
 const actionField = (action) =>
@@ -698,33 +698,29 @@ const actionField = (action) =>
         .keys({ ...action })
         .required();
 
-const userPropertiesLoggedIn = joi
+
+
+const visitorType = joi.any().valid("guest").required().messages({
+    "any.only": `"visitor_type" should be one of "logged in" or "guest".`,
+    "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest".`,
+});
+
+const userId = joi.string().messages({
+    "any.only": `"user_id" should be the Shopify user ID.`,
+    "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify user id.`,
+});
+
+const userConsent = joi.string().allow("").messages({
+    "any.only": `"user_consent" should contain the user consent variable from Shopfy. If no value is available use an empty string.`,
+    "any.required": `"user_consent" is a required field on the user_properties object and should contain an empty string if no consent is present.`,
+});
+
+const userProperties = joi
     .object()
     .keys({
-        visitor_type: joi
-            .any()
-            .valid("logged_in")
-            .required()
-            .messages({
-                "any.only": `"visitor_type" should be one of "logged in".`,
-                "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest", depending on whether the user is logged in or not.`,
-            }),
-        customer_id: joi.string().required().messages({
-            "any.only": `"customer_id" should be a string representing the Shopify customer ID.`,
-            "any.required": `"customer_id" is a required field on the user_properties object and should contain the Shopify customer id.`,
-        }),
-        customer_email: joi.string().required().messages({
-            "any.only": `"customer_email" should be a string representing the customers email stored in Shopify.`,
-            "any.required": `"customer_email" is a required field on the user_properties object and should contain the customer email.`,
-        }),
-        customer_order_count: joi.string().required().messages({
-            "any.only": `"customer_order_count" should be a string representing the customers total order count.`,
-            "any.required": `"customer_order_count" is a required field on the user_properties object and should contain the order count for the customer.`,
-        }),
-        customer_total_spent: joi.string().required().messages({
-            "any.only": `"customer_total_spent" should be a string representing the total spent by this customer in the store.`,
-            "any.required": `"customer_total_spent" is a required field on the user_properties object and should be a string containing the total spent by the customer.`,
-        }),
+        visitor_type: visitorType,
+        user_id: userId,
+        user_consent: userConsent,
     })
     .required()
     .messages({
@@ -732,24 +728,71 @@ const userPropertiesLoggedIn = joi
         "any.required": `"user_properties" is a required field on the data layer object`,
     });
 
-const userProperties = joi
+const userPropertiesLoggedIn$1 = joi
     .object()
     .keys({
-        visitor_type: joi
-            .any().valid("guest")
-            .required()
-            .messages({
-                "any.only": `"visitor_type" should be one of "logged in" or "guest".`,
-                "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest".`,
-            }),
-        user_id: joi.string().messages({
-            "any.only": `"user_id" should be the Shopify user ID.`,
-            "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify user id.`,
+        visitor_type: joi.any().valid("logged_in").required().messages({
+            "any.only": `"visitor_type" should be one of "logged in".`,
+            "any.required": `"visitor_type" is a required field on the user_properties object and should be one of "logged in" or "guest", depending on whether the user is logged in or not.`,
         }),
-        user_consent: joi.string().allow("").messages({
-            "any.only": `"user_consent" should contain the user consent variable from Shopfy. If no value is available use an empty string.`,
-            "any.required": `"user_consent" is a required field on the user_properties object and should contain an empty string if no consent is present.`,
+        customer_id: joi.string().required().messages({
+            "any.only": `"customer_id" should be a string representing the Shopify customer ID.`,
+            "any.required": `"customer_id" is a required field on the user_properties object when the customer is logged in, it should contain the Shopify customer id.`,
         }),
+        customer_email: joi.string().required().messages({
+            "any.only": `"customer_email" should be a string representing the customers email stored in Shopify.`,
+            "any.required": `"customer_email" is a required field on the user_properties object when the customer is logged in, it should contain the customer email.`,
+        }),
+        customer_order_count: joi.string().required().messages({
+            "any.only": `"customer_order_count" should be a string representing the customers total order count.`,
+            "any.required": `"customer_order_count" is a required field on the user_properties object when the customer is logged in, it should contain the order count for the customer.`,
+        }),
+        customer_total_spent: joi.string().required().messages({
+            "any.only": `"customer_total_spent" should be a string representing the total spent by this customer in the store.`,
+            "any.required": `"customer_total_spent" is a required field on the user_properties object when the customer is logged in, it should be a string containing the total spent by the customer.`,
+        }),
+        customer_address_1: joi.string().required().messages({
+            "any.only": `"customer_address_1" should be a string representing the first line of the customers address.`,
+            "any.required": `"customer_address_1" is a required field on the user_properties object when the user is logged in and should be a string containing the first line of the customer's address.`,
+        }),
+        customer_address_2: joi.string().allow(null, "").required().messages({
+            "any.only": `"customer_address_2" should be a string representing the first line of the customers address.`,
+            "any.required": `"customer_address_2" is a required field on the user_properties object when the user is logged in and should be a string containing the second line of the customer's address.`,
+        }),
+        customer_city: joi.string().required().messages({
+            "any.only": `"customer_city" should be a string representing the customer city.`,
+            "any.required": `"customer_city" is a required field on the user_properties object when the user is logged in and should be a string containing the customer's city.`,
+        }),
+        customer_country: joi.string().required().messages({
+            "any.only": `"customer_country" should be a string representing the customer country.`,
+            "any.required": `"customer_country" is a required field on the user_properties object when the user is logged in and should be a string containing the customer's country.`,
+        }),
+        customer_first_name: joi.string().required().messages({
+            "any.only": `"customer_first_name" should be a string representing the customer's first name.`,
+            "any.required": `"customer_first_name" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's first name.`,
+        }),
+        customer_last_name: joi.string().required().messages({
+            "any.only": `"customer_last_name" should be a string representing the customer's last name.`,
+            "any.required": `"customer_last_name" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's last name.`,
+        }),
+        customer_phone: joi.string().required().messages({
+            "any.only": `"customer_phone" should be a string representing the customer's phone number.`,
+            "any.required": `"customer_phone" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's phone number.`,
+        }),
+        customer_province: joi.string().required().messages({
+            "any.only": `"customer_province" should be a string representing the customer's province or state.`,
+            "any.required": `"customer_province" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's province or state.`,
+        }),
+        customer_province_code: joi.string().required().messages({
+            "any.only": `"customer_province_code" should be a string representing the customer's province or state for example SC or AB.`,
+            "any.required": `"customer_province_code" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's province code for example SC or AB.`,
+        }),
+        customer_zip: joi.string().required().messages({
+            "any.only": `"customer_zip" should be a string representing the customer's zip or postal code.`,
+            "any.required": `"customer_zip" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's zip or postal code.`,
+        }),
+        user_consent: userConsent,
+        user_id: userId,
     })
     .required()
     .messages({
@@ -1027,39 +1070,54 @@ const dl_select_item_schema_example = {
     },
 };
 
+const userPropertiesNotLoggedIn = {
+    user_consent: "",
+    user_id: "fadee0bb-008a-48d5-a659-983b4b77fbfb",
+    visitor_type: "guest"
+};
+
 const dl_user_data_schema_example = {
     event: "dl_user_data",
     event_id: "8ff28e85-0503-484e-bb86-53110aba98fb",
     cart_total: "85.0",
-    user_properties: {
-        visitor_type: "guest",
-        user_consent: "",
-        user_id: "208765e8-4f21-4168-bd20-cb799e0afddd",
-    },
+    user_properties: userPropertiesNotLoggedIn
+};
+
+const userPropertiesLoggedIn = {
+    customer_address_1: "1 Hills Plantation Drive",
+	customer_address_2: "",
+	customer_city: "Charleston",
+	customer_country: "United States",
+	customer_email: "bill@gmail.com",
+	customer_first_name: "Bill",
+	customer_id: "5928549548188",
+	customer_last_name: "CA",
+	customer_order_count: "1",
+	customer_phone: "999-999-9999",
+	customer_province: "South Carolina",
+	customer_province_code: "SC",
+	customer_tags: "",
+	customer_total_spent: "0.0",
+	customer_zip: "22222",
+    user_consent: "",
+    user_id: "fadee0bb-008a-48d5-a659-983b4b77fbfb",
+    visitor_type: "logged_in"
 };
 
 const dl_login_schema_example = {
     event: "dl_login",
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312", // unique uuid for FB conversion API
-    user_properties: {
-        visitor_type: "logged_in",
-        customer_id: "128746109283371019823", // Shopify customer id
-        customer_email: "customer@gmail.com",
-        customer_order_count: "2",
-        customer_total_spent: "126.00",
-    },
+    user_properties: userPropertiesLoggedIn
 };
 
 const dl_sign_up_schema_example = {
     event: "dl_sign_up",
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312", // unique uuid for FB conversion API
-    user_properties: {
-        visitor_type: "logged_in",
-        customer_id: "128746109283371019823", // Shopify customer id
-        customer_email: "customer@gmail.com",
-        customer_order_count: "2",
-        customer_total_spent: "126.00",
-    },
+    user_properties: userPropertiesLoggedIn,
+};
+
+const dl_route_change_schema_example = {
+    event: "dl_route_change",
 };
 
 class DLEvent {
@@ -1070,15 +1128,15 @@ class DLEvent {
         this._isValid;
     }
 
-    verify(schemas, eventName) {
+    verify(userProperties, eventName) {
         if (this._verificationhasBeenRun === true)
             throw new Error(
                 "Can't call verify more than once on the same object."
             );
         const dlEventSchema = joi.object({
             event: getEventNameSchema(eventName),
-            event_id: eventId,
-            ...schemas,
+            ...(this.getEventName() !== "dl_route_change" && {event_id: eventId}),
+            ...userProperties,
         });
 
         const validation = dlEventSchema.validate(this.dataLayerObject, {
@@ -1155,7 +1213,7 @@ class DLEventUserData extends DLEvent {
         return super.verify(
             {
                 user_properties: this.loggedIn
-                    ? userPropertiesLoggedIn
+                    ? userPropertiesLoggedIn$1
                     : userProperties,
             },
             this._eventName
@@ -1180,7 +1238,7 @@ class DLEventLogin extends DLEvent {
         return super.verify(
             {
                 user_properties: this.loggedIn
-                    ? userPropertiesLoggedIn
+                    ? userPropertiesLoggedIn$1
                     : userProperties,
             },
             this._eventName
@@ -1205,7 +1263,7 @@ class DLEventSignUp extends DLEvent {
         return super.verify(
             {
                 user_properties: this.loggedIn
-                    ? userPropertiesLoggedIn
+                    ? userPropertiesLoggedIn$1
                     : userProperties,
             },
             this._eventName
@@ -1396,6 +1454,18 @@ class DLEventViewItemList extends DLEvent {
     }
 }
 
+class DLEventRouteChange extends DLEvent {
+    constructor(dataLayerObject) {
+        super(dataLayerObject);
+        this.schemaExample = dl_route_change_schema_example;
+        this._eventName = "dl_route_change";
+    }
+
+    verify() {
+        super.verify({}, this._eventName);
+    }
+}
+
 function ecommerceFactory(subField, fields) {
     return {
         // action field builder + pass name of field that's not currency.
@@ -1419,7 +1489,8 @@ const eventList = [
     "dl_user_data",
     "dl_view_cart",
     "dl_view_item_list",
-    "dl_view_item"
+    "dl_view_item",
+    "dl_route_change"
 ];
 
 // Polling here because overriding the push method on window.dataLayer caused issuese in GTM preview mode
@@ -1482,12 +1553,32 @@ const dlEventMap = {
     dl_view_cart: DLEventViewCart,
     dl_view_item_list: DLEventViewItemList,
     dl_view_item: DLEventViewItem,
+    dl_route_change: DLEventRouteChange,
 };
 
 if (typeof db === 'undefined') {
     var db = new DB();
 }
 var logger = new Logger();
+
+
+function buildInterface(){
+    let body = document.getElementsByTagName("body")[0];
+    // let buttonWrapper = document.createElement("div")
+    // buttonWrapper.classList.add("button-wrapper")
+    let clearVerificationButton = document.createElement("button");
+    clearVerificationButton.classList.add("clear-events", "button-dlv");
+    clearVerificationButton.innerText = "Reset";
+    clearVerificationButton.onclick = resetDB;
+    body.appendChild(clearVerificationButton);
+    let clearToastButton = document.createElement("button");
+    clearToastButton.classList.add("clear-toasts", "button-dlv"); 
+    clearToastButton.innerText = "Clear";
+    clearToastButton.onclick = logger.clearAllNotifications;
+    body.appendChild(clearToastButton);
+}
+
+
 function evaluateDLEvent(dlEventObject) {
     const dlEventName = dlEventObject.event;
     if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
@@ -1518,24 +1609,6 @@ function resetDB() {
     );
 }
 
-function buildInterface(){
-    let body = document.getElementsByTagName("body")[0];
-    // let buttonWrapper = document.createElement("div")
-    // buttonWrapper.classList.add("button-wrapper")
-    let clearVerificationButton = document.createElement("button");
-    clearVerificationButton.classList.add("clear-events", "button-dlv");
-    clearVerificationButton.innerText = "Reset";
-    clearVerificationButton.onclick = resetDB;
-    body.appendChild(clearVerificationButton);
-    let clearToastButton = document.createElement("button");
-    clearToastButton.classList.add("clear-toasts", "button-dlv"); 
-    clearToastButton.innerText = "Clear";
-    clearToastButton.onclick = logger.clearAllNotifications;
-    body.appendChild(clearToastButton);
-}
-
-buildInterface();
-
 // Listen for DL updates and push for evaluation
 let lastIndexProcessed = 0;
 window.dataLayer = window.dataLayer || [];
@@ -1544,3 +1617,5 @@ setInterval(function () {
         evaluateDLEvent(window.dataLayer[lastIndexProcessed]);
     }
 }, 1000);
+
+buildInterface();
