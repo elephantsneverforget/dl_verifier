@@ -49,7 +49,7 @@ class DLEvent {
         // Build the schema for the event
         const dlEventSchema = joi.object({
             event: getEventNameSchema(eventName),
-            // user_properties only on dl_user_data, dl_login, dl_signup
+            // user_properties only required on dl_user_data, dl_login, dl_signup
             ...(this.eventRequiresUserProperties() && {
                 user_properties: this.getUserPropertiesSchema(),
             }),

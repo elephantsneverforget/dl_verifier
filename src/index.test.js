@@ -221,6 +221,13 @@ describe("dl_user_data shape verifier", () => {
         expect(dlEventUserData.isValid()).toBe(true);
         expect(dlEventUserData.getVerificationSummary()).toContain("valid");
     });
+    test("dl_user_data requires the user_properties field and should throw an error if not present", () => {
+        const dlEventUserData = new DLEventUserData(
+            { ...dl_user_data_schema_example, user_properties: {} }
+        );
+        dlEventUserData.verify();
+        expect(dlEventUserData.isValid()).toBe(false);
+    });
     test("A improperly formatted dl_user_data object should throw errors", () => {
         const dlEventUserData = new DLEventUserData(
             dl_remove_from_cart_schema_example
@@ -241,6 +248,13 @@ describe("dl_login shape verifier", () => {
         expect(dlEventLogin.isValid()).toBe(true);
         expect(dlEventLogin.getVerificationSummary()).toContain("valid");
     });
+    test("dl_login requires the user_properties field and should throw an error if not present", () => {
+        const dlEventLogin = new DLEventLogin(
+            { ...dl_login_schema_example, user_properties: {} }
+        );
+        dlEventLogin.verify();
+        expect(dlEventLogin.isValid()).toBe(false);
+    });
     test("A improperly formatted dl_login object should throw errors", () => {
         const dlEventLogin = new DLEventLogin(
             dl_remove_from_cart_schema_example
@@ -260,6 +274,13 @@ describe("dl_sign_up shape verifier", () => {
         expect(dlEventSignUp.getErrors()).toHaveLength(0);
         expect(dlEventSignUp.isValid()).toBe(true);
         expect(dlEventSignUp.getVerificationSummary()).toContain("valid");
+    });
+    test("dl_sign_up requires the user_properties field and should throw an error if not present", () => {
+        const dlEventSignUp = new DLEventSignUp(
+            { ...dl_sign_up_schema_example, user_properties: {} }
+        );
+        dlEventSignUp.verify();
+        expect(dlEventSignUp.isValid()).toBe(false);
     });
     test("A improperly formatted dl_sign_up object should throw errors", () => {
         const dlEventSignUp = new DLEventSignUp(

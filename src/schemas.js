@@ -47,16 +47,14 @@ const variant = joi.string().allow("").messages({
 });
 
 const inventory = joi.string().allow("").messages({
-    "any.only": `"inventory" should be a string representing the quantity in stock for the product. For example: "22"`,
+    "any.required": `"inventory" should be a string representing the quantity in stock for the product. For example: "22"`,
 });
 
 export const userId = joi.string().messages({
-    "any.only": `"user_id" should be the Shopify user ID.`,
     "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify user id.`,
 });
 
 export const userConsent = joi.string().allow("").messages({
-    "any.only": `"user_consent" should contain the user consent variable from Shopfy. If no value is available use an empty string.`,
     "any.required": `"user_consent" is a required field on the user_properties object and should contain an empty string if no consent is present.`,
 });
 
@@ -113,12 +111,10 @@ export const visitorType = joi
     });
 
 export const eventId = joi.string().min(5).required().messages({
-    "any.only": `"event_id" should be a UUID.`,
     "any.required": `"event_id" is a required field. It should be a UUID like value.`,
 });
 
 export const cartTotal = joi.string().min(2).required().messages({
-    "any.only": `"cart_total" should be a string representing the value of the cart. For example "26.99".`,
     "any.required": `"cart_total" is a required field. It should be a string representing the total value of the cart, for example "26.99".`,
 });
 
@@ -135,8 +131,7 @@ export const userProperties = joi
     })
     .required()
     .messages({
-        "any.only": `"user_properties" should be an object representing the Shopify user properties. See documentation for more details.`,
-        "any.required": `"user_properties" is a required field on the data layer object`,
+        "any.required": `"user_properties" should be an object representing the Shopify user properties. See documentation for more details.`,
     });
 
 export const impressions = joi
@@ -206,7 +201,6 @@ export const ecommerce = (conts) =>
         })
         .required()
         .messages({
-            "any.only": `"ecommerce" is a required field on the event object. See documentation for the required fields.`,
             "any.required": `"ecommerce" is a required field on the data layer object.`,
         });
 
@@ -222,19 +216,16 @@ export const ecommerceWithoutWrapper = (actionField) =>
         })
         .required()
         .messages({
-            "any.only": `"ecommerce" is a required field on the event object. See documentation for the required fields.`,
             "any.required": `"ecommerce" is a required field on the data layer object.`,
         });
 
 export const stringSchema = (only, required, emptyString) => {
     if (!emptyString) {
         return joi.string().required().messages({
-            "any.only": only,
             "any.required": required,
         });
     } else {
         return joi.string().allow("").required().messages({
-            "any.only": only,
             "any.required": required,
         });
     }
