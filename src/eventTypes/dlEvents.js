@@ -9,6 +9,7 @@ import {
     cartTotal,
     userPropertiesLoggedIn,
     userPropertiesNotLoggedIn,
+    buildListSchema,
 } from "../schemas.js";
 import { dl_view_item_schema_example } from "../exampleSchemaObjects/dl_view_item.js";
 import { dl_add_to_cart_schema_example } from "../exampleSchemaObjects/dl_add_to_cart.js";
@@ -30,14 +31,15 @@ const eventsRequiringUserPropertiesSchema = [
 ];
 
 class DLEvent {
-    constructor(dataLayerObject) {
+    constructor(dataLayerObject, schemaExample) {
+        this._schemaExample = schemaExample;
         this._dataLayerObject = dataLayerObject;
         this._errors = [];
         this._verificationSummary;
         this._isValid;
         this._userIsLoggedIn =
             dataLayerObject.user_properties?.visitor_type === "logged_in";
-        this._dlEventName = dataLayerObject.event_name;
+        this._dlEventName = schemaExample.event;
     }
 
     verify(additionalSchemas) {
@@ -120,7 +122,7 @@ class DLEvent {
             this._verificationSummary,
             additionalText,
             this._dataLayerObject,
-            this.schemaExample
+            this._schemaExample
         );
     }
 
@@ -140,40 +142,31 @@ class DLEvent {
 
 export class DLEventUserData extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_user_data_schema_example;
-        this._dlEventName = "dl_user_data";
+        super(dataLayerObject, dl_user_data_schema_example);
     }
 }
 
 export class DLEventLogin extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this._dlEventName = "dl_login";
+        super(dataLayerObject, dl_login_schema_example);
     }
 }
 
 export class DLEventSignUp extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_sign_up_schema_example;
-        this._dlEventName = "dl_sign_up";
+        super(dataLayerObject, dl_sign_up_schema_example);
     }
 }
 
 export class DLEventViewItem extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_view_item_schema_example;
-        this._dlEventName = "dl_view_item";
+        super(dataLayerObject, dl_view_item_schema_example);
     }
 
     verify() {
         return super.verify(
             ecommerceFactory("detail", {
-                list: joi.string().required().allow("").optional().messages({
-                    "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
-                }),
+                list: buildListSchema("action field"),
                 action: joi.string().allow("detail").required().messages({
                     "any.required": `"action" is a required field on the actionField object and should contain the string "detail"`,
                 }),
@@ -184,17 +177,13 @@ export class DLEventViewItem extends DLEvent {
 
 export class DLEventAddToCart extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_add_to_cart_schema_example;
-        this._dlEventName = "dl_add_to_cart";
+        super(dataLayerObject, dl_add_to_cart_schema_example);
     }
 
     verify() {
         super.verify(
             ecommerceFactory("add", {
-                list: joi.string().required().allow("").optional().messages({
-                    "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
-                }),
+                list: buildListSchema("action field"),
                 action: joi.string().allow("add").required().messages({
                     "any.required": `"action" is a required field on the actionField object and should contain the string "add"`,
                 }),
@@ -205,9 +194,7 @@ export class DLEventAddToCart extends DLEvent {
 
 export class DLEventBeginCheckout extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_begin_checkout_schema_example;
-        this._dlEventName = "dl_begin_checkout";
+        super(dataLayerObject, dl_begin_checkout_schema_example);
     }
 
     verify() {
@@ -226,17 +213,13 @@ export class DLEventBeginCheckout extends DLEvent {
 
 export class DLEventRemoveFromCart extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_remove_from_cart_schema_example;
-        this._dlEventName = "dl_remove_from_cart";
+        super(dataLayerObject, dl_remove_from_cart_schema_example);
     }
 
     verify() {
         super.verify(
             ecommerceFactory("remove", {
-                list: joi.string().required().allow("").optional().messages({
-                    "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                }),
+                list: buildListSchema("action field"),
             })
         );
     }
@@ -244,19 +227,14 @@ export class DLEventRemoveFromCart extends DLEvent {
 
 export class DLEventSelectItem extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_select_item_schema_example;
-        this._dlEventName = "dl_select_item";
+        super(dataLayerObject, dl_select_item_schema_example);
     }
 
     verify() {
         super.verify(
             ecommerceFactory("click", {
-                list: joi.string().required().allow("").optional().messages({
-                    "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                }),
+                list: buildListSchema("click field"),
                 action: stringSchema(
-                    `"action" is a required field on the actionField object and should contain the string "click"`,
                     `"action" is a required field on the actionField object and should contain the string "click"`,
                     false
                 ),
@@ -267,24 +245,14 @@ export class DLEventSelectItem extends DLEvent {
 
 export class DLEventSearchResults extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_search_results_schema_example;
-        this._dlEventName = "dl_search_results";
+        super(dataLayerObject, dl_search_results_schema_example);
     }
 
     verify() {
         super.verify({
             ecommerce: ecommerceWithoutWrapper({
                 actionField: {
-                    list: joi
-                        .string()
-                        .required()
-                        .allow("")
-                        .optional()
-                        .messages({
-                            "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                            "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                        }),
+                    list: buildListSchema("action field")
                 },
             }),
         });
@@ -293,9 +261,7 @@ export class DLEventSearchResults extends DLEvent {
 
 export class DLEventViewCart extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_view_cart_schema_example;
-        this._dlEventName = "dl_view_cart";
+        super(dataLayerObject, dl_view_cart_schema_example);
     }
 
     verify() {
@@ -303,15 +269,7 @@ export class DLEventViewCart extends DLEvent {
             cart_total: cartTotal,
             ecommerce: ecommerceWithoutWrapper({
                 actionField: {
-                    list: joi
-                        .string()
-                        .required()
-                        .allow("")
-                        .optional()
-                        .messages({
-                            "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                            "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                        }),
+                    list: buildListSchema("action field")
                 },
             }),
         });
@@ -320,9 +278,7 @@ export class DLEventViewCart extends DLEvent {
 
 export class DLEventViewItemList extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_view_item_list_schema_example;
-        this._dlEventName = "dl_view_item_list";
+        super(dataLayerObject, dl_view_item_list_schema_example);
     }
 
     verify() {
@@ -334,9 +290,7 @@ export class DLEventViewItemList extends DLEvent {
 
 export class DLEventRouteChange extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_route_change_schema_example;
-        this._dlEventName = "dl_route_change";
+        super(dataLayerObject, dl_route_change_schema_example);
     }
 }
 

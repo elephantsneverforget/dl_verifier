@@ -37,6 +37,12 @@ const list = joi.string().required().optional().messages({
     "any.required": `"list" is a required field on the impressions array constituent objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
 });
 
+export const buildListSchema = (locations) => {
+    return joi.string().required().optional().messages({
+        "any.required": `"list" is a required field on the ${locations} objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
+    });
+}
+
 const image = joi.string().allow("").messages({
     "any.required": `"image" is an optional field on the ecommerce object and should be a valid URL.`,
 });
@@ -219,7 +225,7 @@ export const ecommerceWithoutWrapper = (actionField) =>
             "any.required": `"ecommerce" is a required field on the data layer object.`,
         });
 
-export const stringSchema = (only, required, emptyString) => {
+export const stringSchema = (required, emptyString) => {
     if (!emptyString) {
         return joi.string().required().messages({
             "any.required": required,
