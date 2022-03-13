@@ -38,10 +38,14 @@ const list = joi.string().required().optional().messages({
 });
 
 export const buildListSchema = (locations) => {
-    return joi.string().required().optional().messages({
-        "any.required": `"list" is a required field on the ${locations} objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
-    });
-}
+    return joi
+        .string()
+        .required()
+        .optional()
+        .messages({
+            "any.required": `"list" is a required field on the ${locations} objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
+        });
+};
 
 const image = joi.string().allow("").messages({
     "any.required": `"image" is an optional field on the ecommerce object and should be a valid URL.`,
@@ -106,7 +110,11 @@ const customerProvinceCode = joi.string().required().messages({
 const customerZip = joi.string().required().messages({
     "any.required": `"customer_zip" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's zip or postal code.`,
 });
-
+export const buildStepSchema = (stepNumber) => {
+    return joi.any().valid(stepNumber).required().messages({
+        "any.required": `"step" is a required field on the actionField object and should contain the string "${stepNumber}".` 
+    })
+}
 export const visitorType = joi
     .any()
     .valid("guest", "logged_in")
@@ -124,9 +132,15 @@ export const cartTotal = joi.string().min(2).required().messages({
     "any.required": `"cart_total" is a required field. It should be a string representing the total value of the cart, for example "26.99".`,
 });
 
-const currencyCode = joi.string().min(3).max(3).required().messages({
+export const currencyCode = joi.string().min(3).max(3).required().messages({
     "any.required": `"currencyCode" is a required field on the ecommerce object, it should be 3 characters long and contain a currency code such as "USD".`,
 });
+
+export const buildActionSchema = (location, stringName) => {
+    return joi.string().allow(`${stringName}`).required().messages({
+        "any.required": `"action" is a required field on the ${location} object and should contain the string "${stringName}"`,
+    });
+};
 
 export const userProperties = joi
     .object()
@@ -183,65 +197,12 @@ export const products = joi
         "any.required": `You must have at least one product in the "products" array.`,
     });
 
-export const getEventNameSchema = function (eventName) {
+export const getEventNameSchema = (eventName) => {
     return joi.string().valid(eventName).required().messages({
         "any.required": `"event" is a required field on the data layer object and should contain and event name such as dl_view_item, dl_add_to_cart etc...`,
     });
 };
 
-export const ecommerce = (conts) =>
-    joi
-        .object()
-        .keys({
-            currencyCode: currencyCode,
-            [conts["ecommerceSubFieldWrapper"]]: joi
-                .object()
-                .keys({
-                    actionField: actionField(conts["actionField"]),
-                    products: products,
-                })
-                .required()
-                .messages({
-                    "any.required": `This object should include a "${conts["ecommerceSubFieldWrapper"]}" property. See the documentation for more details`,
-                }),
-        })
-        .required()
-        .messages({
-            "any.required": `"ecommerce" is a required field on the data layer object.`,
-        });
-
-export const ecommerceWithoutWrapper = (actionField) =>
-    joi
-        .object()
-        .keys({
-            currencyCode: currencyCode,
-            ...(actionField && {
-                actionField: actionField,
-            }),
-            impressions: impressions,
-        })
-        .required()
-        .messages({
-            "any.required": `"ecommerce" is a required field on the data layer object.`,
-        });
-
-export const stringSchema = (required, emptyString) => {
-    if (!emptyString) {
-        return joi.string().required().messages({
-            "any.required": required,
-        });
-    } else {
-        return joi.string().allow("").required().messages({
-            "any.required": required,
-        });
-    }
-};
-
-const actionField = (action) =>
-    joi
-        .object()
-        .keys({ ...action })
-        .required();
 
 export const userPropertiesLoggedIn = joi
     .object()
