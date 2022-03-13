@@ -1408,8 +1408,14 @@ class DB {
     }
 
     _initDB() {
-        const initialDB = {};
-        eventList.forEach((item) => initialDB[item] = 2);
+        const initialDB = {
+            events: {},
+            // scriptLoads: {
+            //     dlListenerLoaded: false,
+            //     gtmLoaded: false
+            // }
+        };
+        eventList.forEach((item) => initialDB.events[item] = 2);
         if (!window.localStorage.getItem(this._dbName)) {
             window.localStorage.setItem(
                 this._dbName,
@@ -1418,24 +1424,37 @@ class DB {
         }
     }
 
-    setProperty(property, value) {
+    setEventValidityProperty(property, value) {
         const currentDB = this.getDB();
-        const newDB = Object.assign(currentDB, {[property]: value});
+        currentDB.events[property] = value;
         window.localStorage.setItem(
             this._dbName,
-            JSON.stringify(newDB)
+            JSON.stringify(currentDB)
         );
     }
 
+    // setScriptLoadStatus(property, value) {
+    //     const currentDB = this.getDB()
+    //     currentDB.scriptLoads[property] = value;
+    //     window.localStorage.setItem(
+    //         this._dbName,
+    //         JSON.stringify(currentDB)
+    //     );
+    // }
+
     clear() {
-        // eslint-disable-next-line no-undef
-        const initialDB = {};
-        eventList.forEach((item) => initialDB[item] = 2);
+        const initialDB = {
+            events: {},
+            // scriptLoads: {
+            //     dlListenerLoaded: false,
+            //     gtmLoaded: false
+            // }
+        };
+        eventList.forEach((item) => initialDB.events[item] = 2);
         window.localStorage.setItem(
             this._dbName,
             JSON.stringify(initialDB)
         );
-
     }
 }
 
@@ -1462,8 +1481,6 @@ var logger = new Logger();
 
 function buildInterface(){
     let body = document.getElementsByTagName("body")[0];
-    // let buttonWrapper = document.createElement("div")
-    // buttonWrapper.classList.add("button-wrapper")
     let clearVerificationButton = document.createElement("button");
     clearVerificationButton.classList.add("clear-events", "button-dlv");
     clearVerificationButton.innerText = "Reset";
@@ -1486,7 +1503,7 @@ function evaluateDLEvent(dlEventObject) {
     dlEvent.logVerificationOutcome();
 
     try {
-        db.setProperty(dlEvent.getEventName(), dlEvent.isValid() ? 1 : 0);
+        db.setEventValidityProperty(dlEvent.getEventName(), dlEvent.isValid() ? 1 : 0);
         window.dispatchEvent(
             new CustomEvent("__elever_injected_script_message", {
                 detail: { db: db.getDB() },

@@ -11,15 +11,18 @@ chrome.runtime.onMessage.addListener((request, sender) => {
 chrome.webRequest.onCompleted.addListener(
     function (response) {
         // If loading GTM Suite events script or GTM
+        console.log("test")
         if (response.statusCode === 200) {
-            if (response.url.contains("events.js")) {
+            if (response.url.includes("events.js")) {
+                chrome.storage.local.set({ [`${response.tabId}-dlListenerLoaded`]: true }, function () {}); 
+                console.log(response);
                 return;
-            } else if (response.url.contains("GTM-")) {
+            } else if (response.url.includes("GTM-")) {
+                chrome.storage.local.set({ [`${response.tabId}-gtmLoaded`]: true }, function () {}); 
+                console.log(response);
                 return;
             }
         }
-        console.log(response);
-        // if (response.url) {};
     },
     {
         urls: [

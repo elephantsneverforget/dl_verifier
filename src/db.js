@@ -16,8 +16,14 @@ export class DB {
     }
 
     _initDB() {
-        const initialDB = {}
-        eventList.forEach((item) => initialDB[item] = 2);
+        const initialDB = {
+            events: {},
+            // scriptLoads: {
+            //     dlListenerLoaded: false,
+            //     gtmLoaded: false
+            // }
+        }
+        eventList.forEach((item) => initialDB.events[item] = 2);
         if (!window.localStorage.getItem(this._dbName)) {
             window.localStorage.setItem(
                 this._dbName,
@@ -26,23 +32,36 @@ export class DB {
         }
     }
 
-    setProperty(property, value) {
+    setEventValidityProperty(property, value) {
         const currentDB = this.getDB()
-        const newDB = Object.assign(currentDB, {[property]: value})
+        currentDB.events[property] = value;
         window.localStorage.setItem(
             this._dbName,
-            JSON.stringify(newDB)
+            JSON.stringify(currentDB)
         );
     }
 
+    // setScriptLoadStatus(property, value) {
+    //     const currentDB = this.getDB()
+    //     currentDB.scriptLoads[property] = value;
+    //     window.localStorage.setItem(
+    //         this._dbName,
+    //         JSON.stringify(currentDB)
+    //     );
+    // }
+
     clear() {
-        // eslint-disable-next-line no-undef
-        const initialDB = {}
-        eventList.forEach((item) => initialDB[item] = 2);
+        const initialDB = {
+            events: {},
+            // scriptLoads: {
+            //     dlListenerLoaded: false,
+            //     gtmLoaded: false
+            // }
+        }
+        eventList.forEach((item) => initialDB.events[item] = 2);
         window.localStorage.setItem(
             this._dbName,
             JSON.stringify(initialDB)
         );
-
     }
 }
