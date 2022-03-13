@@ -8,6 +8,23 @@ chrome.runtime.onMessage.addListener((request, sender) => {
     return true; // Required to keep message port open
 });
 
-// chrome.webRequest.onCompleted.addListener(function(val){
-//     console.log(val)
-// }, {urls: ["<all_urls>"]})
+chrome.webRequest.onCompleted.addListener(
+    function (response) {
+        // If loading GTM Suite events script or GTM
+        if (response.statusCode === 200) {
+            if (response.url.contains("events.js")) {
+                return;
+            } else if (response.url.contains("GTM-")) {
+                return;
+            }
+        }
+        console.log(response);
+        // if (response.url) {};
+    },
+    {
+        urls: [
+            "*://shopify-gtm-suite.getelevar.com/*/*events.js",
+            "*://*/*gtm.js?id=GTM-*",
+        ],
+    }
+);

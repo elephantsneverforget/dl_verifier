@@ -555,6 +555,16 @@ const list = joi.string().required().optional().messages({
     "any.required": `"list" is a required field on the impressions array constituent objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
 });
 
+const buildListSchema = (locations) => {
+    return joi
+        .string()
+        .required()
+        .optional()
+        .messages({
+            "any.required": `"list" is a required field on the ${locations} objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
+        });
+};
+
 const image = joi.string().allow("").messages({
     "any.required": `"image" is an optional field on the ecommerce object and should be a valid URL.`,
 });
@@ -618,7 +628,11 @@ const customerProvinceCode = joi.string().required().messages({
 const customerZip = joi.string().required().messages({
     "any.required": `"customer_zip" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's zip or postal code.`,
 });
-
+const buildStepSchema = (stepNumber) => {
+    return joi.any().valid(stepNumber).required().messages({
+        "any.required": `"step" is a required field on the actionField object and should contain the string "${stepNumber}".` 
+    })
+};
 const visitorType = joi
     .any()
     .valid("guest", "logged_in")
@@ -639,6 +653,12 @@ const cartTotal = joi.string().min(2).required().messages({
 const currencyCode = joi.string().min(3).max(3).required().messages({
     "any.required": `"currencyCode" is a required field on the ecommerce object, it should be 3 characters long and contain a currency code such as "USD".`,
 });
+
+const buildActionSchema = (location, stringName) => {
+    return joi.string().allow(`${stringName}`).required().messages({
+        "any.required": `"action" is a required field on the ${location} object and should contain the string "${stringName}"`,
+    });
+};
 
 joi
     .object()
@@ -695,65 +715,12 @@ const products = joi
         "any.required": `You must have at least one product in the "products" array.`,
     });
 
-const getEventNameSchema = function (eventName) {
+const getEventNameSchema = (eventName) => {
     return joi.string().valid(eventName).required().messages({
         "any.required": `"event" is a required field on the data layer object and should contain and event name such as dl_view_item, dl_add_to_cart etc...`,
     });
 };
 
-const ecommerce = (conts) =>
-    joi
-        .object()
-        .keys({
-            currencyCode: currencyCode,
-            [conts["ecommerceSubFieldWrapper"]]: joi
-                .object()
-                .keys({
-                    actionField: actionField(conts["actionField"]),
-                    products: products,
-                })
-                .required()
-                .messages({
-                    "any.required": `This object should include a "${conts["ecommerceSubFieldWrapper"]}" property. See the documentation for more details`,
-                }),
-        })
-        .required()
-        .messages({
-            "any.required": `"ecommerce" is a required field on the data layer object.`,
-        });
-
-const ecommerceWithoutWrapper = (actionField) =>
-    joi
-        .object()
-        .keys({
-            currencyCode: currencyCode,
-            ...(actionField && {
-                actionField: actionField,
-            }),
-            impressions: impressions,
-        })
-        .required()
-        .messages({
-            "any.required": `"ecommerce" is a required field on the data layer object.`,
-        });
-
-const stringSchema = (only, required, emptyString) => {
-    if (!emptyString) {
-        return joi.string().required().messages({
-            "any.required": required,
-        });
-    } else {
-        return joi.string().allow("").required().messages({
-            "any.required": required,
-        });
-    }
-};
-
-const actionField = (action) =>
-    joi
-        .object()
-        .keys({ ...action })
-        .required();
 
 const userPropertiesLoggedIn$1 = joi
     .object()
@@ -1097,6 +1064,12 @@ const userPropertiesLoggedIn = {
     visitor_type: "logged_in"
 };
 
+const dl_login_schema_example = {
+    event: "dl_login",
+    event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312", // unique uuid for FB conversion API
+    user_properties: userPropertiesLoggedIn
+};
+
 const dl_sign_up_schema_example = {
     event: "dl_sign_up",
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312", // unique uuid for FB conversion API
@@ -1114,14 +1087,15 @@ const eventsRequiringUserPropertiesSchema = [
 ];
 
 class DLEvent {
-    constructor(dataLayerObject) {
+    constructor(dataLayerObject, schemaExample) {
+        this._schemaExample = schemaExample;
         this._dataLayerObject = dataLayerObject;
         this._errors = [];
         this._verificationSummary;
         this._isValid;
         this._userIsLoggedIn =
             dataLayerObject.user_properties?.visitor_type === "logged_in";
-        this._dlEventName = dataLayerObject.event_name;
+        this._dlEventName = schemaExample.event;
     }
 
     verify(additionalSchemas) {
@@ -1204,7 +1178,7 @@ class DLEvent {
             this._verificationSummary,
             additionalText,
             this._dataLayerObject,
-            this.schemaExample
+            this._schemaExample
         );
     }
 
@@ -1224,216 +1198,182 @@ class DLEvent {
 
 class DLEventUserData extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_user_data_schema_example;
-        this._dlEventName = "dl_user_data";
+        super(dataLayerObject, dl_user_data_schema_example);
     }
 }
 
 class DLEventLogin extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this._dlEventName = "dl_login";
+        super(dataLayerObject, dl_login_schema_example);
     }
 }
 
 class DLEventSignUp extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_sign_up_schema_example;
-        this._dlEventName = "dl_sign_up";
+        super(dataLayerObject, dl_sign_up_schema_example);
     }
 }
 
 class DLEventViewItem extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_view_item_schema_example;
-        this._dlEventName = "dl_view_item";
+        super(dataLayerObject, dl_view_item_schema_example);
     }
 
     verify() {
-        return super.verify(
-            ecommerceFactory("detail", {
-                list: joi.string().required().allow("").optional().messages({
-                    "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
-                }),
-                action: joi.string().allow("detail").required().messages({
-                    "any.required": `"action" is a required field on the actionField object and should contain the string "detail"`,
-                }),
-            })
-        );
+        return super.verify({
+            ecommerce: {
+                currencyCode: currencyCode,
+                detail: {
+                    actionField: {
+                        list: buildListSchema("action field"),
+                        action: buildActionSchema("action field", "detail"),
+                    },
+                    products: products,
+                },
+            },
+        });
     }
 }
 
 class DLEventAddToCart extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_add_to_cart_schema_example;
-        this._dlEventName = "dl_add_to_cart";
+        super(dataLayerObject, dl_add_to_cart_schema_example);
     }
 
     verify() {
-        super.verify(
-            ecommerceFactory("add", {
-                list: joi.string().required().allow("").optional().messages({
-                    "any.required": `"list" is a required field on the actionField object and should contain the collection path to the product, or an empty string if not available.`,
-                }),
-                action: joi.string().allow("add").required().messages({
-                    "any.required": `"action" is a required field on the actionField object and should contain the string "add"`,
-                }),
-            })
-        );
+        return super.verify({
+            ecommerce: {
+                currencyCode: currencyCode,
+                add: {
+                    actionField: {
+                        list: buildListSchema("action field"),
+                        action: buildActionSchema("action field", "add"),
+                    },
+                    products: products,
+                },
+            },
+        });
     }
 }
 
 class DLEventBeginCheckout extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_begin_checkout_schema_example;
-        this._dlEventName = "dl_begin_checkout";
+        super(dataLayerObject, dl_begin_checkout_schema_example);
     }
 
     verify() {
-        super.verify(
-            ecommerceFactory("checkout", {
-                step: joi.string().allow("1").required().messages({
-                    "any.required": `"step" is a required field on the actionField object and should contain the string "1".`,
-                }),
-                action: joi.string().allow("checkout").required().messages({
-                    "any.required": `"action" is a required field on the actionField object and should contain the string "checkout"`,
-                }),
-            })
-        );
+        return super.verify({
+            ecommerce: {
+                currencyCode: currencyCode,
+                checkout: {
+                    actionField: {
+                        step: buildStepSchema("1"),
+                        action: buildActionSchema("action field", "checkout"),
+                    },
+                    products: products,
+                },
+            },
+        });
     }
 }
 
 class DLEventRemoveFromCart extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_remove_from_cart_schema_example;
-        this._dlEventName = "dl_remove_from_cart";
+        super(dataLayerObject, dl_remove_from_cart_schema_example);
     }
 
     verify() {
-        super.verify(
-            ecommerceFactory("remove", {
-                list: joi.string().required().allow("").optional().messages({
-                    "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                }),
-            })
-        );
+        return super.verify({
+            ecommerce: {
+                currencyCode: currencyCode,
+                remove: {
+                    actionField: {
+                        list: buildListSchema("action field"),
+                    },
+                    products: products,
+                },
+            },
+        });
     }
 }
 
 class DLEventSelectItem extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_select_item_schema_example;
-        this._dlEventName = "dl_select_item";
+        super(dataLayerObject, dl_select_item_schema_example);
     }
 
     verify() {
-        super.verify(
-            ecommerceFactory("click", {
-                list: joi.string().required().allow("").optional().messages({
-                    "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                }),
-                action: stringSchema(
-                    `"action" is a required field on the actionField object and should contain the string "click"`,
-                    `"action" is a required field on the actionField object and should contain the string "click"`,
-                    false
-                ),
-            })
-        );
+        return super.verify({
+            ecommerce: {
+                currencyCode: currencyCode,
+                click: {
+                    actionField: {
+                        list: buildListSchema("action field"),
+                        action: buildActionSchema("action field", "click"),
+                    },
+                    products: products,
+                },
+            },
+        });
     }
 }
 
 class DLEventSearchResults extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_search_results_schema_example;
-        this._dlEventName = "dl_search_results";
+        super(dataLayerObject, dl_search_results_schema_example);
     }
 
     verify() {
-        super.verify({
-            ecommerce: ecommerceWithoutWrapper({
+        return super.verify({
+            ecommerce: {
+                currencyCode: currencyCode,
                 actionField: {
-                    list: joi
-                        .string()
-                        .required()
-                        .allow("")
-                        .optional()
-                        .messages({
-                            "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                            "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                        }),
+                    list: buildListSchema("action field"),
                 },
-            }),
+                impressions: impressions,
+            },
         });
     }
 }
 
 class DLEventViewCart extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_view_cart_schema_example;
-        this._dlEventName = "dl_view_cart";
+        super(dataLayerObject, dl_view_cart_schema_example);
     }
 
     verify() {
-        super.verify({
+        return super.verify({
             cart_total: cartTotal,
-            ecommerce: ecommerceWithoutWrapper({
+            ecommerce: {
+                currencyCode: currencyCode,
                 actionField: {
-                    list: joi
-                        .string()
-                        .required()
-                        .allow("")
-                        .optional()
-                        .messages({
-                            "any.only": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                            "any.required": `"list" is a required field on the actionField object and should contain the collection the product is from. For example "/collections/puzzles".`,
-                        }),
+                    list: buildListSchema("action field"),
                 },
-            }),
+                impressions: impressions,
+            },
         });
     }
 }
 
 class DLEventViewItemList extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_view_item_list_schema_example;
-        this._dlEventName = "dl_view_item_list";
+        super(dataLayerObject, dl_view_item_list_schema_example);
     }
 
     verify() {
-        super.verify({
-            ecommerce: ecommerceWithoutWrapper(),
+        return super.verify({
+            ecommerce: {
+                currencyCode: currencyCode,
+                impressions: impressions,
+            },
         });
     }
 }
 
 class DLEventRouteChange extends DLEvent {
     constructor(dataLayerObject) {
-        super(dataLayerObject);
-        this.schemaExample = dl_route_change_schema_example;
-        this._dlEventName = "dl_route_change";
+        super(dataLayerObject, dl_route_change_schema_example);
     }
-}
-
-function ecommerceFactory(subField, fields) {
-    return {
-        // action field builder + pass name of field that's not currency.
-        ecommerce: ecommerce({
-            ecommerceSubFieldWrapper: subField,
-            actionField: {
-                ...fields,
-            },
-        }),
-    };
 }
 
 const eventList = [
