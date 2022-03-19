@@ -1,13 +1,14 @@
+// Set the events 
 chrome.runtime.onMessage.addListener((request, sender) => {
     if (request.msg == "DBUPDATE") {
         let db = Object.assign({}, request.data);
         let tabId = sender.tab.id;
-        // console.log("Saving db to local storage, tab ID is: " + tabId);
         chrome.storage.local.set({ [`${tabId}`]: db }, function () {});
     }
     return true; // Required to keep message port open
 });
 
+// Set gtmLoaded to true when listener loads
 chrome.webRequest.onCompleted.addListener(
     function (response) {
         // If loading GTM Suite events script or GTM
@@ -24,7 +25,7 @@ chrome.webRequest.onCompleted.addListener(
     }
 );
 
-
+// Set dlListenerLoaded to true when listener loads
 chrome.webRequest.onCompleted.addListener(
     function (response) {
         // If loading GTM Suite events script or GTM

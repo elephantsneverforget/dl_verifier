@@ -4,36 +4,42 @@ import htm from "./preact_htm.js";
 const html = htm.bind(h);
 let db, tabId, gtmLoaded, dlListenerLoaded;
 
-function App(props) {
-    console.log("Props.events " + JSON.stringify(props.events));
+const DLEventStatusElement = (props) => {
+    console.log(props.event);
+    return html`
+        <div>
+            <div class="event-title">${props.eventName}</div>
+            <div class="event-status ${getStatusCSS(props.eventStatus)}">
+                <span>${getStatus(props.eventStatus)}</span>
+            </div>
+        </div>
+    `;
+};
+
+const App = (props) => {
     return props.db?.events
         ? html`
               <div class="wrapper">
-                  <div class="container">
+                  <div class="container events-container">
                       ${Object.keys(props.db.events).map(
-                          (event) => html`
-                              <div>
-                                  <div class="event-title">${event}</div>
-                                  <div
-                                      class="event-status ${getStatusCSS(
-                                          props.db.events[event]
-                                      )}"
-                                  >
-                                      <span
-                                          >${getStatus(
-                                              props.db.events[event]
-                                          )}</span
-                                      >
-                                  </div>
-                              </div>
-                          `
+                          (event) =>
+                              html`<${DLEventStatusElement}
+                                  eventName=${event}
+                                  eventStatus=${props.db.events[event]}
+                              />`
                       )}
                   </div>
-                  <div class="container"></div>
-              </div>
-              <div>${props.gtmLoaded ? "GTM Loaded" : "nota"}</div>
-              <div>
-                  ${props.dlListenerLoaded ? "DL Listener Loaded" : "nota"}
+                  <div class="container scripts-container">
+                      <${DLEventStatusElement}
+                          eventName="GTM Loaded"
+                          eventStatus=${props.gtmLoaded}
+                      />
+                      <${DLEventStatusElement}
+                          eventName="DL Listener Loaded"
+                          eventStatus=${props.dlListenerLoaded}
+                      />
+
+                  </div>
               </div>
           `
         : html`<div>Waiting for data. Fire an event.</div>
@@ -41,7 +47,7 @@ function App(props) {
               <div>
                   ${props.dlListenerLoaded ? "DL Listener Loaded" : "nota"}
               </div> `;
-}
+};
 
 // What tab am I?
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
