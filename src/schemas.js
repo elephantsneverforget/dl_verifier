@@ -56,8 +56,10 @@ const variant = joi.string().allow("").messages({
     "any.required": `"variant" is a required field on the ecommerce object.`,
 });
 
+const inventoryString = `"inventory" should be a string representing the quantity in stock for the product. For example: "22"` 
 const inventory = joi.string().allow("").messages({
-    "any.required": `"inventory" should be a string representing the quantity in stock for the product. For example: "22"`,
+    "any.all": inventoryString,
+    "any.required": inventoryString,
 });
 
 export const userId = joi.string().messages({
