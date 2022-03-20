@@ -7,60 +7,54 @@
         <title>HTML 5 Boilerplate</title>
         <script type="module" src="./panel.js"></script>
         <style>
-            #popup {
-                width: 400px;
-                padding: 20px;
-            }
-            th {
-                text-align: left;
-            }
-            td {
-                padding-top: 10px;
-            }
-            tr:nth-child(even) {
-                background: #ccc;
-            }
-            tr:nth-child(odd) {
-                background: #fff;
-            }
-            td {
-                padding-left: 0px;
-                padding-right: 0px;
-            }
-            
-            .wrapper {
-                display: flex;
-                direction: row;
-            }
-
-
-
             .container {
+                top: 0;
+                position: fixed;
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: center;
-                margin-top: 25px;
+                padding-top: 25px;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
                     Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
                     "Segoe UI Emoji", "Segoe UI Symbol";
             }
 
+            .events-container {
+                width: 75%;
+                left: 0;
+            }
+
             .scripts-container {
-                align-items: start;
+                right: 0;
+                width: 25%;
+                height: 100%;
+                background: #f8f8f8;
+                align-items: center;
                 flex-direction: column;
                 justify-content: flex-start;
             }
 
-            .container > div {
-                border: 1px solid #e9e9e9;
+            .status-element {
+                border: 1px solid #f6f6f6;
                 background-color: white;
                 border-radius: 8px;
                 margin: 10px;
-                font-size: 14px;
-                width: 230px;
+                font-size: 12px;
+                width: 200px;
                 text-align: center;
-                -webkit-box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.09);
-                box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.09);
+                -webkit-box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.02);
+                box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.02);
+            }
+
+            .feather-check-circle {
+                color: rgb(61 199 99);
+                stroke: rgb(61 199 99);
+            }
+
+            .icon {
+                vertical-align: top;
+                padding-left: 6px;
+                display: inline-block;
             }
 
             .event-title {
@@ -82,8 +76,6 @@
                 background: rgb(61 199 99 / 34%);
                 color: rgb(61 199 99);
             }
-
-
 
             .error {
                 background: rgb(237 61 61 / 17%);

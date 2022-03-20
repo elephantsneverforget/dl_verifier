@@ -15,8 +15,8 @@ export class Logger {
         if (errors.length > 0) {
             notyf.error({
                 message: verificationSummary,
-                duration: 0,
-                dismissible: false,
+                duration: 6000,
+                dismissible: true,
                 position: { x: "left", y: "bottom" },
                 ripple: false,
             });
@@ -54,8 +54,8 @@ export class Logger {
         } else {
             notyf.success({
                 message: verificationSummary,
-                duration: 0,
-                dismissible: false,
+                duration: 6000,
+                dismissible: true,
                 position: { x: "left", y: "bottom" },
                 ripple: false,
             });

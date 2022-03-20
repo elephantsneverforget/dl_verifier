@@ -12,7 +12,7 @@ chrome.runtime.onMessage.addListener((request, sender) => {
 chrome.webRequest.onCompleted.addListener(
     function (response) {
         // If loading GTM Suite events script or GTM
-        console.log("set to true gtmLoaded. Tab ID is: " + response.tabId);
+        // console.log("set to true gtmLoaded. Tab ID is: " + response.tabId);
         if (response.statusCode === 200) {
             chrome.storage.local.set(
                 { [`${response.tabId}-gtmLoaded`]: true },
@@ -29,7 +29,7 @@ chrome.webRequest.onCompleted.addListener(
 chrome.webRequest.onCompleted.addListener(
     function (response) {
         // If loading GTM Suite events script or GTM
-        console.log("set to true DL Listener loaded. Tab ID is: " + response.tabId);
+        // console.log("set to true DL Listener loaded. Tab ID is: " + response.tabId);
         if (response.statusCode === 200) {
             chrome.storage.local.set(
                 { [`${response.tabId}-dlListenerLoaded`]: true },

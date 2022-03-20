@@ -1,16 +1,74 @@
-import { h, render } from "./preact.js";
-import htm from "./preact_htm.js";
+import { h, render } from "./preact/preact.js";
+import htm from "./preact/preact_htm.js";
 
 const html = htm.bind(h);
 let db, tabId, gtmLoaded, dlListenerLoaded;
 
 const DLEventStatusElement = (props) => {
+    const getEventStatusIcon = (eventStatus) => {
+        switch (eventStatus) {
+            case 0:
+                return "assets/x-circle.svg";
+            case 1:
+                return "assets/check-circle.svg";
+            case 2:
+                return "assets/eye-off.svg";
+            default:
+                return "";
+        }
+    };
+    const getEventStatusText = (eventStatus) => {
+        switch (eventStatus) {
+            case 0:
+                return "Failed Verification";
+            case 1:
+                return "Verified";
+            case 2:
+                return "Not Seen";
+            default:
+                return "";
+        }
+    };
     console.log(props.event);
     return html`
-        <div>
+        <div class="status-element">
             <div class="event-title">${props.eventName}</div>
             <div class="event-status ${getStatusCSS(props.eventStatus)}">
-                <span>${getStatus(props.eventStatus)}</span>
+                <span>${getEventStatusText(props.eventStatus)}</span>
+                <img
+                    class="icon"
+                    src="${getEventStatusIcon(props.eventStatus)}"
+                    height="15"
+                    width="15"
+                />
+            </div>
+        </div>
+    `;
+};
+
+const ScriptStatusElement = (props) => {
+    console.log(props.event);
+    const getLoadStatusIcon = (scriptLoaded) => {
+        switch (scriptLoaded) {
+            case true:
+                return "assets/check-circle.svg";
+            case false:
+                return "assets/eye-off.svg";
+            default:
+                return "";
+        }
+    };
+    return html`
+        <div class="status-element">
+            <div class="event-title">${props.eventName}</div>
+            <div class="event-status ${props.loaded ? "verified" : "error"}">
+                <span>${props.loaded ? "Loaded" : "Not Loaded"}</span>
+                <img
+                    class="icon"
+                    src="${getLoadStatusIcon(props.loaded)}"
+                    height="15"
+                    width="15"
+                />
             </div>
         </div>
     `;
@@ -30,23 +88,26 @@ const App = (props) => {
                       )}
                   </div>
                   <div class="container scripts-container">
-                      <${DLEventStatusElement}
+                      <${ScriptStatusElement}
                           eventName="GTM Loaded"
-                          eventStatus=${props.gtmLoaded}
+                          loaded=${props.gtmLoaded}
                       />
-                      <${DLEventStatusElement}
+                      <${ScriptStatusElement}
                           eventName="DL Listener Loaded"
-                          eventStatus=${props.dlListenerLoaded}
+                          loaded=${props.dlListenerLoaded}
                       />
-
+                      <p style="width: 200px; color: black; font-size: 13px;">
+                          This extension does not validate the contents of your
+                          events, only the shape and type of each property. See
+                          our documentation for more information.
+                      </p>
+                      <p style="width: 200px; color: black; font-size: 13px;">
+                      <b>Open the console to get detailed error messages for each event.</b>
+                  </p>
                   </div>
               </div>
           `
-        : html`<div>Waiting for data. Fire an event.</div>
-              <div>${props.gtmLoaded ? "GTM Loaded" : "nota"}</div>
-              <div>
-                  ${props.dlListenerLoaded ? "DL Listener Loaded" : "nota"}
-              </div> `;
+        : html`<div>Waiting for data. Fire an event.</div>`;
 };
 
 // What tab am I?
@@ -92,12 +153,6 @@ function renderPanel() {
         />`,
         document.body
     );
-}
-
-function getStatus(value) {
-    if (value === 1) return "Verified";
-    if (value === 0) return "Failed Verification";
-    return "Event Not Seen";
 }
 
 function getStatusCSS(value) {

@@ -43,7 +43,7 @@ export const buildListSchema = (locations) => {
         .required()
         .optional()
         .messages({
-            "any.required": `"list" is a required field on the ${locations} objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
+            "any.required": `"list" is a required field on the ${locations} objects. It should contain the path to the collection the product was visited from. For example "/collections/toys"`,
         });
 };
 
