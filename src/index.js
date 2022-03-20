@@ -76,3 +76,13 @@ setInterval(function () {
 }, 1000);
 
 // buildInterface();
+
+window.addEventListener("__elever_reset_db", async function (event) {
+    console.log(event);
+    console.log("Received reset request")
+    resetDB();
+    // chrome.storage.local.set(
+        // { [`${event.tabId}-dlListenerLoaded`]: false },
+        // function () {}
+    // );
+});

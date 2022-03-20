@@ -1500,6 +1500,15 @@ const evaluateDLEvent = (dlEventObject) => {
     }
 };
 
+const resetDB = () => {
+    db.clear();
+    window.dispatchEvent(
+        new CustomEvent("__elever_injected_script_message", {
+            detail: { db: db.getDB() },
+        })
+    );
+};
+
 // Listen for DL updates and push for evaluation
 let lastIndexProcessed = 0;
 window.dataLayer = window.dataLayer || [];
@@ -1510,3 +1519,13 @@ setInterval(function () {
 }, 1000);
 
 // buildInterface();
+
+window.addEventListener("__elever_reset_db", async function (event) {
+    console.log(event);
+    console.log("Received reset request");
+    resetDB();
+    // chrome.storage.local.set(
+        // { [`${event.tabId}-dlListenerLoaded`]: false },
+        // function () {}
+    // );
+});

@@ -105,7 +105,9 @@ const App = (props) => {
                               for each event.</b
                           >
                       </p>
-
+                      <button style="z-index: 1000;" onClick=${() => reset()}>
+                          Reset
+                      </button>
                   </div>
               </div>
           `
@@ -164,5 +166,6 @@ function getStatusCSS(value) {
 }
 
 const reset = () => {
-    console.log("Reset");
+    chrome.tabs.sendMessage(tabId, { msg: "RESET", tabId: tabId }, {frameId: 0}, ()=>true);
+    console.log("Sent reset");
 };
