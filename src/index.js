@@ -36,23 +36,7 @@ if (typeof db === 'undefined') {
 }
 var logger = new Logger();
 
-
-// function buildInterface(){
-//     let body = document.getElementsByTagName("body")[0];
-//     let clearVerificationButton = document.createElement("button");
-//     clearVerificationButton.classList.add("clear-events", "button-dlv");
-//     clearVerificationButton.innerText = "Reset"
-//     clearVerificationButton.onclick = resetDB;
-//     body.appendChild(clearVerificationButton);
-//     let clearToastButton = document.createElement("button");
-//     clearToastButton.classList.add("clear-toasts", "button-dlv"); 
-//     clearToastButton.innerText = "Clear";
-//     clearToastButton.onclick = logger.clearAllNotifications;
-//     body.appendChild(clearToastButton);
-// }
-
-
-function evaluateDLEvent(dlEventObject) {
+const evaluateDLEvent = (dlEventObject) => {
     const dlEventName = dlEventObject.event;
     if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
         return null;
@@ -73,7 +57,7 @@ function evaluateDLEvent(dlEventObject) {
     }
 }
 
-function resetDB() {
+const resetDB = () => {
     db.clear();
     window.dispatchEvent(
         new CustomEvent("__elever_injected_script_message", {

@@ -29,7 +29,6 @@ const DLEventStatusElement = (props) => {
                 return "";
         }
     };
-    console.log(props.event);
     return html`
         <div class="status-element">
             <div class="event-title">${props.eventName}</div>
@@ -47,7 +46,6 @@ const DLEventStatusElement = (props) => {
 };
 
 const ScriptStatusElement = (props) => {
-    console.log(props.event);
     const getLoadStatusIcon = (scriptLoaded) => {
         switch (scriptLoaded) {
             case true:
@@ -102,8 +100,12 @@ const App = (props) => {
                           our documentation for more information.
                       </p>
                       <p style="width: 200px; color: black; font-size: 13px;">
-                      <b>Open the console to get detailed error messages for each event.</b>
-                  </p>
+                          <b
+                              >Open the console to get detailed error messages
+                              for each event.</b
+                          >
+                      </p>
+
                   </div>
               </div>
           `
@@ -160,3 +162,7 @@ function getStatusCSS(value) {
     if (value === 0) return "error";
     return "not-seen";
 }
+
+const reset = () => {
+    console.log("Reset");
+};
