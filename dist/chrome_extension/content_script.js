@@ -20,8 +20,18 @@ window.addEventListener(
 // Listen for DB reset notification and relay to content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.msg === "RESET") {
+        console.log(sender)
+        console.log(request)
         console.log("Received reset message in content_script.js");
         window.dispatchEvent(new CustomEvent("__elever_reset_db", {tabId: sender.tabId}));
+        chrome.storage.local.set(
+            { [`${request.tabId}-dlListenerLoaded`]: false },
+            function () {}
+        );
+        chrome.storage.local.set(
+            { [`${request.tabId}-gtmLoaded`]: false },
+            function () {}
+        );
         sendResponse();
     }
 });

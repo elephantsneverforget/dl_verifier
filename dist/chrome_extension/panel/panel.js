@@ -59,8 +59,8 @@ const ScriptStatusElement = (props) => {
     return html`
         <div class="status-element">
             <div class="event-title">${props.eventName}</div>
-            <div class="event-status ${props.loaded ? "verified" : "error"}">
-                <span>${props.loaded ? "Loaded" : "Not Loaded"}</span>
+            <div class="event-status ${props.loaded ? "verified" : "not-seen"}">
+                <span>${props.loaded ? "Loaded" : "Not Seen"}</span>
                 <img
                     class="icon"
                     src="${getLoadStatusIcon(props.loaded)}"
@@ -131,11 +131,11 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     chrome.storage.onChanged.addListener(function (changes) {
         console.log("In changes");
         console.log(changes);
-        if (changes[`${tabId}-gtmLoaded`]?.newValue) {
+        if (changes[`${tabId}-gtmLoaded`]?.newValue !== changes[`${tabId}-gtmLoaded`]?.oldValue) {
             // console.log("gtmLoaded in panel.js");
             gtmLoaded = changes[`${tabId}-gtmLoaded`]?.newValue;
         }
-        if (changes[`${tabId}-dlListenerLoaded`]?.newValue) {
+        if (changes[`${tabId}-dlListenerLoaded`]?.newValue !== changes[`${tabId}-dlListenerLoaded`]?.oldValue) {
             // console.log("dlListenerloaded in panel.js");
             dlListenerLoaded = changes[`${tabId}-dlListenerLoaded`]?.newValue;
         }
