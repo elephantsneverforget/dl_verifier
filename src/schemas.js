@@ -5,7 +5,7 @@ const category = joi.string().allow("").required().messages({
     "any.required": `"category" is a required field on the impressions and products array constituent objects. This represents the category from which the product is from. A Chess board might have a category of "board_game".`,
 });
 
-const name = joi.string().min(1).required().messages({
+const name = joi.string().required().messages({
     "any.required": `"name" is a required field and should on the impressions and products array constituent objects. It should represent the name of the product.`,
 });
 
@@ -56,7 +56,7 @@ const variant = joi.string().allow("").messages({
     "any.required": `"variant" is a required field on the ecommerce object.`,
 });
 
-const inventoryString = `"inventory" should be a string representing the quantity in stock for the product. For example: "22"` 
+const inventoryString = `"inventory" should be a string representing the quantity in stock for the product. For example: "22"`;
 const inventory = joi.string().allow("").messages({
     "any.all": inventoryString,
     "any.required": inventoryString,
@@ -113,10 +113,14 @@ const customerZip = joi.string().required().messages({
     "any.required": `"customer_zip" is a required field on the user_properties object when the user is logged in and should be a string representing the customer's zip or postal code.`,
 });
 export const buildStepSchema = (stepNumber) => {
-    return joi.any().valid(stepNumber).required().messages({
-        "any.required": `"step" is a required field on the actionField object and should contain the string "${stepNumber}".` 
-    })
-}
+    return joi
+        .any()
+        .valid(stepNumber)
+        .required()
+        .messages({
+            "any.required": `"step" is a required field on the actionField object and should contain the string "${stepNumber}".`,
+        });
+};
 export const visitorType = joi
     .any()
     .valid("guest", "logged_in")
@@ -139,9 +143,13 @@ export const currencyCode = joi.string().min(3).max(3).required().messages({
 });
 
 export const buildActionSchema = (location, stringName) => {
-    return joi.string().allow(`${stringName}`).required().messages({
-        "any.required": `"action" is a required field on the ${location} object and should contain the string "${stringName}"`,
-    });
+    return joi
+        .string()
+        .allow(`${stringName}`)
+        .required()
+        .messages({
+            "any.required": `"action" is a required field on the ${location} object and should contain the string "${stringName}"`,
+        });
 };
 
 export const userProperties = joi
@@ -158,19 +166,17 @@ export const userProperties = joi
 
 export const impressions = joi
     .array()
-    .items(
-        joi.object({
-            name: name,
-            id: id,
-            product_id: productId,
-            variant_id: variantId,
-            brand: brand,
-            category: category,
-            price: price,
-            position: position,
-            list: list,
-        })
-    )
+    .items({
+        name: name,
+        id: id,
+        product_id: productId,
+        variant_id: variantId,
+        brand: brand,
+        category: category,
+        price: price,
+        position: position,
+        list: list,
+    })
     .min(1)
     .required()
     .messages({
@@ -179,20 +185,18 @@ export const impressions = joi
 
 export const products = joi
     .array()
-    .items(
-        joi.object({
-            name: name,
-            id: id,
-            product_id: productId,
-            variant_id: variantId,
-            image: image,
-            brand: brand,
-            category: category,
-            variant: variant,
-            price: price,
-            inventory: inventory,
-        })
-    )
+    .items({
+        name: name,
+        id: id,
+        product_id: productId,
+        variant_id: variantId,
+        image: image,
+        brand: brand,
+        category: category,
+        variant: variant,
+        price: price,
+        inventory: inventory,
+    })
     .min(1)
     .required()
     .messages({
@@ -204,7 +208,6 @@ export const getEventNameSchema = (eventName) => {
         "any.required": `"event" is a required field on the data layer object and should contain and event name such as dl_view_item, dl_add_to_cart etc...`,
     });
 };
-
 
 export const userPropertiesLoggedIn = joi
     .object()

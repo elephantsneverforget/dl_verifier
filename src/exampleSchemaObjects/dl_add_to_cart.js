@@ -25,4 +25,4 @@ export const dl_add_to_cart_schema_example = {
             ],
         },
     },
-};
+}
