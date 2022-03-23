@@ -23,10 +23,8 @@ const DLEventStatusElement = (props) => {
                 return "Failed Verification";
             case 1:
                 return "Verified";
-            case 2:
-                return "Not Seen";
             default:
-                return "";
+                return "Not Seen";
         }
     };
     return html`
@@ -48,19 +46,29 @@ const DLEventStatusElement = (props) => {
 const ScriptStatusElement = (props) => {
     const getLoadStatusIcon = (scriptLoaded) => {
         switch (scriptLoaded) {
-            case true:
+            case 0:
+                return "assets/x-circle.svg";
+            case 1:
                 return "assets/check-circle.svg";
-            case false:
-                return "assets/eye-off.svg";
             default:
-                return "";
+                return "assets/eye-off.svg";
+        }
+    };
+    const getEventStatusText = (scriptLoaded) => {
+        switch (scriptLoaded) {
+            case 0:
+                return "Error Loading";
+            case 1:
+                return "Loaded";
+            default:
+                return "Not Seen";
         }
     };
     return html`
         <div class="status-element">
             <div class="event-title">${props.eventName}</div>
-            <div class="event-status ${props.loaded ? "verified" : "not-seen"}">
-                <span>${props.loaded ? "Loaded" : "Not Seen"}</span>
+            <div class="event-status ${getStatusCSS(props.loaded)}">
+                <span>${getEventStatusText(props.loaded)}</span>
                 <img
                     class="icon"
                     src="${getLoadStatusIcon(props.loaded)}"
@@ -87,11 +95,11 @@ const App = (props) => {
                   </div>
                   <div class="container scripts-container">
                       <${ScriptStatusElement}
-                          eventName="GTM Loaded"
+                          eventName="GTM Scripts"
                           loaded=${props.gtmLoaded}
                       />
                       <${ScriptStatusElement}
-                          eventName="DL Listener Loaded"
+                          eventName="DL Listener"
                           loaded=${props.dlListenerLoaded}
                       />
                       <p style="width: 200px; color: black; font-size: 13px;">

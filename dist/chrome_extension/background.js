@@ -15,9 +15,14 @@ chrome.webRequest.onCompleted.addListener(
         // console.log("set to true gtmLoaded. Tab ID is: " + response.tabId);
         if (response.statusCode === 200) {
             chrome.storage.local.set(
-                { [`${response.tabId}-gtmLoaded`]: true },
+                { [`${response.tabId}-gtmLoaded`]: 1 },
                 function () {}
             );
+        } else {
+            chrome.storage.local.set(
+                { [`${response.tabId}-gtmLoaded`]: 0 },
+                function () {}
+            ); 
         }
     },
     {
@@ -32,9 +37,14 @@ chrome.webRequest.onCompleted.addListener(
         // console.log("set to true DL Listener loaded. Tab ID is: " + response.tabId);
         if (response.statusCode === 200) {
             chrome.storage.local.set(
-                { [`${response.tabId}-dlListenerLoaded`]: true },
+                { [`${response.tabId}-dlListenerLoaded`]: 1 },
                 function () {}
             );
+        } else {
+            chrome.storage.local.set(
+                { [`${response.tabId}-dlListenerLoaded`]: 0 },
+                function () {}
+            ); 
         }
     },
     {
@@ -48,11 +58,11 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
     console.log("Set to false script loads after page reload");
     console.log(details);
     chrome.storage.local.set(
-        { [`${details.tabId}-dlListenerLoaded`]: false },
+        { [`${details.tabId}-dlListenerLoaded`]: null },
         function () {}
     );
     chrome.storage.local.set(
-        { [`${details.tabId}-gtmLoaded`]: false },
+        { [`${details.tabId}-gtmLoaded`]: null },
         function () {}
     );
 });
