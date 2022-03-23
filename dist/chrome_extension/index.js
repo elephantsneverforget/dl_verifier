@@ -463,7 +463,7 @@ class Logger {
             notyf.error({
                 message: verificationSummary,
                 duration: 6000,
-                dismissible: true,
+                dismissible: false,
                 position: { x: "left", y: "bottom" },
                 ripple: false,
             });
@@ -502,7 +502,7 @@ class Logger {
             notyf.success({
                 message: verificationSummary,
                 duration: 6000,
-                dismissible: true,
+                dismissible: false,
                 position: { x: "left", y: "bottom" },
                 ripple: false,
             });
@@ -703,20 +703,18 @@ const impressions = joi
 
 const products = joi
     .array()
-    .items(
-        joi.object({
-            name: name,
-            id: id,
-            product_id: productId,
-            variant_id: variantId,
-            image: image,
-            brand: brand,
-            category: category,
-            variant: variant,
-            price: price,
-            inventory: inventory,
-        })
-    )
+    .items({
+        name: name,
+        id: id,
+        product_id: productId,
+        variant_id: variantId,
+        image: image,
+        brand: brand,
+        category: category,
+        variant: variant,
+        price: price,
+        inventory: inventory,
+    })
     .min(1)
     .required()
     .messages({

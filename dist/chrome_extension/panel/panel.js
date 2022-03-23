@@ -105,7 +105,7 @@ const App = (props) => {
                               for each event.</b
                           >
                       </p>
-                      <button style="z-index: 1000;" onClick=${() => reset()}>
+                      <button class="reset-button" onClick=${() => reset()}>
                           Reset
                       </button>
                   </div>
