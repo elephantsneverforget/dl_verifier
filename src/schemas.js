@@ -9,7 +9,7 @@ const name = joi.string().required().messages({
     "any.required": `"name" is a required field and should on the impressions and products array constituent objects. It should represent the name of the product.`,
 });
 
-const id = joi.string().allow("").required().messages({
+const SKU = joi.string().allow("").required().messages({
     "any.required": `"id" is a required field on the impressions and products array constituent objects. It should be a string containing the product SKU`,
 });
 
@@ -168,7 +168,7 @@ export const impressions = joi
     .array()
     .items({
         name: name,
-        id: id,
+        id: SKU,
         product_id: productId,
         variant_id: variantId,
         brand: brand,
@@ -187,7 +187,7 @@ export const products = joi
     .array()
     .items({
         name: name,
-        id: id,
+        id: SKU,
         product_id: productId,
         variant_id: variantId,
         image: image,
