@@ -12,6 +12,7 @@ import {
     getEventNameSchema,
     buildStepSchema,
     impressions,
+    ecommerce,
 } from "../schemas.js";
 
 import { dl_view_item_schema_example } from "../exampleSchemaObjects/dl_view_item.js";
@@ -168,7 +169,7 @@ export class DLEventViewItem extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 detail: {
                     actionField: {
@@ -177,7 +178,7 @@ export class DLEventViewItem extends DLEvent {
                     },
                     products: products,
                 },
-            },
+            }),
         });
     }
 }
@@ -189,16 +190,29 @@ export class DLEventAddToCart extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
-                add: {
-                    actionField: {
-                        list: buildListSchema("action field"),
-                        action: buildActionSchema("action field", "add"),
-                    },
-                    products: products,
-                },
-            },
+                add: joi
+                    .object()
+                    .keys({
+                        actionField: joi
+                            .object()
+                            .keys({
+                                list: buildListSchema("action field"),
+                                action: buildActionSchema(
+                                    "action field",
+                                    "add"
+                                ),
+                            })
+                            .required()
+                            .messages({
+                                "any.required": `actionField is a required field.`,
+                            }),
+                        products: products,
+                    })
+                    .required()
+                    .messages({ "any.required": `add is a required field.` }),
+            }),
         });
     }
 }
@@ -210,7 +224,7 @@ export class DLEventBeginCheckout extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 checkout: {
                     actionField: {
@@ -219,7 +233,7 @@ export class DLEventBeginCheckout extends DLEvent {
                     },
                     products: products,
                 },
-            },
+            }),
         });
     }
 }
@@ -231,7 +245,7 @@ export class DLEventRemoveFromCart extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 remove: {
                     actionField: {
@@ -239,7 +253,7 @@ export class DLEventRemoveFromCart extends DLEvent {
                     },
                     products: products,
                 },
-            },
+            }),
         });
     }
 }
@@ -251,7 +265,7 @@ export class DLEventSelectItem extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 click: {
                     actionField: {
@@ -260,7 +274,7 @@ export class DLEventSelectItem extends DLEvent {
                     },
                     products: products,
                 },
-            },
+            }),
         });
     }
 }
@@ -272,13 +286,13 @@ export class DLEventSearchResults extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 actionField: {
                     list: buildListSchema("action field"),
                 },
                 impressions: impressions,
-            },
+            }),
         });
     }
 }
@@ -291,13 +305,13 @@ export class DLEventViewCart extends DLEvent {
     verify() {
         return super.verify({
             cart_total: cartTotal,
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 actionField: {
                     list: buildListSchema("action field"),
                 },
                 impressions: impressions,
-            },
+            }),
         });
     }
 }
@@ -309,10 +323,10 @@ export class DLEventViewItemList extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 impressions: impressions,
-            },
+            }),
         });
     }
 }

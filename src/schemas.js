@@ -6,7 +6,7 @@ const category = joi.string().allow("").required().messages({
 });
 
 const name = joi.string().required().messages({
-    "any.required": `"name" is a required field and should on the impressions and products array constituent objects. It should represent the name of the product.`,
+    "any.required": `"name" is a required field and should be in the impressions and products array constituent objects. It should represent the name of the product.`,
 });
 
 const SKU = joi.string().allow("").required().messages({
@@ -41,10 +41,17 @@ export const buildListSchema = (locations) => {
     return joi
         .string()
         .required()
-        .optional()
         .messages({
-            "any.required": `"list" is a required field on the ${locations} objects. It should contain the path to the collection the product was visited from. For example "/collections/toys"`,
+            "any.required": `"list" is a required field on the ${locations} object. It should contain the path to the collection the product was visited from. For example "/collections/toys"`,
         });
+};
+
+export const ecommerce = (contents) => {
+    return joi.object().keys(
+        contents
+    ).required().messages({
+        "any.required": `"ecommerce" is a required field.`,
+    });
 };
 
 const image = joi.string().allow("").messages({
@@ -145,7 +152,7 @@ export const currencyCode = joi.string().min(3).max(3).required().messages({
 export const buildActionSchema = (location, stringName) => {
     return joi
         .string()
-        .allow(`${stringName}`)
+        .allow(stringName)
         .required()
         .messages({
             "any.required": `"action" is a required field on the ${location} object and should contain the string "${stringName}"`,

@@ -55,8 +55,8 @@ chrome.webRequest.onCompleted.addListener(
 // Clear the script listener looaded booleans before the next page reload
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
     if (details.frameId !== 0) return;
-    console.log("Set to false script loads after page reload");
-    console.log(details);
+    // console.log("Set to false script loads after page reload");
+    // console.log(details);
     chrome.storage.local.set(
         { [`${details.tabId}-dlListenerLoaded`]: null },
         function () {}

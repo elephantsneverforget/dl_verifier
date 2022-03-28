@@ -4,6 +4,8 @@ import htm from "./preact/preact_htm.js";
 const html = htm.bind(h);
 let db, tabId, gtmLoaded, dlListenerLoaded;
 
+const optionalEvents = ["dl_begin_checkout", "dl_sign_up", "dl_login", "dl_search_results"];
+
 const DLEventStatusElement = (props) => {
     const getEventStatusIcon = (eventStatus) => {
         switch (eventStatus) {
@@ -27,8 +29,12 @@ const DLEventStatusElement = (props) => {
                 return "Not Seen";
         }
     };
+    const eventIsOptional = (eventName) => {
+        return optionalEvents.indexOf(eventName) > -1;
+    }
     return html`
         <div class="status-element">
+            ${eventIsOptional(props.eventName) ? html`<div class="optional-label">Optional</div>`: null}
             <div class="event-title">${props.eventName}</div>
             <div class="event-status ${getStatusCSS(props.eventStatus)}">
                 <span>${getEventStatusText(props.eventStatus)}</span>
@@ -95,7 +101,7 @@ const App = (props) => {
                   </div>
                   <div class="container scripts-container">
                       <${ScriptStatusElement}
-                          eventName="GTM Scripts"
+                          eventName="GTM Script"
                           loaded=${props.gtmLoaded}
                       />
                       <${ScriptStatusElement}
@@ -106,13 +112,13 @@ const App = (props) => {
                           Reset
                       </button>
                       <p style="width: 200px; color: black; font-size: 12px;">
-                          This extension does not validate the contents of your
+                          This extension does not validate the contents or timing of your
                           events, only the shape. See our <a style="color: black;" href="https://www.notion.so/elevar/Elevar-Headless-Onboarding-Guide-01bd8ddc8b5e48ea8caa3ca99cab5021" target="_blank">documentation</a> for more
                           information.
                       </p>
                       <p style="width: 200px; color: black; font-size: 12px;">
                           <b
-                              >Open the console to get detailed error
+                              >Open the console to see detailed error
                               messages.</b
                           >
                       </p>
@@ -137,8 +143,8 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     });
     // Listen to changes on the db object
     chrome.storage.onChanged.addListener(function (changes) {
-        console.log("In changes");
-        console.log(changes);
+        // console.log("In changes");
+        // console.log(changes);
         if (
             changes[`${tabId}-gtmLoaded`]?.newValue !==
             changes[`${tabId}-gtmLoaded`]?.oldValue
@@ -162,7 +168,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 });
 
 function renderPanel() {
-    console.log("Event list: " + JSON.stringify(db));
+    // console.log("Event list: " + JSON.stringify(db));
     render(
         html`<${App}
             db="${db}"
@@ -186,5 +192,5 @@ const reset = () => {
         { frameId: 0 },
         () => true
     );
-    console.log("Sent reset");
+    // console.log("Sent reset");
 };

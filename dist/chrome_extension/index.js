@@ -524,10 +524,10 @@ const category = joi.string().allow("").required().messages({
 });
 
 const name = joi.string().required().messages({
-    "any.required": `"name" is a required field and should on the impressions and products array constituent objects. It should represent the name of the product.`,
+    "any.required": `"name" is a required field and should be in the impressions and products array constituent objects. It should represent the name of the product.`,
 });
 
-const id = joi.string().allow("").required().messages({
+const SKU = joi.string().allow("").required().messages({
     "any.required": `"id" is a required field on the impressions and products array constituent objects. It should be a string containing the product SKU`,
 });
 
@@ -559,10 +559,17 @@ const buildListSchema = (locations) => {
     return joi
         .string()
         .required()
-        .optional()
         .messages({
-            "any.required": `"list" is a required field on the ${locations} objects. It should contain the path to the collection the product was visited from. For example "/collections/toys"`,
+            "any.required": `"list" is a required field on the ${locations} object. It should contain the path to the collection the product was visited from. For example "/collections/toys"`,
         });
+};
+
+const ecommerce = (contents) => {
+    return joi.object().keys(
+        contents
+    ).required().messages({
+        "any.required": `"ecommerce" is a required field.`,
+    });
 };
 
 const image = joi.string().allow("").messages({
@@ -663,7 +670,7 @@ const currencyCode = joi.string().min(3).max(3).required().messages({
 const buildActionSchema = (location, stringName) => {
     return joi
         .string()
-        .allow(`${stringName}`)
+        .allow(stringName)
         .required()
         .messages({
             "any.required": `"action" is a required field on the ${location} object and should contain the string "${stringName}"`,
@@ -686,7 +693,7 @@ const impressions = joi
     .array()
     .items({
         name: name,
-        id: id,
+        id: SKU,
         product_id: productId,
         variant_id: variantId,
         brand: brand,
@@ -705,7 +712,7 @@ const products = joi
     .array()
     .items({
         name: name,
-        id: id,
+        id: SKU,
         product_id: productId,
         variant_id: variantId,
         image: image,
@@ -1226,7 +1233,7 @@ class DLEventViewItem extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 detail: {
                     actionField: {
@@ -1235,7 +1242,7 @@ class DLEventViewItem extends DLEvent {
                     },
                     products: products,
                 },
-            },
+            }),
         });
     }
 }
@@ -1247,16 +1254,29 @@ class DLEventAddToCart extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
-                add: {
-                    actionField: {
-                        list: buildListSchema("action field"),
-                        action: buildActionSchema("action field", "add"),
-                    },
-                    products: products,
-                },
-            },
+                add: joi
+                    .object()
+                    .keys({
+                        actionField: joi
+                            .object()
+                            .keys({
+                                list: buildListSchema("action field"),
+                                action: buildActionSchema(
+                                    "action field",
+                                    "add"
+                                ),
+                            })
+                            .required()
+                            .messages({
+                                "any.required": `actionField is a required field.`,
+                            }),
+                        products: products,
+                    })
+                    .required()
+                    .messages({ "any.required": `add is a required field.` }),
+            }),
         });
     }
 }
@@ -1268,7 +1288,7 @@ class DLEventBeginCheckout extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 checkout: {
                     actionField: {
@@ -1277,7 +1297,7 @@ class DLEventBeginCheckout extends DLEvent {
                     },
                     products: products,
                 },
-            },
+            }),
         });
     }
 }
@@ -1289,7 +1309,7 @@ class DLEventRemoveFromCart extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 remove: {
                     actionField: {
@@ -1297,7 +1317,7 @@ class DLEventRemoveFromCart extends DLEvent {
                     },
                     products: products,
                 },
-            },
+            }),
         });
     }
 }
@@ -1309,7 +1329,7 @@ class DLEventSelectItem extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 click: {
                     actionField: {
@@ -1318,7 +1338,7 @@ class DLEventSelectItem extends DLEvent {
                     },
                     products: products,
                 },
-            },
+            }),
         });
     }
 }
@@ -1330,13 +1350,13 @@ class DLEventSearchResults extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 actionField: {
                     list: buildListSchema("action field"),
                 },
                 impressions: impressions,
-            },
+            }),
         });
     }
 }
@@ -1349,13 +1369,13 @@ class DLEventViewCart extends DLEvent {
     verify() {
         return super.verify({
             cart_total: cartTotal,
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 actionField: {
                     list: buildListSchema("action field"),
                 },
                 impressions: impressions,
-            },
+            }),
         });
     }
 }
@@ -1367,10 +1387,10 @@ class DLEventViewItemList extends DLEvent {
 
     verify() {
         return super.verify({
-            ecommerce: {
+            ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 impressions: impressions,
-            },
+            }),
         });
     }
 }
