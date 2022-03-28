@@ -49,9 +49,7 @@ export const buildListSchema = (locations) => {
 export const ecommerce = (contents) => {
     return joi.object().keys(
         contents
-    ).required().messages({
-        "any.required": `"ecommerce" is a required field.`,
-    });
+    ).required();
 };
 
 const image = joi.string().allow("").messages({

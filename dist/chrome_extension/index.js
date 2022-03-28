@@ -567,9 +567,7 @@ const buildListSchema = (locations) => {
 const ecommerce = (contents) => {
     return joi.object().keys(
         contents
-    ).required().messages({
-        "any.required": `"ecommerce" is a required field.`,
-    });
+    ).required();
 };
 
 const image = joi.string().allow("").messages({
@@ -1235,13 +1233,22 @@ class DLEventViewItem extends DLEvent {
         return super.verify({
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
-                detail: {
-                    actionField: {
-                        list: buildListSchema("action field"),
-                        action: buildActionSchema("action field", "detail"),
-                    },
-                    products: products,
-                },
+                detail: joi
+                    .object()
+                    .keys({
+                        actionField: joi
+                            .object()
+                            .keys({
+                                list: buildListSchema("action field"),
+                                action: buildActionSchema(
+                                    "action field",
+                                    "detail"
+                                ),
+                            })
+                            .required(),
+                        products: products,
+                    })
+                    .required(),
             }),
         });
     }
@@ -1268,14 +1275,10 @@ class DLEventAddToCart extends DLEvent {
                                     "add"
                                 ),
                             })
-                            .required()
-                            .messages({
-                                "any.required": `actionField is a required field.`,
-                            }),
+                            .required(),
                         products: products,
                     })
-                    .required()
-                    .messages({ "any.required": `add is a required field.` }),
+                    .required(),
             }),
         });
     }
