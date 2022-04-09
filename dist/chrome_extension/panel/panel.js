@@ -2,7 +2,7 @@ import { h, render } from "./preact/preact.js";
 import htm from "./preact/preact_htm.js";
 
 const html = htm.bind(h);
-let db, tabId, gtmLoaded, dlListenerLoaded;
+let db, tabId, gtmLoaded, dlListenerLoaded, gtmContainerId;
 
 const optionalEvents = ["dl_begin_checkout", "dl_sign_up", "dl_login", "dl_search_results"];
 
@@ -101,7 +101,7 @@ const App = (props) => {
                   </div>
                   <div class="container scripts-container">
                       <${ScriptStatusElement}
-                          eventName="GTM Script"
+                          eventName=${props.gtmLoaded ? gtmContainerId : "GTM Script"}
                           loaded=${props.gtmLoaded}
                       />
                       <${ScriptStatusElement}
@@ -138,6 +138,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         // console.log("First load");
         db = result[tabId];
         gtmLoaded = result[`${tabId}-gtmLoaded`];
+        gtmContainerId = result[`${tabId}-gtmContainerId`];
         dlListenerLoaded = result[`${tabId}-dlListenerLoaded`];
         renderPanel();
     });

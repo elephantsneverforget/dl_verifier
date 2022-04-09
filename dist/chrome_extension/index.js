@@ -1293,13 +1293,13 @@ class DLEventBeginCheckout extends DLEvent {
         return super.verify({
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
-                checkout: {
-                    actionField: {
+                checkout: joi.object().keys({
+                    actionField: joi.object().keys({
                         step: buildStepSchema("1"),
                         action: buildActionSchema("action field", "checkout"),
-                    },
+                    }).required(),
                     products: products,
-                },
+                }).required(),
             }),
         });
     }
@@ -1314,12 +1314,12 @@ class DLEventRemoveFromCart extends DLEvent {
         return super.verify({
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
-                remove: {
-                    actionField: {
+                remove: joi.object().keys({
+                    actionField: joi.object().keys({
                         list: buildListSchema("action field"),
-                    },
+                    }).required(),
                     products: products,
-                },
+                }).required(),
             }),
         });
     }
@@ -1334,13 +1334,13 @@ class DLEventSelectItem extends DLEvent {
         return super.verify({
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
-                click: {
-                    actionField: {
+                click: joi.object().keys({
+                    actionField: joi.object().keys({
                         list: buildListSchema("action field"),
                         action: buildActionSchema("action field", "click"),
-                    },
+                    }).required(),
                     products: products,
-                },
+                }),
             }),
         });
     }
@@ -1355,9 +1355,9 @@ class DLEventSearchResults extends DLEvent {
         return super.verify({
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
-                actionField: {
+                actionField: joi.object().keys({
                     list: buildListSchema("action field"),
-                },
+                }).required(),
                 impressions: impressions,
             }),
         });
@@ -1374,9 +1374,9 @@ class DLEventViewCart extends DLEvent {
             cart_total: cartTotal,
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
-                actionField: {
+                actionField: joi.object().keys({
                     list: buildListSchema("action field"),
-                },
+                }).required(),
                 impressions: impressions,
             }),
         });

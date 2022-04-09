@@ -8,14 +8,21 @@ chrome.runtime.onMessage.addListener((request, sender) => {
     return true; // Required to keep message port open
 });
 
-// Set gtmLoaded to true when listener loads
+// Set gtmLoaded to true when GTM container loads
 chrome.webRequest.onCompleted.addListener(
     function (response) {
+        var gtmContainerId = new RegExp("(?<=id=).*").exec(response.url)[0];
+        console.log(gtmContainerId);
+        console.log(response)
         // If loading GTM Suite events script or GTM
         // console.log("set to true gtmLoaded. Tab ID is: " + response.tabId);
         if (response.statusCode === 200) {
             chrome.storage.local.set(
                 { [`${response.tabId}-gtmLoaded`]: 1 },
+                function () {}
+            );
+            chrome.storage.local.set(
+                { [`${response.tabId}-gtmContainerId`]: gtmContainerId },
                 function () {}
             );
         } else {
