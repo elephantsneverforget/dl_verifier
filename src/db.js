@@ -7,7 +7,6 @@ export class DB {
         this._dbName = "_verifier_db";
         this._eventList = eventList;
         this._initDB();
-        // 2 = unseen // 1 = valid // 0 = invalid all start at 2
 
     }
 
@@ -18,11 +17,8 @@ export class DB {
     _initDB() {
         const initialDB = {
             events: {},
-            // scriptLoads: {
-            //     dlListenerLoaded: false,
-            //     gtmLoaded: false
-            // }
         }
+        // 2 = unseen // 1 = valid // 0 = invalid all start at 2
         eventList.forEach((item) => initialDB.events[item] = 2);
         if (!window.localStorage.getItem(this._dbName)) {
             window.localStorage.setItem(
@@ -41,22 +37,9 @@ export class DB {
         );
     }
 
-    // setScriptLoadStatus(property, value) {
-    //     const currentDB = this.getDB()
-    //     currentDB.scriptLoads[property] = value;
-    //     window.localStorage.setItem(
-    //         this._dbName,
-    //         JSON.stringify(currentDB)
-    //     );
-    // }
-
     clear() {
         const initialDB = {
             events: {},
-            // scriptLoads: {
-            //     dlListenerLoaded: false,
-            //     gtmLoaded: false
-            // }
         }
         eventList.forEach((item) => initialDB.events[item] = 2);
         window.localStorage.setItem(

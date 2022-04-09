@@ -17,18 +17,18 @@ import { DB } from "./db";
 import { Logger } from "./logger";
 
 const dlEventMap = {
+    dl_view_item: DLEventViewItem,
     dl_add_to_cart: DLEventAddToCart,
-    dl_begin_checkout: DLEventBeginCheckout,
-    dl_login: DLEventLogin,
     dl_remove_from_cart: DLEventRemoveFromCart,
-    dl_search_results: DLEventSearchResults,
     dl_select_item: DLEventSelectItem,
-    dl_sign_up: DLEventSignUp,
     dl_user_data: DLEventUserData,
     dl_view_cart: DLEventViewCart,
     dl_view_item_list: DLEventViewItemList,
-    dl_view_item: DLEventViewItem,
     dl_route_change: DLEventRouteChange,
+    dl_begin_checkout: DLEventBeginCheckout,
+    dl_login: DLEventLogin,
+    dl_sign_up: DLEventSignUp,
+    dl_search_results: DLEventSearchResults,
 };
 
 if (typeof db === 'undefined') {

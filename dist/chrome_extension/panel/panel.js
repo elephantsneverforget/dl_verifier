@@ -97,7 +97,7 @@ const App = (props) => {
         ? html`
               <div class="wrapper">
                   <div class="container events-container">
-                      ${Object.keys(props.db.events).map(
+                      ${Object.keys(props.db.events).sort(orderEvents).map(
                           (event) =>
                               html`<${DLEventStatusElement}
                                   eventName=${event}
@@ -139,9 +139,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     tabId = tabs[0].id;
     // Get a copy of the db so we don't have to wait until the first change to display it.
     chrome.storage.local.get(function (result) {
-        // console.log("In storage.local.get. Tab ID is: " + tabId);
-        // console.log(result);
-        // console.log("First load");
         db = result[tabId];
         gtmLoaded = result[`${tabId}-gtmLoaded`];
         gtmContainerId = result[`${tabId}-gtmContainerId`];
@@ -201,3 +198,9 @@ const reset = () => {
     );
     // console.log("Sent reset");
 };
+
+const orderEvents = (a) => {
+    if(optionalEvents.includes(a)) return 1;
+    if(nonPlusOnlyEvents.includes(a)) return 1;
+    return -1;
+}

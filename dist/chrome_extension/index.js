@@ -1406,17 +1406,17 @@ class DLEventRouteChange extends DLEvent {
 
 const eventList = [
     "dl_add_to_cart",
-    "dl_begin_checkout",
-    "dl_login",
     "dl_remove_from_cart",
-    "dl_search_results",
     "dl_select_item",
-    "dl_sign_up",
     "dl_user_data",
     "dl_view_cart",
     "dl_view_item_list",
     "dl_view_item",
-    "dl_route_change"
+    "dl_route_change",
+    "dl_begin_checkout",
+    "dl_sign_up",
+    "dl_search_results",
+    "dl_login",
 ];
 
 // Polling here because overriding the push method on window.dataLayer caused issuese in GTM preview mode
@@ -1427,7 +1427,6 @@ class DB {
         this._dbName = "_verifier_db";
         this._eventList = eventList;
         this._initDB();
-        // 2 = unseen // 1 = valid // 0 = invalid all start at 2
 
     }
 
@@ -1438,11 +1437,8 @@ class DB {
     _initDB() {
         const initialDB = {
             events: {},
-            // scriptLoads: {
-            //     dlListenerLoaded: false,
-            //     gtmLoaded: false
-            // }
         };
+        // 2 = unseen // 1 = valid // 0 = invalid all start at 2
         eventList.forEach((item) => initialDB.events[item] = 2);
         if (!window.localStorage.getItem(this._dbName)) {
             window.localStorage.setItem(
@@ -1461,22 +1457,9 @@ class DB {
         );
     }
 
-    // setScriptLoadStatus(property, value) {
-    //     const currentDB = this.getDB()
-    //     currentDB.scriptLoads[property] = value;
-    //     window.localStorage.setItem(
-    //         this._dbName,
-    //         JSON.stringify(currentDB)
-    //     );
-    // }
-
     clear() {
         const initialDB = {
             events: {},
-            // scriptLoads: {
-            //     dlListenerLoaded: false,
-            //     gtmLoaded: false
-            // }
         };
         eventList.forEach((item) => initialDB.events[item] = 2);
         window.localStorage.setItem(
@@ -1487,18 +1470,18 @@ class DB {
 }
 
 const dlEventMap = {
+    dl_view_item: DLEventViewItem,
     dl_add_to_cart: DLEventAddToCart,
-    dl_begin_checkout: DLEventBeginCheckout,
-    dl_login: DLEventLogin,
     dl_remove_from_cart: DLEventRemoveFromCart,
-    dl_search_results: DLEventSearchResults,
     dl_select_item: DLEventSelectItem,
-    dl_sign_up: DLEventSignUp,
     dl_user_data: DLEventUserData,
     dl_view_cart: DLEventViewCart,
     dl_view_item_list: DLEventViewItemList,
-    dl_view_item: DLEventViewItem,
     dl_route_change: DLEventRouteChange,
+    dl_begin_checkout: DLEventBeginCheckout,
+    dl_login: DLEventLogin,
+    dl_sign_up: DLEventSignUp,
+    dl_search_results: DLEventSearchResults,
 };
 
 if (typeof db === 'undefined') {
