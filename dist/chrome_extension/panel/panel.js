@@ -4,7 +4,9 @@ import htm from "./preact/preact_htm.js";
 const html = htm.bind(h);
 let db, tabId, gtmLoaded, dlListenerLoaded, gtmContainerId;
 
-const optionalEvents = ["dl_begin_checkout", "dl_sign_up", "dl_login", "dl_search_results"];
+const optionalEvents = ["dl_sign_up", "dl_login", "dl_search_results"];
+
+const nonPlusOnlyEvents = ["dl_begin_checkout"];
 
 const DLEventStatusElement = (props) => {
     const getEventStatusIcon = (eventStatus) => {
@@ -32,9 +34,13 @@ const DLEventStatusElement = (props) => {
     const eventIsOptional = (eventName) => {
         return optionalEvents.indexOf(eventName) > -1;
     }
+    const eventIsNonPlusOnly = (eventName) => {
+        return nonPlusOnlyEvents.indexOf(eventName) > -1;
+    }
     return html`
         <div class="status-element">
-            ${eventIsOptional(props.eventName) ? html`<div class="optional-label">Optional</div>`: null}
+            ${eventIsOptional(props.eventName) ? html`<div class="optional-label">OPTIONAL</div>`: null}
+            ${eventIsNonPlusOnly(props.eventName) ? html`<div class="optional-label">NON PLUS STORES ONLY</div>`: null}
             <div class="event-title">${props.eventName}</div>
             <div class="event-status ${getStatusCSS(props.eventStatus)}">
                 <span>${getEventStatusText(props.eventStatus)}</span>
