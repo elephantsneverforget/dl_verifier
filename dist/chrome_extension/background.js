@@ -1,4 +1,4 @@
-// Set the events 
+// Set the events
 chrome.runtime.onMessage.addListener((request, sender) => {
     if (request.msg == "DBUPDATE") {
         let db = Object.assign({}, request.data);
@@ -13,23 +13,22 @@ chrome.webRequest.onCompleted.addListener(
     function (response) {
         var gtmContainerId = new RegExp("(?<=id=).*").exec(response.url)[0];
         console.log(gtmContainerId);
-        console.log(response)
+        console.log(response);
         // If loading GTM Suite events script or GTM
         // console.log("set to true gtmLoaded. Tab ID is: " + response.tabId);
         if (response.statusCode === 200) {
             chrome.storage.local.set(
-                { [`${response.tabId}-gtmLoaded`]: 1 },
-                function () {}
-            );
-            chrome.storage.local.set(
-                { [`${response.tabId}-gtmContainerId`]: gtmContainerId },
+                {
+                    [`${response.tabId}-gtmLoaded`]: 1,
+                    [`${response.tabId}-gtmContainerId`]: gtmContainerId,
+                },
                 function () {}
             );
         } else {
             chrome.storage.local.set(
                 { [`${response.tabId}-gtmLoaded`]: 0 },
                 function () {}
-            ); 
+            );
         }
     },
     {
@@ -51,7 +50,7 @@ chrome.webRequest.onCompleted.addListener(
             chrome.storage.local.set(
                 { [`${response.tabId}-dlListenerLoaded`]: 0 },
                 function () {}
-            ); 
+            );
         }
     },
     {
@@ -62,14 +61,15 @@ chrome.webRequest.onCompleted.addListener(
 // Clear the script listener looaded booleans before the next page reload
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
     if (details.frameId !== 0) return;
-    // console.log("Set to false script loads after page reload");
-    // console.log(details);
     chrome.storage.local.set(
         { [`${details.tabId}-dlListenerLoaded`]: null },
         function () {}
     );
     chrome.storage.local.set(
-        { [`${details.tabId}-gtmLoaded`]: null },
+        {
+            [`${details.tabId}-gtmLoaded`]: null,
+            [`${details.tabId}-gtmContainerId`]: null,
+        },
         function () {}
     );
 });

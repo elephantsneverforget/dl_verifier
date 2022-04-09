@@ -142,6 +142,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         db = result[tabId];
         gtmLoaded = result[`${tabId}-gtmLoaded`];
         gtmContainerId = result[`${tabId}-gtmContainerId`];
+        console.log("Container ID is: " + gtmContainerId);
         dlListenerLoaded = result[`${tabId}-dlListenerLoaded`];
         renderPanel();
     });

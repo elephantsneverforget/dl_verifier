@@ -30,17 +30,22 @@ const dlEventMap = {
     dl_search_results: DLEventSearchResults,
 };
 
+dataLayerDB;
 if (typeof dataLayerDB === "undefined") {
     var dataLayerDB = new DB();
 }
 
-// Send DB to background script on initial load
-window.dispatchEvent(
-    new CustomEvent("__elever_injected_script_message", {
-        detail: { db: dataLayerDB.getDB() },
-    })
-);
+// Sends a copy of the db to the background script for routing to the panel
+const sendUpdatedDB = () => {
+    console.log("sendUpdate" + JSON.stringify(dataLayerDB.getDB()));
+    window.dispatchEvent(
+        new CustomEvent("__elever_injected_script_message", {
+            detail: { db: dataLayerDB.getDB() },
+        })
+    );
+};
 
+// Evaluate each event relevant event that's pushed to the DL
 const evaluateDLEvent = (dlEventObject) => {
     const dlEventName = dlEventObject.event;
     if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
@@ -48,31 +53,16 @@ const evaluateDLEvent = (dlEventObject) => {
     const dlEvent = new dlEventMap[dlEventName](dlEventObject);
     dlEvent.verify();
     dlEvent.logVerificationOutcome();
-
     try {
         dataLayerDB.setEventValidityProperty(
             dlEvent.getEventName(),
             dlEvent.isValid() ? 1 : 0
         );
-        window.dispatchEvent(
-            new CustomEvent("__elever_injected_script_message", {
-                detail: { db: dataLayerDB.getDB() },
-            })
-        );
-        console.log("Sent event from index.js");
+        console.log("Sending updated DB after new event");
+        sendUpdatedDB();
     } catch (e) {
         console.log(e);
     }
-};
-
-// Clear events DB to not seen
-const resetDB = () => {
-    dataLayerDB.clear();
-    window.dispatchEvent(
-        new CustomEvent("__elever_injected_script_message", {
-            detail: { db: dataLayerDB.getDB() },
-        })
-    );
 };
 
 // Listen for DL updates and push for evaluation
@@ -84,7 +74,13 @@ setInterval(function () {
     }
 }, 1000);
 
-// Listen for db reset event
+// Listen for db reset event from panael.js
 window.addEventListener("__elever_reset_db", async function () {
-    resetDB();
+    console.log("Reset DB called");
+    dataLayerDB.clear();
+    sendUpdatedDB();
 });
+
+// Send initial db to background script
+console.log("Sending updated DB from main script")
+sendUpdatedDB();

@@ -23,7 +23,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // console.log(sender)
         // console.log(request)
         // console.log("Received reset message in content_script.js");
-        window.dispatchEvent(new CustomEvent("__elever_reset_db", {tabId: sender.tabId}));
+        window.dispatchEvent(
+            new CustomEvent("__elever_reset_db", { tabId: sender.tabId })
+        );
         chrome.storage.local.set(
             { [`${request.tabId}-dlListenerLoaded`]: false },
             function () {}
@@ -35,3 +37,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse();
     }
 });
+
+if (window.contentScriptInjected !== true) {
+    var script = document.createElement("script");
+    script.setAttribute("type", "text/javascript");
+    script.src = chrome.runtime.getURL("index.js");
+    var head = document.getElementsByTagName("head")[0];
+    head.appendChild(script);
+    console.log("injecting script");
+    window.contentScriptInjected = true;
+}

@@ -11,9 +11,9 @@
     "content_scripts": [
         {
             "matches": ["http://*/*", "https://*/*"],
-            "js": ["content_script.js", "inject.js"],
-            "css": ["./notyf.css", "./index.css"],
-            "all_frames": true
+            "js": ["content_script.js"],
+            "css": ["./notyf.css"],
+            "all_frames": false
         }
     ],
     "web_accessible_resources": [
