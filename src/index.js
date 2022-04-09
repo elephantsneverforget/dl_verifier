@@ -10,11 +10,10 @@ import {
     DLEventViewCart,
     DLEventViewItemList,
     DLEventSignUp,
-    DLEventRouteChange
+    DLEventRouteChange,
 } from "./eventTypes/dlEvents.js";
 
 import { DB } from "./db";
-import { Logger } from "./logger";
 
 const dlEventMap = {
     dl_view_item: DLEventViewItem,
@@ -31,40 +30,50 @@ const dlEventMap = {
     dl_search_results: DLEventSearchResults,
 };
 
-if (typeof db === 'undefined') {
-    var db = new DB();
+if (typeof dataLayerDB === "undefined") {
+    var dataLayerDB = new DB();
 }
-var logger = new Logger();
+
+// Send DB to background script on initial load
+window.dispatchEvent(
+    new CustomEvent("__elever_injected_script_message", {
+        detail: { db: dataLayerDB.getDB() },
+    })
+);
 
 const evaluateDLEvent = (dlEventObject) => {
     const dlEventName = dlEventObject.event;
     if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
-        return null;
+        return;
     const dlEvent = new dlEventMap[dlEventName](dlEventObject);
     dlEvent.verify();
     dlEvent.logVerificationOutcome();
 
     try {
-        db.setEventValidityProperty(dlEvent.getEventName(), dlEvent.isValid() ? 1 : 0);
+        dataLayerDB.setEventValidityProperty(
+            dlEvent.getEventName(),
+            dlEvent.isValid() ? 1 : 0
+        );
         window.dispatchEvent(
             new CustomEvent("__elever_injected_script_message", {
-                detail: { db: db.getDB() },
+                detail: { db: dataLayerDB.getDB() },
             })
         );
-        console.log("Sent event from index.js")
+        console.log("Sent event from index.js");
     } catch (e) {
         console.log(e);
     }
-}
+};
 
+// Clear events DB to not seen
 const resetDB = () => {
-    db.clear();
+    dataLayerDB.clear();
     window.dispatchEvent(
         new CustomEvent("__elever_injected_script_message", {
-            detail: { db: db.getDB() },
+            detail: { db: dataLayerDB.getDB() },
         })
     );
-}
+};
 
 // Listen for DL updates and push for evaluation
 let lastIndexProcessed = 0;
@@ -75,14 +84,7 @@ setInterval(function () {
     }
 }, 1000);
 
-// buildInterface();
-
-window.addEventListener("__elever_reset_db", async function (event) {
-    console.log(event);
-    console.log("Received reset request")
+// Listen for db reset event
+window.addEventListener("__elever_reset_db", async function () {
     resetDB();
-    // chrome.storage.local.set(
-        // { [`${event.tabId}-dlListenerLoaded`]: false },
-        // function () {}
-    // );
 });

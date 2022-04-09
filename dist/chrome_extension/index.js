@@ -1484,23 +1484,30 @@ const dlEventMap = {
     dl_search_results: DLEventSearchResults,
 };
 
-if (typeof db === 'undefined') {
-    var db = new DB();
+if (typeof dataLayerDB === 'undefined') {
+    var dataLayerDB = new DB();
 }
+
+// Send DB to background script on initial load
+window.dispatchEvent(
+    new CustomEvent("__elever_injected_script_message", {
+        detail: { db: dataLayerDB.getDB() },
+    })
+);
 
 const evaluateDLEvent = (dlEventObject) => {
     const dlEventName = dlEventObject.event;
     if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
-        return null;
+        return;
     const dlEvent = new dlEventMap[dlEventName](dlEventObject);
     dlEvent.verify();
     dlEvent.logVerificationOutcome();
 
     try {
-        db.setEventValidityProperty(dlEvent.getEventName(), dlEvent.isValid() ? 1 : 0);
+        dataLayerDB.setEventValidityProperty(dlEvent.getEventName(), dlEvent.isValid() ? 1 : 0);
         window.dispatchEvent(
             new CustomEvent("__elever_injected_script_message", {
-                detail: { db: db.getDB() },
+                detail: { db: dataLayerDB.getDB() },
             })
         );
         console.log("Sent event from index.js");
@@ -1509,11 +1516,12 @@ const evaluateDLEvent = (dlEventObject) => {
     }
 };
 
+// Clear events DB to not seen
 const resetDB = () => {
-    db.clear();
+    dataLayerDB.clear();
     window.dispatchEvent(
         new CustomEvent("__elever_injected_script_message", {
-            detail: { db: db.getDB() },
+            detail: { db: dataLayerDB.getDB() },
         })
     );
 };
@@ -1527,14 +1535,10 @@ setInterval(function () {
     }
 }, 1000);
 
-// buildInterface();
 
+// Listen for db reset event
 window.addEventListener("__elever_reset_db", async function (event) {
     console.log(event);
     console.log("Received reset request");
     resetDB();
-    // chrome.storage.local.set(
-        // { [`${event.tabId}-dlListenerLoaded`]: false },
-        // function () {}
-    // );
 });
