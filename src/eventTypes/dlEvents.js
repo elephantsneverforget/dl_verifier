@@ -72,6 +72,7 @@ class DLEvent {
         });
 
         if (validation.error) {
+            console.log(validation.error);
             this._isValid = false;
             this._errors = validation.error.details;
             this._verificationSummary = `${
@@ -168,6 +169,7 @@ export class DLEventViewItem extends DLEvent {
     }
 
     verify() {
+        console.log("Running verify on DLEventViewItem");
         return super.verify({
             ecommerce: ecommerce({
                 currencyCode: currencyCode,

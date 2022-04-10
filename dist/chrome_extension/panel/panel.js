@@ -85,7 +85,7 @@ const App = (props) => {
                       <button class="reset-button" onClick=${() => reset()}>
                           Reset
                       </button>
-                      <p style="width: 200px; color: black; font-size: 12px;">
+                      <p style="width: 175px; color: black; font-size: 12px;">
                           This extension does not validate the contents or
                           timing of your events, only the shape. See our
                           <a
@@ -96,7 +96,7 @@ const App = (props) => {
                           >
                           for more information.
                       </p>
-                      <p style="width: 200px; color: black; font-size: 12px;">
+                      <p style="width: 175px; color: black; font-size: 12px;">
                           <b
                               >Open the console to see detailed error
                               messages.</b
@@ -113,6 +113,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     tabId = tabs[0].id;
     // Get a copy of the db so we don't have to wait until the first change to display it.
     chrome.storage.local.get(function (result) {
+        console.log("Updating panel with data: " + JSON.stringify(result));
         db = result[`${tabId}-eventsDB`];
         gtmLoaded = result[`${tabId}-gtmLoaded`];
         gtmContainerId = result[`${tabId}-gtmContainerId`];

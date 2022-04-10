@@ -69,6 +69,16 @@ describe("dl_view_item shape verifier", () => {
         expect(dlEventViewItem.isValid()).toBe(false);
         expect(dlEventViewItem.getVerificationSummary()).toContain("invalid");
     });
+    test("A dl_view_item missing actionField.action throws an error", () => {
+        delete dl_view_item_schema_example.ecommerce.detail.actionField.action;
+        const dlEventViewItem = new DLEventViewItem(
+            dl_view_item_schema_example
+        );
+        dlEventViewItem.verify();
+        expect(dlEventViewItem.isValid()).toBe(false);
+        expect(dlEventViewItem.getVerificationSummary()).toContain("invalid");
+        expect(dlEventViewItem.getErrors()[0].message).toContain("action");
+    });
 });
 
 describe("dl_add_to_cart shape verifier", () => {

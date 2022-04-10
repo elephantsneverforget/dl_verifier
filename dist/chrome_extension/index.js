@@ -1134,6 +1134,7 @@ class DLEvent {
         });
 
         if (validation.error) {
+            console.log(validation.error);
             this._isValid = false;
             this._errors = validation.error.details;
             this._verificationSummary = `${
@@ -1230,6 +1231,7 @@ class DLEventViewItem extends DLEvent {
     }
 
     verify() {
+        console.log("Running verify on DLEventViewItem");
         return super.verify({
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
@@ -1489,7 +1491,6 @@ if (typeof dataLayerDB === "undefined") {
 
 // Sends a copy of the db to the background script for routing to the panel
 const sendUpdatedDB = () => {
-    console.log("sendUpdate" + JSON.stringify(dataLayerDB.getDB()));
     window.dispatchEvent(
         new CustomEvent("__elever_injected_script_message", {
             detail: { db: dataLayerDB.getDB() },
@@ -1504,13 +1505,14 @@ const evaluateDLEvent = (dlEventObject) => {
         return;
     const dlEvent = new dlEventMap[dlEventName](dlEventObject);
     dlEvent.verify();
-    dlEvent.logVerificationOutcome();
+    if (!dlEvent.isValid()) dlEvent.logVerificationOutcome();
+    console.log("Event about to be verified: " + JSON.stringify(dlEvent));
     try {
         dataLayerDB.setEventValidityProperty(
             dlEvent.getEventName(),
             dlEvent.isValid() ? "verified" : "failed"
         );
-        console.log("Sending updated DB after new event");
+        console.log(dlEvent.getErrors());
         sendUpdatedDB();
     } catch (e) {
         console.log(e);
@@ -1522,6 +1524,7 @@ let lastIndexProcessed = 0;
 window.dataLayer = window.dataLayer || [];
 setInterval(function () {
     for (; lastIndexProcessed < window.dataLayer.length; lastIndexProcessed++) {
+        console.log("Processing event: " + JSON.stringify(window.dataLayer[lastIndexProcessed]));
         evaluateDLEvent(window.dataLayer[lastIndexProcessed]);
     }
 }, 1000);
@@ -1534,5 +1537,4 @@ window.addEventListener("__elever_reset_db", async function () {
 });
 
 // Send initial db to background script
-console.log("Sending updated DB from main script");
 sendUpdatedDB();

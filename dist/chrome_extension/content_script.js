@@ -34,6 +34,5 @@ if (window.contentScriptInjected !== true) {
     script.src = chrome.runtime.getURL("index.js");
     var head = document.getElementsByTagName("head")[0];
     head.appendChild(script);
-    console.log("injecting script");
     window.contentScriptInjected = true;
 }
