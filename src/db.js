@@ -19,7 +19,7 @@ export class DB {
             events: {},
         }
         // 2 = unseen // 1 = valid // 0 = invalid all start at 2
-        eventList.forEach((item) => initialDB.events[item] = 2);
+        eventList.forEach((item) => initialDB.events[item] = "unseen");
         if (!window.localStorage.getItem(this._dbName)) {
             window.localStorage.setItem(
                 this._dbName,
@@ -41,7 +41,7 @@ export class DB {
         const initialDB = {
             events: {},
         }
-        eventList.forEach((item) => initialDB.events[item] = 2);
+        eventList.forEach((item) => initialDB.events[item] = "unseen");
         window.localStorage.setItem(
             this._dbName,
             JSON.stringify(initialDB)

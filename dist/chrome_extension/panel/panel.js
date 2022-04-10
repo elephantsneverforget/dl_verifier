@@ -9,28 +9,6 @@ const optionalEvents = ["dl_sign_up", "dl_login", "dl_search_results"];
 const nonPlusOnlyEvents = ["dl_begin_checkout"];
 
 const DLEventStatusElement = (props) => {
-    const getEventStatusIcon = (eventStatus) => {
-        switch (eventStatus) {
-            case 0:
-                return "assets/x-circle.svg";
-            case 1:
-                return "assets/check-circle.svg";
-            case 2:
-                return "assets/eye-off.svg";
-            default:
-                return "";
-        }
-    };
-    const getEventStatusText = (eventStatus) => {
-        switch (eventStatus) {
-            case 0:
-                return "Failed Verification";
-            case 1:
-                return "Verified";
-            default:
-                return "Not Seen";
-        }
-    };
     const eventIsOptional = (eventName) => {
         return optionalEvents.indexOf(eventName) > -1;
     };
@@ -60,26 +38,6 @@ const DLEventStatusElement = (props) => {
 };
 
 const ScriptStatusElement = (props) => {
-    const getLoadStatusIcon = (scriptLoaded) => {
-        switch (scriptLoaded) {
-            case 0:
-                return "assets/x-circle.svg";
-            case 1:
-                return "assets/check-circle.svg";
-            default:
-                return "assets/eye-off.svg";
-        }
-    };
-    const getEventStatusText = (scriptLoaded) => {
-        switch (scriptLoaded) {
-            case 0:
-                return "Error Loading";
-            case 1:
-                return "Loaded";
-            default:
-                return "Not Seen";
-        }
-    };
     return html`
         <div class="status-element">
             <div class="event-title">${props.eventName}</div>
@@ -87,7 +45,7 @@ const ScriptStatusElement = (props) => {
                 <span>${getEventStatusText(props.loaded)}</span>
                 <img
                     class="icon"
-                    src="${getLoadStatusIcon(props.loaded)}"
+                    src="${getEventStatusIcon(props.loaded)}"
                     height="15"
                     width="15"
                 />
@@ -115,7 +73,7 @@ const App = (props) => {
                   </div>
                   <div class="container scripts-container">
                       <${ScriptStatusElement}
-                          eventName=${props.gtmLoaded
+                          eventName=${props.gtmLoaded === "verified"
                               ? gtmContainerId
                               : "GTM Script"}
                           loaded=${props.gtmLoaded}
@@ -155,14 +113,13 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     tabId = tabs[0].id;
     // Get a copy of the db so we don't have to wait until the first change to display it.
     chrome.storage.local.get(function (result) {
-        db = result[tabId];
+        db = result[`${tabId}-eventsDB`];
         gtmLoaded = result[`${tabId}-gtmLoaded`];
         gtmContainerId = result[`${tabId}-gtmContainerId`];
-        console.log("Container ID is: " + gtmContainerId);
         dlListenerLoaded = result[`${tabId}-dlListenerLoaded`];
         renderPanel();
     });
-    // Listen to changes on the db object
+    // Listen to changes
     chrome.storage.onChanged.addListener(function (changes) {
         // console.log("In changes");
         // console.log(changes);
@@ -180,15 +137,15 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             // console.log("dlListenerloaded in panel.js");
             dlListenerLoaded = changes[`${tabId}-dlListenerLoaded`]?.newValue;
         }
-        if (typeof changes[tabId] !== "undefined") {
-            // console.log("db updated in panel.js");
-            db = changes[tabId].newValue;
+        if (typeof changes[`${tabId}-eventsDB`] !== "undefined") {
+            console.log("db updated in panel.js");
+            db = changes[`${tabId}-eventsDB`].newValue;
         }
         renderPanel();
     });
 });
 
-function renderPanel() {
+const renderPanel = () => {
     // console.log("Event list: " + JSON.stringify(db));
     render(
         html`<${App}
@@ -200,9 +157,9 @@ function renderPanel() {
     );
 }
 
-function getStatusCSS(value) {
-    if (value === 1) return "verified";
-    if (value === 0) return "error";
+const getStatusCSS = (value) => {
+    if (value === "verified") return "verified";
+    if (value === "failed") return "error";
     return "not-seen";
 }
 
@@ -213,11 +170,36 @@ const reset = () => {
         { frameId: 0 },
         () => true
     );
-    // console.log("Sent reset");
 };
 
 const orderEvents = (a) => {
     if (optionalEvents.includes(a)) return 1;
     if (nonPlusOnlyEvents.includes(a)) return 1;
     return -1;
+};
+
+const getEventStatusText = (eventStatus) => {
+    switch (eventStatus) {
+        case "failed":
+            return "Failed Verification";
+        case "verified":
+            return "Verified";
+        case "unseen":
+            return "Not Seen";
+        default:
+            return "";
+    }
+};
+
+const getEventStatusIcon = (eventStatus) => {
+    switch (eventStatus) {
+        case "failed":
+            return "assets/x-circle.svg";
+        case "verified":
+            return "assets/check-circle.svg";
+        case "unseen":
+            return "assets/eye-off.svg";
+        default:
+            return "";
+    }
 };

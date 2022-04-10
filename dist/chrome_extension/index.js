@@ -1439,7 +1439,7 @@ class DB {
             events: {},
         };
         // 2 = unseen // 1 = valid // 0 = invalid all start at 2
-        eventList.forEach((item) => initialDB.events[item] = 2);
+        eventList.forEach((item) => initialDB.events[item] = "unseen");
         if (!window.localStorage.getItem(this._dbName)) {
             window.localStorage.setItem(
                 this._dbName,
@@ -1461,7 +1461,7 @@ class DB {
         const initialDB = {
             events: {},
         };
-        eventList.forEach((item) => initialDB.events[item] = 2);
+        eventList.forEach((item) => initialDB.events[item] = "unseen");
         window.localStorage.setItem(
             this._dbName,
             JSON.stringify(initialDB)
@@ -1508,7 +1508,7 @@ const evaluateDLEvent = (dlEventObject) => {
     try {
         dataLayerDB.setEventValidityProperty(
             dlEvent.getEventName(),
-            dlEvent.isValid() ? 1 : 0
+            dlEvent.isValid() ? "verified" : "failed"
         );
         console.log("Sending updated DB after new event");
         sendUpdatedDB();

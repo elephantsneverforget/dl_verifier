@@ -56,7 +56,7 @@ const evaluateDLEvent = (dlEventObject) => {
     try {
         dataLayerDB.setEventValidityProperty(
             dlEvent.getEventName(),
-            dlEvent.isValid() ? 1 : 0
+            dlEvent.isValid() ? "verified" : "failed"
         );
         console.log("Sending updated DB after new event");
         sendUpdatedDB();

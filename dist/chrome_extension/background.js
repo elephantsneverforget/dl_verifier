@@ -1,9 +1,11 @@
-// Set the events
+// Set the events DB
 chrome.runtime.onMessage.addListener((request, sender) => {
     if (request.msg == "DBUPDATE") {
         let db = Object.assign({}, request.data);
-        let tabId = sender.tab.id;
-        chrome.storage.local.set({ [`${tabId}`]: db }, function () {});
+        chrome.storage.local.set(
+            { [`${sender.tab.id}-eventsDB`]: db },
+            function () {}
+        );
     }
     return true; // Required to keep message port open
 });
@@ -13,20 +15,19 @@ chrome.webRequest.onCompleted.addListener(
     function (response) {
         var gtmContainerId = new RegExp("(?<=id=).*").exec(response.url)[0];
         console.log(gtmContainerId);
-        console.log(response);
         // If loading GTM Suite events script or GTM
         // console.log("set to true gtmLoaded. Tab ID is: " + response.tabId);
         if (response.statusCode === 200) {
             chrome.storage.local.set(
                 {
-                    [`${response.tabId}-gtmLoaded`]: 1,
+                    [`${response.tabId}-gtmLoaded`]: "verified",
                     [`${response.tabId}-gtmContainerId`]: gtmContainerId,
                 },
                 function () {}
             );
         } else {
             chrome.storage.local.set(
-                { [`${response.tabId}-gtmLoaded`]: 0 },
+                { [`${response.tabId}-gtmLoaded`]: "failed" },
                 function () {}
             );
         }
@@ -36,19 +37,17 @@ chrome.webRequest.onCompleted.addListener(
     }
 );
 
-// Set dlListenerLoaded to true when listener loads
+// Set DL listener loaded status
 chrome.webRequest.onCompleted.addListener(
     function (response) {
-        // If loading GTM Suite events script or GTM
-        // console.log("set to true DL Listener loaded. Tab ID is: " + response.tabId);
         if (response.statusCode === 200) {
             chrome.storage.local.set(
-                { [`${response.tabId}-dlListenerLoaded`]: 1 },
+                { [`${response.tabId}-dlListenerLoaded`]: "verified" },
                 function () {}
             );
         } else {
             chrome.storage.local.set(
-                { [`${response.tabId}-dlListenerLoaded`]: 0 },
+                { [`${response.tabId}-dlListenerLoaded`]: "failed" },
                 function () {}
             );
         }
@@ -61,15 +60,22 @@ chrome.webRequest.onCompleted.addListener(
 // Clear the script listener looaded booleans before the next page reload
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
     if (details.frameId !== 0) return;
-    chrome.storage.local.set(
-        { [`${details.tabId}-dlListenerLoaded`]: null },
-        function () {}
-    );
+    resetBaseValues(details.tabId);
+});
+
+// Setup any base values on initial load
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    resetBaseValues(tabs[0].id);
+});
+
+const resetBaseValues = (tabId) => {
+    console.log("Resetting base values");
     chrome.storage.local.set(
         {
-            [`${details.tabId}-gtmLoaded`]: null,
-            [`${details.tabId}-gtmContainerId`]: null,
+            [`${tabId}-dlListenerLoaded`]: "unseen",
+            [`${tabId}-gtmLoaded`]: "unseen",
+            [`${tabId}-gtmContainerId`]: undefined,
         },
         function () {}
     );
-});
+};
