@@ -38,6 +38,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
+// Inject the joi script into the active tab
 if (window.contentScriptInjected !== true) {
     var script = document.createElement("script");
     script.setAttribute("type", "text/javascript");

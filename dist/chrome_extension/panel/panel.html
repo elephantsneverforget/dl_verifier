@@ -15,18 +15,24 @@
 
             .events-container {
                 justify-content: center;
+                flex-wrap: wrap;
+                padding-top: 25px;
+                display: flex;
+                padding-left: 25px;
+                padding-right: 25px;
+            }
+
+            .events-container-wrapper {
                 width: 75%;
                 left: 0;
                 top: 0;
                 position: fixed;
-                flex-wrap: wrap;
-                padding-top: 25px;
-                display: flex;
             }
 
             .scripts-container {
                 display:flex;
                 flex-direction: column;
+                width: 25%;
                 top:0;
                 position: fixed;
                 right: 0;
@@ -34,7 +40,6 @@
                 background: #f8f8f8;
                 justify-content: flex-start;
                 padding-top: 25px;
-                padding: 25px 2%;
                 align-items: center;
             }
 
@@ -62,6 +67,7 @@
                 -webkit-box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.02);
                 box-shadow: 0px 0px 12px 4px rgba(0, 0, 0, 0.02);
                 position: relative;
+                min-width: 0;
             }
 
             .feather-check-circle {

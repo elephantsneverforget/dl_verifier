@@ -33,14 +33,18 @@ const DLEventStatusElement = (props) => {
     };
     const eventIsOptional = (eventName) => {
         return optionalEvents.indexOf(eventName) > -1;
-    }
+    };
     const eventIsNonPlusOnly = (eventName) => {
         return nonPlusOnlyEvents.indexOf(eventName) > -1;
-    }
+    };
     return html`
         <div class="status-element">
-            ${eventIsOptional(props.eventName) ? html`<div class="optional-label">OPTIONAL</div>`: null}
-            ${eventIsNonPlusOnly(props.eventName) ? html`<div class="optional-label">NON PLUS STORES ONLY</div>`: null}
+            ${eventIsOptional(props.eventName)
+                ? html`<div class="optional-label">OPTIONAL</div>`
+                : null}
+            ${eventIsNonPlusOnly(props.eventName)
+                ? html`<div class="optional-label">NON PLUS STORES ONLY</div>`
+                : null}
             <div class="event-title">${props.eventName}</div>
             <div class="event-status ${getStatusCSS(props.eventStatus)}">
                 <span>${getEventStatusText(props.eventStatus)}</span>
@@ -96,18 +100,24 @@ const App = (props) => {
     return props.db?.events
         ? html`
               <div class="wrapper">
-                  <div class="container events-container">
-                      ${Object.keys(props.db.events).sort(orderEvents).map(
-                          (event) =>
-                              html`<${DLEventStatusElement}
-                                  eventName=${event}
-                                  eventStatus=${props.db.events[event]}
-                              />`
-                      )}
+                  <div class="events-container-wrapper">
+                      <div class="container events-container">
+                          ${Object.keys(props.db.events)
+                              .sort(orderEvents)
+                              .map(
+                                  (event) =>
+                                      html`<${DLEventStatusElement}
+                                          eventName=${event}
+                                          eventStatus=${props.db.events[event]}
+                                      />`
+                              )}
+                      </div>
                   </div>
                   <div class="container scripts-container">
                       <${ScriptStatusElement}
-                          eventName=${props.gtmLoaded ? gtmContainerId : "GTM Script"}
+                          eventName=${props.gtmLoaded
+                              ? gtmContainerId
+                              : "GTM Script"}
                           loaded=${props.gtmLoaded}
                       />
                       <${ScriptStatusElement}
@@ -118,9 +128,15 @@ const App = (props) => {
                           Reset
                       </button>
                       <p style="width: 200px; color: black; font-size: 12px;">
-                          This extension does not validate the contents or timing of your
-                          events, only the shape. See our <a style="color: black;" href="https://www.notion.so/elevar/Elevar-Headless-Onboarding-Guide-01bd8ddc8b5e48ea8caa3ca99cab5021" target="_blank">documentation</a> for more
-                          information.
+                          This extension does not validate the contents or
+                          timing of your events, only the shape. See our
+                          <a
+                              style="color: black;"
+                              href="https://www.notion.so/elevar/Elevar-Headless-Onboarding-Guide-01bd8ddc8b5e48ea8caa3ca99cab5021"
+                              target="_blank"
+                              >documentation</a
+                          >
+                          for more information.
                       </p>
                       <p style="width: 200px; color: black; font-size: 12px;">
                           <b
@@ -201,7 +217,7 @@ const reset = () => {
 };
 
 const orderEvents = (a) => {
-    if(optionalEvents.includes(a)) return 1;
-    if(nonPlusOnlyEvents.includes(a)) return 1;
+    if (optionalEvents.includes(a)) return 1;
+    if (nonPlusOnlyEvents.includes(a)) return 1;
     return -1;
-}
+};
