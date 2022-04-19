@@ -35,6 +35,14 @@ if (typeof dataLayerDB === "undefined") {
     var dataLayerDB = new DB();
 }
 
+// Checks whether the dl_user_data event is already in the data layer
+const eventPreceededByUserData = () => {
+    return (
+        window.dataLayer.filter((dlEvent) => dlEvent.event === "dl_user_data")
+            .length > 0
+    );
+};
+
 // Sends a copy of the db to the background script for routing to the panel
 const sendUpdatedDB = () => {
     window.dispatchEvent(
@@ -49,16 +57,20 @@ const evaluateDLEvent = (dlEventObject) => {
     const dlEventName = dlEventObject.event;
     if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
         return;
+
     const dlEvent = new dlEventMap[dlEventName](dlEventObject);
     dlEvent.verify();
-    if (!dlEvent.isValid()) dlEvent.logVerificationOutcome();
-    console.log("Event about to be verified: " + JSON.stringify(dlEvent));
+    // console.log("Event about to be verified: " + JSON.stringify(dlEvent));
     try {
+        // If the event is not dl_user_data or route change, ensure it was preced by dl_user_data
+        eventPreceededByUserData(dlEvent)
+            ? dlEvent.setMissingUserData(false)
+            : dlEvent.setMissingUserData(true);
+        dlEvent.logVerificationOutcome();
         dataLayerDB.setEventValidityProperty(
             dlEvent.getEventName(),
             dlEvent.isValid() ? "verified" : "failed"
         );
-        console.log(dlEvent.getErrors());
         sendUpdatedDB();
     } catch (e) {
         console.log(e);
@@ -70,14 +82,13 @@ let lastIndexProcessed = 0;
 window.dataLayer = window.dataLayer || [];
 setInterval(function () {
     for (; lastIndexProcessed < window.dataLayer.length; lastIndexProcessed++) {
-        console.log("Processing event: " + JSON.stringify(window.dataLayer[lastIndexProcessed]));
         evaluateDLEvent(window.dataLayer[lastIndexProcessed]);
     }
 }, 1000);
 
 // Listen for db reset event from panael.js
 window.addEventListener("__elever_reset_db", async function () {
-    console.log("Reset DB called");
+    // console.log("Reset DB called");
     dataLayerDB.clear();
     sendUpdatedDB();
 });

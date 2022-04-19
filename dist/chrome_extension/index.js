@@ -457,8 +457,15 @@ class Logger {
         verificationSummary,
         additionalText,
         dataLayerObject,
-        schemaExample
+        schemaExample,
+        notPrecededByUserData
     ) {
+        if (notPrecededByUserData) {
+            console.log(
+                "%c" + "Event not preceded by dl_user_data",
+                "display: inline-block ; background-color: gold ; color: black ; font-weight: bold ; padding: 3px 7px 3px 7px ; border-radius: 3px 3px 3px 3px ;"
+            );
+        }
         if (errors.length > 0) {
             notyf.error({
                 message: verificationSummary,
@@ -506,13 +513,6 @@ class Logger {
                 position: { x: "left", y: "bottom" },
                 ripple: false,
             });
-            console.log(
-                "%c" +
-                    verificationSummary +
-                    " " +
-                    (additionalText ? additionalText : ""),
-                "background-color: #3dc763 ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
-            );
         }
     }
 }
@@ -1106,6 +1106,7 @@ class DLEvent {
         this._userIsLoggedIn =
             dataLayerObject.user_properties?.visitor_type === "logged_in";
         this._dlEventName = schemaExample.event;
+        this._missingUserData = true;
     }
 
     verify(additionalSchemas) {
@@ -1134,7 +1135,7 @@ class DLEvent {
         });
 
         if (validation.error) {
-            console.log(validation.error);
+            // console.log(validation.error);
             this._isValid = false;
             this._errors = validation.error.details;
             this._verificationSummary = `${
@@ -1189,7 +1190,8 @@ class DLEvent {
             this._verificationSummary,
             additionalText,
             this._dataLayerObject,
-            this._schemaExample
+            this._schemaExample,
+            this._missingUserData
         );
     }
 
@@ -1197,13 +1199,13 @@ class DLEvent {
         return this._userIsLoggedIn;
     }
 
+    setMissingUserData(isMissing){
+        this._missingUserData = isMissing;
+    }
+
     formatEventID(eventID) {
         if (eventID === undefined) return "N/A";
-        const length = eventID.length;
-        return `${eventID.slice(0, 3)}..${eventID.slice(
-            length - 4,
-            length - 1
-        )}`;
+        return `${eventID.slice(0, 5)}...`;
     }
 }
 
@@ -1231,7 +1233,7 @@ class DLEventViewItem extends DLEvent {
     }
 
     verify() {
-        console.log("Running verify on DLEventViewItem");
+        // console.log("Running verify on DLEventViewItem");
         return super.verify({
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
@@ -1489,6 +1491,14 @@ if (typeof dataLayerDB === "undefined") {
     var dataLayerDB = new DB();
 }
 
+// Checks whether the dl_user_data event is already in the data layer
+const eventPreceededByUserData = () => {
+    return (
+        window.dataLayer.filter((dlEvent) => dlEvent.event === "dl_user_data")
+            .length > 0
+    );
+};
+
 // Sends a copy of the db to the background script for routing to the panel
 const sendUpdatedDB = () => {
     window.dispatchEvent(
@@ -1503,16 +1513,20 @@ const evaluateDLEvent = (dlEventObject) => {
     const dlEventName = dlEventObject.event;
     if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
         return;
+
     const dlEvent = new dlEventMap[dlEventName](dlEventObject);
     dlEvent.verify();
-    if (!dlEvent.isValid()) dlEvent.logVerificationOutcome();
-    console.log("Event about to be verified: " + JSON.stringify(dlEvent));
+    // console.log("Event about to be verified: " + JSON.stringify(dlEvent));
     try {
+        // If the event is not dl_user_data or route change, ensure it was preced by dl_user_data
+        eventPreceededByUserData(dlEvent)
+            ? dlEvent.setMissingUserData(false)
+            : dlEvent.setMissingUserData(true);
+        dlEvent.logVerificationOutcome();
         dataLayerDB.setEventValidityProperty(
             dlEvent.getEventName(),
             dlEvent.isValid() ? "verified" : "failed"
         );
-        console.log(dlEvent.getErrors());
         sendUpdatedDB();
     } catch (e) {
         console.log(e);
@@ -1524,14 +1538,13 @@ let lastIndexProcessed = 0;
 window.dataLayer = window.dataLayer || [];
 setInterval(function () {
     for (; lastIndexProcessed < window.dataLayer.length; lastIndexProcessed++) {
-        console.log("Processing event: " + JSON.stringify(window.dataLayer[lastIndexProcessed]));
         evaluateDLEvent(window.dataLayer[lastIndexProcessed]);
     }
 }, 1000);
 
 // Listen for db reset event from panael.js
 window.addEventListener("__elever_reset_db", async function () {
-    console.log("Reset DB called");
+    // console.log("Reset DB called");
     dataLayerDB.clear();
     sendUpdatedDB();
 });

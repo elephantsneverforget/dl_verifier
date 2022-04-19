@@ -44,6 +44,7 @@ class DLEvent {
         this._userIsLoggedIn =
             dataLayerObject.user_properties?.visitor_type === "logged_in";
         this._dlEventName = schemaExample.event;
+        this._missingUserData = true;
     }
 
     verify(additionalSchemas) {
@@ -72,7 +73,7 @@ class DLEvent {
         });
 
         if (validation.error) {
-            console.log(validation.error);
+            // console.log(validation.error);
             this._isValid = false;
             this._errors = validation.error.details;
             this._verificationSummary = `${
@@ -127,7 +128,8 @@ class DLEvent {
             this._verificationSummary,
             additionalText,
             this._dataLayerObject,
-            this._schemaExample
+            this._schemaExample,
+            this._missingUserData
         );
     }
 
@@ -135,13 +137,13 @@ class DLEvent {
         return this._userIsLoggedIn;
     }
 
+    setMissingUserData(isMissing){
+        this._missingUserData = isMissing;
+    }
+
     formatEventID(eventID) {
         if (eventID === undefined) return "N/A";
-        const length = eventID.length;
-        return `${eventID.slice(0, 3)}..${eventID.slice(
-            length - 4,
-            length - 1
-        )}`;
+        return `${eventID.slice(0, 5)}...`;
     }
 }
 
@@ -169,7 +171,7 @@ export class DLEventViewItem extends DLEvent {
     }
 
     verify() {
-        console.log("Running verify on DLEventViewItem");
+        // console.log("Running verify on DLEventViewItem");
         return super.verify({
             ecommerce: ecommerce({
                 currencyCode: currencyCode,

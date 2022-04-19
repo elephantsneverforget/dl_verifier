@@ -10,8 +10,15 @@ export class Logger {
         verificationSummary,
         additionalText,
         dataLayerObject,
-        schemaExample
+        schemaExample,
+        notPrecededByUserData
     ) {
+        if (notPrecededByUserData) {
+            console.log(
+                "%c" + "Event not preceded by dl_user_data",
+                "display: inline-block ; background-color: gold ; color: black ; font-weight: bold ; padding: 3px 7px 3px 7px ; border-radius: 3px 3px 3px 3px ;"
+            );
+        }
         if (errors.length > 0) {
             notyf.error({
                 message: verificationSummary,
@@ -59,13 +66,6 @@ export class Logger {
                 position: { x: "left", y: "bottom" },
                 ripple: false,
             });
-            console.log(
-                "%c" +
-                    verificationSummary +
-                    " " +
-                    (additionalText ? additionalText : ""),
-                "background-color: #3dc763 ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
-            );
         }
     }
 }

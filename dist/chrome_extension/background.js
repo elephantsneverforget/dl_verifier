@@ -16,7 +16,9 @@ chrome.webRequest.onCompleted.addListener(
         // If loading GTM Suite events script or GTM
         // console.log("set to true gtmLoaded. Tab ID is: " + response.tabId);
         if (response.statusCode === 200) {
-            let gtmContainerId = new RegExp("(?<=id=).{11}").exec(response.url)[0];
+            let gtmContainerId = new RegExp("(?<=id=).{11}").exec(response.url)
+                ? new RegExp("(?<=id=).{11}").exec(response.url)[0]
+                : undefined;
             chrome.storage.local.set(
                 {
                     [`${response.tabId}-gtmLoaded`]: "verified",
