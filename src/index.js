@@ -69,7 +69,7 @@ const evaluateDLEvent = (dlEventObject) => {
         dlEvent.logVerificationOutcome();
         dataLayerDB.setEventValidityProperty(
             dlEvent.getEventName(),
-            dlEvent.isValid() ? "verified" : "failed"
+            dlEvent.getProperties()
         );
         sendUpdatedDB();
     } catch (e) {

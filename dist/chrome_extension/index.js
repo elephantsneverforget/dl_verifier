@@ -1277,6 +1277,13 @@ class DLEvent {
         if (eventID === undefined) return "N/A";
         return `${eventID.slice(0, 5)}...`;
     }
+
+    getProperties() {
+        return {
+            eventVerificationStatus: this.isValid() ? "verified" : "failed",
+            wasPrecededByUserData: this.wasPrecededByUserData(),
+        };
+    }
 }
 
 class DLEventUserData extends DLEvent {
@@ -1537,7 +1544,10 @@ class DB {
             events: {},
         };
         // 2 = unseen // 1 = valid // 0 = invalid all start at 2
-        eventList.forEach((item) => initialDB.events[item] = "unseen");
+        eventList.forEach((item) => initialDB.events[item] = {
+            eventVerificationStatus: "unseen",
+            wasPrecededByUserData: "unseen",
+        });
         if (!window.localStorage.getItem(this._dbName)) {
             window.localStorage.setItem(
                 this._dbName,
@@ -1559,7 +1569,11 @@ class DB {
         const initialDB = {
             events: {},
         };
-        eventList.forEach((item) => initialDB.events[item] = "unseen");
+        // 2 = unseen // 1 = valid // 0 = invalid all start at 2
+        eventList.forEach((item) => initialDB.events[item] = {
+            eventVerificationStatus: "unseen",
+            wasPrecededByUserData: "unseen",
+        });
         window.localStorage.setItem(
             this._dbName,
             JSON.stringify(initialDB)
@@ -1619,7 +1633,7 @@ const evaluateDLEvent = (dlEventObject) => {
         dlEvent.logVerificationOutcome();
         dataLayerDB.setEventValidityProperty(
             dlEvent.getEventName(),
-            dlEvent.isValid() ? "verified" : "failed"
+            dlEvent.getProperties()
         );
         sendUpdatedDB();
     } catch (e) {

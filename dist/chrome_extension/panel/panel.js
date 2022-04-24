@@ -66,7 +66,7 @@ const App = (props) => {
                                   (event) =>
                                       html`<${DLEventStatusElement}
                                           eventName=${event}
-                                          eventStatus=${props.db.events[event]}
+                                          eventStatus=${props.db.events[event].eventVerificationStatus}
                                       />`
                               )}
                       </div>
@@ -147,7 +147,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 });
 
 const renderPanel = () => {
-    // console.log("Event list: " + JSON.stringify(db));
     render(
         html`<${App}
             db="${db}"

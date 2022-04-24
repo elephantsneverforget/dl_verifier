@@ -161,6 +161,13 @@ class DLEvent {
         if (eventID === undefined) return "N/A";
         return `${eventID.slice(0, 5)}...`;
     }
+
+    getProperties() {
+        return {
+            eventVerificationStatus: this.isValid() ? "verified" : "failed",
+            wasPrecededByUserData: this.wasPrecededByUserData(),
+        };
+    }
 }
 
 export class DLEventUserData extends DLEvent {
