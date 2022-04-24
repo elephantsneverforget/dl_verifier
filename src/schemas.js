@@ -1,6 +1,26 @@
 // This file contains all schemas to check dl items against.
 import joi from "joi";
 
+export const crtoMappedUserId = joi.string().allow("").required().messages({
+    "any.required": `"crto_mapped_user_id" should be a string representing the crto_mapped_user_id cookie. See documentation for more details.`,
+});
+
+export const crtoIsUserOptout = joi.string().allow("").required().messages({
+    "any.required": `"crto_is_user_optout" should be a string representing the crto_is_user_optout cookie. See documentation for more details.`,
+});
+
+export const fbp = joi.string().allow("").required().messages({
+    "any.required": `"_fbp" should be a string representing the _fbp cookie. See documentation for more details.`,
+});
+
+export const ga = joi.string().allow("").required().messages({
+    "any.required": `"_ga" should be a string representing the ga_XXXXXXXX cookie. See documentation for more details.`,
+});
+
+export const ga4 = joi.string().allow("").required().messages({
+    "any.required": `"_ga_XXXXXXXX" should be a string representing the GA4 cookie. See documentation for more details.`,
+});
+
 const category = joi.string().allow("").required().messages({
     "any.required": `"category" is a required field on the impressions and products array constituent objects. This represents the category from which the product is from. A Chess board might have a category of "board_game".`,
 });
@@ -47,9 +67,7 @@ export const buildListSchema = (locations) => {
 };
 
 export const ecommerce = (contents) => {
-    return joi.object().keys(
-        contents
-    ).required();
+    return joi.object().keys(contents).required();
 };
 
 const image = joi.string().allow("").messages({
@@ -68,7 +86,7 @@ const inventory = joi.string().allow("").messages({
 });
 
 export const userId = joi.string().messages({
-    "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify user id.`,
+    "any.required": `"user_id" is a required field on the user_properties object and should contain a unique identifier for your user that is persisted across sessions.`,
 });
 
 export const userConsent = joi.string().allow("").messages({
@@ -167,6 +185,22 @@ export const userProperties = joi
     .required()
     .messages({
         "any.required": `"user_properties" should be an object representing the Shopify user properties. See documentation for more details.`,
+    });
+
+export const marketingSchema = joi
+    .object()
+    .keys({
+        _fbp: fbp,
+        _ga: ga,
+        // [joi.string()
+        // .pattern(new RegExp('^_ga_.*$'))]: ga4,
+        user_id: userId,
+        crto_mapped_user_id: crtoMappedUserId,
+        crto_is_user_optout: crtoIsUserOptout,
+    })
+    .required()
+    .messages({
+        "any.required": `"marketing" should be an object representing all marketing data. See documentation for more details.`,
     });
 
 export const impressions = joi

@@ -13,6 +13,7 @@ import {
     buildStepSchema,
     impressions,
     ecommerce,
+    marketingSchema
 } from "../schemas.js";
 
 import { dl_view_item_schema_example } from "../exampleSchemaObjects/dl_view_item.js";
@@ -56,6 +57,9 @@ class DLEvent {
         // Build the schema for the event
         const dlEventSchema = joi.object({
             event: getEventNameSchema(this._dlEventName),
+            ...(this.eventRequiresMarketingProperties() && {
+                marketing: marketingSchema,
+            }),
             // user_properties only required on dl_user_data, dl_login, dl_signup
             ...(this.eventRequiresUserProperties() && {
                 user_properties: this.getUserPropertiesSchema(),
@@ -103,7 +107,9 @@ class DLEvent {
             true
         );
     }
-
+    eventRequiresMarketingProperties(){
+        return this._dlEventName !== "dl_route_change";
+    }
     getUserPropertiesSchema() {
         return this.userIsLoggedIn()
             ? userPropertiesLoggedIn

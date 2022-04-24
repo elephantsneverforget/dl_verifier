@@ -1,6 +1,9 @@
+import { marketingObject } from "./marketing_object";
+
 export const dl_view_item_schema_example = {
     event: "dl_view_item",
     event_id: "231f2c91-c2f3-421f-9d20-bb46a956e87a",
+    marketing: marketingObject,
     ecommerce: {
         currencyCode: "USD",
         detail: {

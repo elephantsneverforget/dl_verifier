@@ -1,6 +1,9 @@
+import { marketingObject } from "./marketing_object";
+
 export const dl_remove_from_cart_schema_example = {
     event: "dl_remove_from_cart",
     event_id: "07df1ccc-7a89-4be2-a863-b0a238080280",
+    marketing: marketingObject,
     ecommerce: {
         currencyCode: "USD",
         remove: {

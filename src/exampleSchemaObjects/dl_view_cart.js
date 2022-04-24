@@ -1,6 +1,9 @@
+import { marketingObject } from "./marketing_object";
+
 export const dl_view_cart_schema_example = {
     event: "dl_view_cart",
     event_id: "e06ba901-57c9-41ee-89f0-28ea91258230",
+    marketing: marketingObject,
     cart_total: "26.99",
     ecommerce: {
         currencyCode: "USD",
