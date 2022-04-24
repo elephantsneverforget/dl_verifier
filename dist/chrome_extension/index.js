@@ -519,6 +519,26 @@ class Logger {
 
 // This file contains all schemas to check dl items against.
 
+const crtoMappedUserId = joi.string().allow("").required().messages({
+    "any.required": `"crto_mapped_user_id" should be a string representing the crto_mapped_user_id cookie. See documentation for more details.`,
+});
+
+const crtoIsUserOptout = joi.string().allow("").required().messages({
+    "any.required": `"crto_is_user_optout" should be a string representing the crto_is_user_optout cookie. See documentation for more details.`,
+});
+
+const fbp = joi.string().allow("").required().messages({
+    "any.required": `"_fbp" should be a string representing the _fbp cookie. See documentation for more details.`,
+});
+
+const ga = joi.string().allow("").required().messages({
+    "any.required": `"_ga" should be a string representing the ga_XXXXXXXX cookie. See documentation for more details.`,
+});
+
+joi.string().allow("").required().messages({
+    "any.required": `"_ga_XXXXXXXX" should be a string representing the GA4 cookie. See documentation for more details.`,
+});
+
 const category = joi.string().allow("").required().messages({
     "any.required": `"category" is a required field on the impressions and products array constituent objects. This represents the category from which the product is from. A Chess board might have a category of "board_game".`,
 });
@@ -565,9 +585,7 @@ const buildListSchema = (locations) => {
 };
 
 const ecommerce = (contents) => {
-    return joi.object().keys(
-        contents
-    ).required();
+    return joi.object().keys(contents).required();
 };
 
 const image = joi.string().allow("").messages({
@@ -586,7 +604,7 @@ const inventory = joi.string().allow("").messages({
 });
 
 const userId = joi.string().messages({
-    "any.required": `"user_id" is a required field on the user_properties object and should contain the Shopify user id.`,
+    "any.required": `"user_id" is a required field on the user_properties object and should contain a unique identifier for your user that is persisted across sessions.`,
 });
 
 const userConsent = joi.string().allow("").messages({
@@ -687,6 +705,22 @@ joi
         "any.required": `"user_properties" should be an object representing the Shopify user properties. See documentation for more details.`,
     });
 
+const marketingSchema = joi
+    .object()
+    .keys({
+        _fbp: fbp,
+        _ga: ga,
+        // [joi.string()
+        // .pattern(new RegExp('^_ga_.*$'))]: ga4,
+        user_id: userId,
+        crto_mapped_user_id: crtoMappedUserId,
+        crto_is_user_optout: crtoIsUserOptout,
+    })
+    .required()
+    .messages({
+        "any.required": `"marketing" should be an object representing all marketing data. See documentation for more details.`,
+    });
+
 const impressions = joi
     .array()
     .items({
@@ -770,9 +804,20 @@ const userPropertiesNotLoggedIn$1 = joi
         "any.required": `"user_properties" is a required field on the data layer object`,
     });
 
+const marketingObject = {
+    // This is the GA4 cookie ID. The XXX... portion of the cookie will differ for every client
+    "_ga_XXXXXXXXXX": "GS1.1.1649714540.17.0.1.60", // GA4 Cookie ID
+    _fbp: "fb.1.1649615616201.121355119", // FB cookie id
+    _ga: "GA1.2.1173945483.1649615616", // GA cookie id
+    user_id: "bc574dca-c842-4de7-98a1-dd9529729456", // UUID uniqe per user, should be persisted as long as possible and kept consistent between sessions
+    crto_mapped_user_id: "dlkjla38uj", // Criteo cookie id if using Criteo
+    crto_is_user_optout: "false", // Criteo opt out status
+};
+
 const dl_view_item_schema_example = {
     event: "dl_view_item",
     event_id: "231f2c91-c2f3-421f-9d20-bb46a956e87a",
+    marketing: marketingObject,
     ecommerce: {
         currencyCode: "USD",
         detail: {
@@ -803,6 +848,7 @@ const dl_view_item_schema_example = {
 const dl_add_to_cart_schema_example = {
     event: "dl_add_to_cart",
     event_id: "887cb1e5-27ea-47c3-95a3-fdca8299e719",
+    marketing: marketingObject,
     ecommerce: {
         currencyCode: "USD",
         add: {
@@ -832,6 +878,7 @@ const dl_add_to_cart_schema_example = {
 const dl_begin_checkout_schema_example = {
     event: "dl_begin_checkout",
     event_id: "4b2be7b2-bf61-4959-b340-065d262da12a",
+    marketing: marketingObject,
     ecommerce: {
         currencyCode: "USD",
         checkout: {
@@ -861,6 +908,7 @@ const dl_begin_checkout_schema_example = {
 const dl_remove_from_cart_schema_example = {
     event: "dl_remove_from_cart",
     event_id: "07df1ccc-7a89-4be2-a863-b0a238080280",
+    marketing: marketingObject,
     ecommerce: {
         currencyCode: "USD",
         remove: {
@@ -889,6 +937,7 @@ const dl_remove_from_cart_schema_example = {
 const dl_search_results_schema_example = {
     event: "dl_search_results",
     event_id: "ee8eb7ca-8db2-4cc6-b875-2398b66b8ffe",
+    marketing: marketingObject,
     ecommerce: {
         currencyCode: "USD",
         actionField: {
@@ -935,6 +984,7 @@ const dl_search_results_schema_example = {
 const dl_view_cart_schema_example = {
     event: "dl_view_cart",
     event_id: "e06ba901-57c9-41ee-89f0-28ea91258230",
+    marketing: marketingObject,
     cart_total: "26.99",
     ecommerce: {
         currencyCode: "USD",
@@ -973,6 +1023,7 @@ const dl_view_cart_schema_example = {
 const dl_view_item_list_schema_example = {
     event: "dl_view_item_list",
     event_id: "2b0c5796-7abe-4465-8e24-0ffade4699df",
+    marketing: marketingObject,
     ecommerce: {
         currencyCode: "USD",
         impressions: [
@@ -1016,6 +1067,7 @@ const dl_view_item_list_schema_example = {
 const dl_select_item_schema_example = {
     event: "dl_select_item",
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312",
+    marketing: marketingObject,
     ecommerce: {
         currencyCode: "USD",
         click: {
@@ -1049,6 +1101,7 @@ const userPropertiesNotLoggedIn = {
 const dl_user_data_schema_example = {
     event: "dl_user_data",
     event_id: "8ff28e85-0503-484e-bb86-53110aba98fb",
+    marketing: marketingObject,
     cart_total: "85.0",
     user_properties: userPropertiesNotLoggedIn
 };
@@ -1077,12 +1130,14 @@ const userPropertiesLoggedIn = {
 const dl_login_schema_example = {
     event: "dl_login",
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312", // unique uuid for FB conversion API
+    marketing: marketingObject,
     user_properties: userPropertiesLoggedIn
 };
 
 const dl_sign_up_schema_example = {
     event: "dl_sign_up",
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312", // unique uuid for FB conversion API
+    marketing: marketingObject,
     user_properties: userPropertiesLoggedIn,
 };
 
@@ -1118,12 +1173,16 @@ class DLEvent {
         // Build the schema for the event
         const dlEventSchema = joi.object({
             event: getEventNameSchema(this._dlEventName),
+            // Marketing not required on route change
+            ...(this.eventRequiresMarketingProperties() && {
+                marketing: marketingSchema,
+            }),
             // user_properties only required on dl_user_data, dl_login, dl_signup
             ...(this.eventRequiresUserProperties() && {
                 user_properties: this.getUserPropertiesSchema(),
             }),
             // No event_id for dl_route_change
-            ...(this.getEventName() !== "dl_route_change" && {
+            ...(this.eventRequiresEventId() && {
                 event_id: eventId,
             }),
             ...additionalSchemas,
@@ -1165,6 +1224,13 @@ class DLEvent {
             true
         );
     }
+    eventRequiresMarketingProperties() {
+        return this._dlEventName !== "dl_route_change";
+    }
+
+    eventRequiresEventId() {
+        return this.getEventName() !== "dl_route_change";
+    }
 
     getUserPropertiesSchema() {
         return this.userIsLoggedIn()
@@ -1199,7 +1265,11 @@ class DLEvent {
         return this._userIsLoggedIn;
     }
 
-    setMissingUserData(isMissing){
+    wasPrecededByUserData() {
+        return this._missingUserData;
+    }
+
+    setMissingUserData(isMissing) {
         this._missingUserData = isMissing;
     }
 
@@ -1297,13 +1367,22 @@ class DLEventBeginCheckout extends DLEvent {
         return super.verify({
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
-                checkout: joi.object().keys({
-                    actionField: joi.object().keys({
-                        step: buildStepSchema("1"),
-                        action: buildActionSchema("action field", "checkout"),
-                    }).required(),
-                    products: products,
-                }).required(),
+                checkout: joi
+                    .object()
+                    .keys({
+                        actionField: joi
+                            .object()
+                            .keys({
+                                step: buildStepSchema("1"),
+                                action: buildActionSchema(
+                                    "action field",
+                                    "checkout"
+                                ),
+                            })
+                            .required(),
+                        products: products,
+                    })
+                    .required(),
             }),
         });
     }
@@ -1318,12 +1397,18 @@ class DLEventRemoveFromCart extends DLEvent {
         return super.verify({
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
-                remove: joi.object().keys({
-                    actionField: joi.object().keys({
-                        list: buildListSchema("action field"),
-                    }).required(),
-                    products: products,
-                }).required(),
+                remove: joi
+                    .object()
+                    .keys({
+                        actionField: joi
+                            .object()
+                            .keys({
+                                list: buildListSchema("action field"),
+                            })
+                            .required(),
+                        products: products,
+                    })
+                    .required(),
             }),
         });
     }
@@ -1339,10 +1424,13 @@ class DLEventSelectItem extends DLEvent {
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
                 click: joi.object().keys({
-                    actionField: joi.object().keys({
-                        list: buildListSchema("action field"),
-                        action: buildActionSchema("action field", "click"),
-                    }).required(),
+                    actionField: joi
+                        .object()
+                        .keys({
+                            list: buildListSchema("action field"),
+                            action: buildActionSchema("action field", "click"),
+                        })
+                        .required(),
                     products: products,
                 }),
             }),
@@ -1359,9 +1447,12 @@ class DLEventSearchResults extends DLEvent {
         return super.verify({
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
-                actionField: joi.object().keys({
-                    list: buildListSchema("action field"),
-                }).required(),
+                actionField: joi
+                    .object()
+                    .keys({
+                        list: buildListSchema("action field"),
+                    })
+                    .required(),
                 impressions: impressions,
             }),
         });
@@ -1378,9 +1469,12 @@ class DLEventViewCart extends DLEvent {
             cart_total: cartTotal,
             ecommerce: ecommerce({
                 currencyCode: currencyCode,
-                actionField: joi.object().keys({
-                    list: buildListSchema("action field"),
-                }).required(),
+                actionField: joi
+                    .object()
+                    .keys({
+                        list: buildListSchema("action field"),
+                    })
+                    .required(),
                 impressions: impressions,
             }),
         });
