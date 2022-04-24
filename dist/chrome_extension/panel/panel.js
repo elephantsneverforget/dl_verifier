@@ -6,6 +6,17 @@ let db, tabId, gtmLoaded, dlListenerLoaded, gtmContainerId;
 
 const optionalEvents = ["dl_sign_up", "dl_login", "dl_search_results"];
 
+const eventsRequiredToBePrecededByUserData = [
+    "dl_add_to_cart",
+    "dl_remove_from_cart",
+    "dl_select_item",
+    "dl_view_cart",
+    "dl_view_item_list",
+    "dl_view_item",
+    "dl_begin_checkout",
+    "dl_search_results",
+];
+
 const nonPlusOnlyEvents = ["dl_begin_checkout"];
 
 const DLEventStatusElement = (props) => {
@@ -15,6 +26,12 @@ const DLEventStatusElement = (props) => {
     const eventIsNonPlusOnly = (eventName) => {
         return nonPlusOnlyEvents.indexOf(eventName) > -1;
     };
+    const eventNotPrecededByDLUserData = (wasPrecededByUserData, eventName) => {
+        return (
+            eventsRequiredToBePrecededByUserData.indexOf(eventName) > -1 &&
+            wasPrecededByUserData === false
+        );
+    };
     return html`
         <div class="status-element">
             ${eventIsOptional(props.eventName)
@@ -22,6 +39,14 @@ const DLEventStatusElement = (props) => {
                 : null}
             ${eventIsNonPlusOnly(props.eventName)
                 ? html`<div class="optional-label">NON PLUS STORES ONLY</div>`
+                : null}
+            ${eventNotPrecededByDLUserData(
+                props.wasPreceededByUserData,
+                props.eventName
+            )
+                ? html`<div class="preceded-label">
+                      NOT PRECDEDED BY dl_user_data
+                  </div>`
                 : null}
             <div class="event-title">${props.eventName}</div>
             <div class="event-status ${getStatusCSS(props.eventStatus)}">
@@ -66,7 +91,11 @@ const App = (props) => {
                                   (event) =>
                                       html`<${DLEventStatusElement}
                                           eventName=${event}
-                                          eventStatus=${props.db.events[event].eventVerificationStatus}
+                                          eventStatus=${props.db.events[event]
+                                              .eventVerificationStatus}
+                                          wasPreceededByUserData=${props.db
+                                              .events[event]
+                                              .wasPrecededByUserData}
                                       />`
                               )}
                       </div>
@@ -155,13 +184,13 @@ const renderPanel = () => {
         />`,
         document.body
     );
-}
+};
 
 const getStatusCSS = (value) => {
     if (value === "verified") return "verified";
     if (value === "failed") return "error";
     return "not-seen";
-}
+};
 
 const reset = () => {
     chrome.tabs.sendMessage(
