@@ -13,13 +13,7 @@ export class Logger {
         schemaExample,
         notPrecededByUserData
     ) {
-        if (notPrecededByUserData) {
-            console.log(
-                "%c" + "Event not preceded by dl_user_data",
-                "display: inline-block ; background-color: gold ; color: black ; font-weight: bold ; padding: 3px 7px 3px 7px ; border-radius: 3px 3px 3px 3px ;"
-            );
-        }
-        if (errors.length > 0) {
+        if (errors.length > 0 || notPrecededByUserData) {
             notyf.error({
                 message: verificationSummary,
                 duration: 6000,
@@ -31,6 +25,12 @@ export class Logger {
                 "%c" + verificationSummary,
                 "background-color: #ed3d3d ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
             );
+            if (notPrecededByUserData) {
+                console.log(
+                    "%c" + "Event not preceded by dl_user_data",
+                    "display: inline-block ; background-color: gold ; color: black ; font-weight: bold ; padding: 3px 7px 3px 7px ; border-radius: 3px 3px 3px 3px ;"
+                );
+            }
             errors.forEach((error) =>
                 console.log(
                     "%c" + error.message,

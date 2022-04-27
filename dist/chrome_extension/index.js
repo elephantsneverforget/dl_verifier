@@ -460,13 +460,7 @@ class Logger {
         schemaExample,
         notPrecededByUserData
     ) {
-        if (notPrecededByUserData) {
-            console.log(
-                "%c" + "Event not preceded by dl_user_data",
-                "display: inline-block ; background-color: gold ; color: black ; font-weight: bold ; padding: 3px 7px 3px 7px ; border-radius: 3px 3px 3px 3px ;"
-            );
-        }
-        if (errors.length > 0) {
+        if (errors.length > 0 || notPrecededByUserData) {
             notyf.error({
                 message: verificationSummary,
                 duration: 6000,
@@ -478,6 +472,12 @@ class Logger {
                 "%c" + verificationSummary,
                 "background-color: #ed3d3d ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
             );
+            if (notPrecededByUserData) {
+                console.log(
+                    "%c" + "Event not preceded by dl_user_data",
+                    "display: inline-block ; background-color: gold ; color: black ; font-weight: bold ; padding: 3px 7px 3px 7px ; border-radius: 3px 3px 3px 3px ;"
+                );
+            }
             errors.forEach((error) =>
                 console.log(
                     "%c" + error.message,
@@ -1151,8 +1151,15 @@ const eventsRequiringUserPropertiesSchema = [
     "dl_sign_up",
 ];
 
+const eventsNotRequiringUserDataToPrecedeThem = [
+    "dl_user_data",
+    "dl_login",
+    "dl_sign_up",
+    "dl_route_change",
+];
+
 class DLEvent {
-    constructor(dataLayerObject, schemaExample) {
+    constructor(dataLayerObject, schemaExample, dataLayer) {
         this._schemaExample = schemaExample;
         this._dataLayerObject = dataLayerObject;
         this._errors = [];
@@ -1161,7 +1168,8 @@ class DLEvent {
         this._userIsLoggedIn =
             dataLayerObject.user_properties?.visitor_type === "logged_in";
         this._dlEventName = schemaExample.event;
-        this._missingUserData = true;
+        if (dataLayer) this.setShouldBePrecededByDLUserData(dataLayer);
+        this.verify();
     }
 
     verify(additionalSchemas) {
@@ -1224,6 +1232,7 @@ class DLEvent {
             true
         );
     }
+
     eventRequiresMarketingProperties() {
         return this._dlEventName !== "dl_route_change";
     }
@@ -1257,7 +1266,7 @@ class DLEvent {
             additionalText,
             this._dataLayerObject,
             this._schemaExample,
-            this._missingUserData
+            this.isMissingUserData()
         );
     }
 
@@ -1265,12 +1274,38 @@ class DLEvent {
         return this._userIsLoggedIn;
     }
 
-    wasPrecededByUserData() {
+    isMissingUserData() {
         return this._missingUserData;
     }
 
     setMissingUserData(isMissing) {
         this._missingUserData = isMissing;
+    }
+
+    eventMustBePrecededByUserData() {
+        return !eventsNotRequiringUserDataToPrecedeThem.includes(
+            this._dlEventName
+        );
+    }
+
+    eventWasPrecededByUserData(dataLayerSnapshot) {
+        return (
+            dataLayerSnapshot.filter(
+                (dlEvent) => dlEvent.event === "dl_user_data"
+            ).length > 0
+        );
+    }
+
+    setShouldBePrecededByDLUserData(dataLayerSnapshot) {
+        // If not required set to false
+        if (!this.eventMustBePrecededByUserData())
+            return this.setMissingUserData(false);
+        // If we're here we know it's required
+        if (this.eventWasPrecededByUserData(dataLayerSnapshot)) {
+            this.setMissingUserData(false);
+        } else {
+            this.setMissingUserData(true);
+        }
     }
 
     formatEventID(eventID) {
@@ -1281,32 +1316,62 @@ class DLEvent {
     getProperties() {
         return {
             eventVerificationStatus: this.isValid() ? "verified" : "failed",
-            wasPrecededByUserData: this.wasPrecededByUserData(),
+            wasPrecededByUserData: this.isMissingUserData,
         };
+    }
+
+    static shouldProcessEvent(dlEventObject) {
+        if (typeof dlEventObject !== "object") return false;
+        if (!(dlEventObject.event in this.getEventMap())) return false;
+        return true;
+    }
+
+    static getEventMap() {
+        return {
+            dl_view_item: DLEventViewItem,
+            dl_add_to_cart: DLEventAddToCart,
+            dl_remove_from_cart: DLEventRemoveFromCart,
+            dl_select_item: DLEventSelectItem,
+            dl_user_data: DLEventUserData,
+            dl_view_cart: DLEventViewCart,
+            dl_view_item_list: DLEventViewItemList,
+            dl_route_change: DLEventRouteChange,
+            dl_begin_checkout: DLEventBeginCheckout,
+            dl_login: DLEventLogin,
+            dl_sign_up: DLEventSignUp,
+            dl_search_results: DLEventSearchResults,
+        };
+    }
+
+    static dlEventFactory(dlEventObject, dataLayer){
+        const dlEvent = DLEvent.getEventMap()[dlEventObject.event];
+        const event = new dlEvent(dlEventObject, dataLayer);
+        return event;
+        // return new DLEvent.getEventMap()[dlEventObject.event](dlEventObject, dataLayer);
     }
 }
 
 class DLEventUserData extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_user_data_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_user_data_schema_example, dataLayer);
     }
 }
 
 class DLEventLogin extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_login_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_login_schema_example, dataLayer);
     }
 }
 
 class DLEventSignUp extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_sign_up_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_sign_up_schema_example, dataLayer);
     }
 }
 
 class DLEventViewItem extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_view_item_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_view_item_schema_example, dataLayer);
     }
 
     verify() {
@@ -1336,8 +1401,8 @@ class DLEventViewItem extends DLEvent {
 }
 
 class DLEventAddToCart extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_add_to_cart_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_add_to_cart_schema_example, dataLayer);
     }
 
     verify() {
@@ -1366,8 +1431,8 @@ class DLEventAddToCart extends DLEvent {
 }
 
 class DLEventBeginCheckout extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_begin_checkout_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_begin_checkout_schema_example, dataLayer);
     }
 
     verify() {
@@ -1396,8 +1461,8 @@ class DLEventBeginCheckout extends DLEvent {
 }
 
 class DLEventRemoveFromCart extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_remove_from_cart_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_remove_from_cart_schema_example, dataLayer);
     }
 
     verify() {
@@ -1422,8 +1487,8 @@ class DLEventRemoveFromCart extends DLEvent {
 }
 
 class DLEventSelectItem extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_select_item_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_select_item_schema_example, dataLayer);
     }
 
     verify() {
@@ -1446,8 +1511,8 @@ class DLEventSelectItem extends DLEvent {
 }
 
 class DLEventSearchResults extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_search_results_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_search_results_schema_example, dataLayer);
     }
 
     verify() {
@@ -1467,8 +1532,8 @@ class DLEventSearchResults extends DLEvent {
 }
 
 class DLEventViewCart extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_view_cart_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_view_cart_schema_example, dataLayer);
     }
 
     verify() {
@@ -1489,8 +1554,8 @@ class DLEventViewCart extends DLEvent {
 }
 
 class DLEventViewItemList extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_view_item_list_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_view_item_list_schema_example, dataLayer);
     }
 
     verify() {
@@ -1504,8 +1569,8 @@ class DLEventViewItemList extends DLEvent {
 }
 
 class DLEventRouteChange extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_route_change_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_route_change_schema_example, dataLayer);
     }
 }
 
@@ -1581,31 +1646,9 @@ class DB {
     }
 }
 
-const dlEventMap = {
-    dl_view_item: DLEventViewItem,
-    dl_add_to_cart: DLEventAddToCart,
-    dl_remove_from_cart: DLEventRemoveFromCart,
-    dl_select_item: DLEventSelectItem,
-    dl_user_data: DLEventUserData,
-    dl_view_cart: DLEventViewCart,
-    dl_view_item_list: DLEventViewItemList,
-    dl_route_change: DLEventRouteChange,
-    dl_begin_checkout: DLEventBeginCheckout,
-    dl_login: DLEventLogin,
-    dl_sign_up: DLEventSignUp,
-    dl_search_results: DLEventSearchResults,
-};
 if (typeof dataLayerDB === "undefined") {
     var dataLayerDB = new DB();
 }
-
-// Checks whether the dl_user_data event is already in the data layer
-const eventPreceededByUserData = () => {
-    return (
-        window.dataLayer.filter((dlEvent) => dlEvent.event === "dl_user_data")
-            .length > 0
-    );
-};
 
 // Sends a copy of the db to the background script for routing to the panel
 const sendUpdatedDB = () => {
@@ -1618,18 +1661,10 @@ const sendUpdatedDB = () => {
 
 // Evaluate each event relevant event that's pushed to the DL
 const evaluateDLEvent = (dlEventObject) => {
-    const dlEventName = dlEventObject.event;
-    if (typeof dlEventObject !== "object" || !(dlEventName in dlEventMap))
-        return;
-
-    const dlEvent = new dlEventMap[dlEventName](dlEventObject);
-    dlEvent.verify();
-    // console.log("Event about to be verified: " + JSON.stringify(dlEvent));
+    if (!DLEvent.shouldProcessEvent(dlEventObject)) return;
+    const dlEvent = DLEvent.dlEventFactory(dlEventObject, window.dataLayer);
     try {
         // If the event is not dl_user_data or route change, ensure it was preced by dl_user_data
-        eventPreceededByUserData(dlEvent)
-            ? dlEvent.setMissingUserData(false)
-            : dlEvent.setMissingUserData(true);
         dlEvent.logVerificationOutcome();
         dataLayerDB.setEventValidityProperty(
             dlEvent.getEventName(),

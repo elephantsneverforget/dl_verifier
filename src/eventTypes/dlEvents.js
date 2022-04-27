@@ -35,8 +35,15 @@ const eventsRequiringUserPropertiesSchema = [
     "dl_sign_up",
 ];
 
-class DLEvent {
-    constructor(dataLayerObject, schemaExample) {
+const eventsNotRequiringUserDataToPrecedeThem = [
+    "dl_user_data",
+    "dl_login",
+    "dl_sign_up",
+    "dl_route_change",
+];
+
+export class DLEvent {
+    constructor(dataLayerObject, schemaExample, dataLayer) {
         this._schemaExample = schemaExample;
         this._dataLayerObject = dataLayerObject;
         this._errors = [];
@@ -45,7 +52,8 @@ class DLEvent {
         this._userIsLoggedIn =
             dataLayerObject.user_properties?.visitor_type === "logged_in";
         this._dlEventName = schemaExample.event;
-        this._missingUserData = true;
+        if (dataLayer) this.setShouldBePrecededByDLUserData(dataLayer);
+        this.verify();
     }
 
     verify(additionalSchemas) {
@@ -108,6 +116,7 @@ class DLEvent {
             true
         );
     }
+
     eventRequiresMarketingProperties() {
         return this._dlEventName !== "dl_route_change";
     }
@@ -141,7 +150,7 @@ class DLEvent {
             additionalText,
             this._dataLayerObject,
             this._schemaExample,
-            this._missingUserData
+            this.isMissingUserData()
         );
     }
 
@@ -149,12 +158,38 @@ class DLEvent {
         return this._userIsLoggedIn;
     }
 
-    wasPrecededByUserData() {
+    isMissingUserData() {
         return this._missingUserData;
     }
 
     setMissingUserData(isMissing) {
         this._missingUserData = isMissing;
+    }
+
+    eventMustBePrecededByUserData() {
+        return !eventsNotRequiringUserDataToPrecedeThem.includes(
+            this._dlEventName
+        );
+    }
+
+    eventWasPrecededByUserData(dataLayerSnapshot) {
+        return (
+            dataLayerSnapshot.filter(
+                (dlEvent) => dlEvent.event === "dl_user_data"
+            ).length > 0
+        );
+    }
+
+    setShouldBePrecededByDLUserData(dataLayerSnapshot) {
+        // If not required set to false
+        if (!this.eventMustBePrecededByUserData())
+            return this.setMissingUserData(false);
+        // If we're here we know it's required
+        if (this.eventWasPrecededByUserData(dataLayerSnapshot)) {
+            this.setMissingUserData(false);
+        } else {
+            this.setMissingUserData(true);
+        }
     }
 
     formatEventID(eventID) {
@@ -165,32 +200,62 @@ class DLEvent {
     getProperties() {
         return {
             eventVerificationStatus: this.isValid() ? "verified" : "failed",
-            wasPrecededByUserData: this.wasPrecededByUserData(),
+            wasPrecededByUserData: this.isMissingUserData,
         };
+    }
+
+    static shouldProcessEvent(dlEventObject) {
+        if (typeof dlEventObject !== "object") return false;
+        if (!(dlEventObject.event in this.getEventMap())) return false;
+        return true;
+    }
+
+    static getEventMap() {
+        return {
+            dl_view_item: DLEventViewItem,
+            dl_add_to_cart: DLEventAddToCart,
+            dl_remove_from_cart: DLEventRemoveFromCart,
+            dl_select_item: DLEventSelectItem,
+            dl_user_data: DLEventUserData,
+            dl_view_cart: DLEventViewCart,
+            dl_view_item_list: DLEventViewItemList,
+            dl_route_change: DLEventRouteChange,
+            dl_begin_checkout: DLEventBeginCheckout,
+            dl_login: DLEventLogin,
+            dl_sign_up: DLEventSignUp,
+            dl_search_results: DLEventSearchResults,
+        };
+    }
+
+    static dlEventFactory(dlEventObject, dataLayer){
+        const dlEvent = DLEvent.getEventMap()[dlEventObject.event];
+        const event = new dlEvent(dlEventObject, dataLayer);
+        return event;
+        // return new DLEvent.getEventMap()[dlEventObject.event](dlEventObject, dataLayer);
     }
 }
 
 export class DLEventUserData extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_user_data_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_user_data_schema_example, dataLayer);
     }
 }
 
 export class DLEventLogin extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_login_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_login_schema_example, dataLayer);
     }
 }
 
 export class DLEventSignUp extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_sign_up_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_sign_up_schema_example, dataLayer);
     }
 }
 
 export class DLEventViewItem extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_view_item_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_view_item_schema_example, dataLayer);
     }
 
     verify() {
@@ -220,8 +285,8 @@ export class DLEventViewItem extends DLEvent {
 }
 
 export class DLEventAddToCart extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_add_to_cart_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_add_to_cart_schema_example, dataLayer);
     }
 
     verify() {
@@ -250,8 +315,8 @@ export class DLEventAddToCart extends DLEvent {
 }
 
 export class DLEventBeginCheckout extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_begin_checkout_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_begin_checkout_schema_example, dataLayer);
     }
 
     verify() {
@@ -280,8 +345,8 @@ export class DLEventBeginCheckout extends DLEvent {
 }
 
 export class DLEventRemoveFromCart extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_remove_from_cart_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_remove_from_cart_schema_example, dataLayer);
     }
 
     verify() {
@@ -306,8 +371,8 @@ export class DLEventRemoveFromCart extends DLEvent {
 }
 
 export class DLEventSelectItem extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_select_item_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_select_item_schema_example, dataLayer);
     }
 
     verify() {
@@ -330,8 +395,8 @@ export class DLEventSelectItem extends DLEvent {
 }
 
 export class DLEventSearchResults extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_search_results_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_search_results_schema_example, dataLayer);
     }
 
     verify() {
@@ -351,8 +416,8 @@ export class DLEventSearchResults extends DLEvent {
 }
 
 export class DLEventViewCart extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_view_cart_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_view_cart_schema_example, dataLayer);
     }
 
     verify() {
@@ -373,8 +438,8 @@ export class DLEventViewCart extends DLEvent {
 }
 
 export class DLEventViewItemList extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_view_item_list_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_view_item_list_schema_example, dataLayer);
     }
 
     verify() {
@@ -388,7 +453,7 @@ export class DLEventViewItemList extends DLEvent {
 }
 
 export class DLEventRouteChange extends DLEvent {
-    constructor(dataLayerObject) {
-        super(dataLayerObject, dl_route_change_schema_example);
+    constructor(dataLayerObject, dataLayer) {
+        super(dataLayerObject, dl_route_change_schema_example, dataLayer);
     }
 }
