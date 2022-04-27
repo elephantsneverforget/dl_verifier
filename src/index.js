@@ -43,7 +43,7 @@ setInterval(function () {
     }
 }, 1000);
 
-// Listen for db reset event from panael.js
+// Listen for db reset event from panel.js
 window.addEventListener("__elever_reset_db", async function () {
     // console.log("Reset DB called");
     dataLayerDB.clear();

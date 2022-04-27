@@ -5,6 +5,10 @@ export const crtoMappedUserId = joi.string().allow("").required().messages({
     "any.required": `"crto_mapped_user_id" should be a string representing the crto_mapped_user_id cookie. See documentation for more details.`,
 });
 
+export const ttclid = joi.string().allow("").required().messages({
+    "any.required": `"ttclid" should be a string representing the ttclid cookie from TikTok. See documentation for more details.`,
+});
+
 export const crtoIsUserOptout = joi.string().allow("").required().messages({
     "any.required": `"crto_is_user_optout" should be a string representing the crto_is_user_optout cookie. See documentation for more details.`,
 });
@@ -85,7 +89,7 @@ const inventory = joi.string().allow("").messages({
     "any.required": inventoryString,
 });
 
-export const userId = joi.string().messages({
+export const userId = joi.string().required().messages({
     "any.required": `"user_id" is a required field on the user_properties object and should contain a unique identifier for your user that is persisted across sessions.`,
 });
 
@@ -190,17 +194,18 @@ export const userProperties = joi
 export const marketingSchema = joi
     .object()
     .keys({
-        _fbp: fbp,
-        _ga: ga,
+        // _fbp: fbp,
+        // _ga: ga,
         // [joi.string()
         // .pattern(new RegExp('^_ga_.*$'))]: ga4,
+        // ttclid: ttclid,
         user_id: userId,
-        crto_mapped_user_id: crtoMappedUserId,
-        crto_is_user_optout: crtoIsUserOptout,
+        // crto_mapped_user_id: crtoMappedUserId,
+        // crto_is_user_optout: crtoIsUserOptout,
     })
     .required()
     .messages({
-        "any.required": `"marketing" should be an object representing all marketing data. See documentation for more details.`,
+        "any.required": `"marketing" should be an object representing all marketing data. The minimal object will contain at least a user_id propert. See documentation for more details.`,
     });
 
 export const impressions = joi

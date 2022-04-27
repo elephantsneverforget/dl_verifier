@@ -35,7 +35,6 @@ describe("Events preceded or not preceded by dl_user_data events have correct pr
             dl_view_item_schema_example,
             [{ event: "dl_user_data" }, { event: "dl_view_item" }]
         );
-        // dlEventViewItem.verify();
         expect(dlEventViewItem.isMissingUserData()).toBe(false);
         expect(dlEventViewItem.isValid()).toBe(true);
     });

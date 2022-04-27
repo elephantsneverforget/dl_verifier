@@ -11,9 +11,9 @@ export class Logger {
         additionalText,
         dataLayerObject,
         schemaExample,
-        notPrecededByUserData
+        isMissingUserData
     ) {
-        if (errors.length > 0 || notPrecededByUserData) {
+        if (errors.length > 0 || isMissingUserData) {
             notyf.error({
                 message: verificationSummary,
                 duration: 6000,
@@ -25,9 +25,9 @@ export class Logger {
                 "%c" + verificationSummary,
                 "background-color: #ed3d3d ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
             );
-            if (notPrecededByUserData) {
+            if (isMissingUserData) {
                 console.log(
-                    "%c" + "Event not preceded by dl_user_data",
+                    "%c" + "Event not preceded by dl_user_data in the data layer",
                     "display: inline-block ; background-color: gold ; color: black ; font-weight: bold ; padding: 3px 7px 3px 7px ; border-radius: 3px 3px 3px 3px ;"
                 );
             }

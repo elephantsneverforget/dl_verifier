@@ -458,9 +458,9 @@ class Logger {
         additionalText,
         dataLayerObject,
         schemaExample,
-        notPrecededByUserData
+        isMissingUserData
     ) {
-        if (errors.length > 0 || notPrecededByUserData) {
+        if (errors.length > 0 || isMissingUserData) {
             notyf.error({
                 message: verificationSummary,
                 duration: 6000,
@@ -472,9 +472,9 @@ class Logger {
                 "%c" + verificationSummary,
                 "background-color: #ed3d3d ; color: #ffffff ; font-weight: bold ; padding: 4px ;"
             );
-            if (notPrecededByUserData) {
+            if (isMissingUserData) {
                 console.log(
-                    "%c" + "Event not preceded by dl_user_data",
+                    "%c" + "Event not preceded by dl_user_data in the data layer",
                     "display: inline-block ; background-color: gold ; color: black ; font-weight: bold ; padding: 3px 7px 3px 7px ; border-radius: 3px 3px 3px 3px ;"
                 );
             }
@@ -519,19 +519,23 @@ class Logger {
 
 // This file contains all schemas to check dl items against.
 
-const crtoMappedUserId = joi.string().allow("").required().messages({
+joi.string().allow("").required().messages({
     "any.required": `"crto_mapped_user_id" should be a string representing the crto_mapped_user_id cookie. See documentation for more details.`,
 });
 
-const crtoIsUserOptout = joi.string().allow("").required().messages({
+joi.string().allow("").required().messages({
+    "any.required": `"ttclid" should be a string representing the ttclid cookie from TikTok. See documentation for more details.`,
+});
+
+joi.string().allow("").required().messages({
     "any.required": `"crto_is_user_optout" should be a string representing the crto_is_user_optout cookie. See documentation for more details.`,
 });
 
-const fbp = joi.string().allow("").required().messages({
+joi.string().allow("").required().messages({
     "any.required": `"_fbp" should be a string representing the _fbp cookie. See documentation for more details.`,
 });
 
-const ga = joi.string().allow("").required().messages({
+joi.string().allow("").required().messages({
     "any.required": `"_ga" should be a string representing the ga_XXXXXXXX cookie. See documentation for more details.`,
 });
 
@@ -603,7 +607,7 @@ const inventory = joi.string().allow("").messages({
     "any.required": inventoryString,
 });
 
-const userId = joi.string().messages({
+const userId = joi.string().required().messages({
     "any.required": `"user_id" is a required field on the user_properties object and should contain a unique identifier for your user that is persisted across sessions.`,
 });
 
@@ -708,13 +712,14 @@ joi
 const marketingSchema = joi
     .object()
     .keys({
-        _fbp: fbp,
-        _ga: ga,
+        // _fbp: fbp,
+        // _ga: ga,
         // [joi.string()
         // .pattern(new RegExp('^_ga_.*$'))]: ga4,
+        // ttclid: ttclid,
         user_id: userId,
-        crto_mapped_user_id: crtoMappedUserId,
-        crto_is_user_optout: crtoIsUserOptout,
+        // crto_mapped_user_id: crtoMappedUserId,
+        // crto_is_user_optout: crtoIsUserOptout,
     })
     .required()
     .messages({
@@ -1145,21 +1150,10 @@ const dl_route_change_schema_example = {
     event: "dl_route_change",
 };
 
-const eventsRequiringUserPropertiesSchema = [
-    "dl_user_data",
-    "dl_login",
-    "dl_sign_up",
-];
-
-const eventsNotRequiringUserDataToPrecedeThem = [
-    "dl_user_data",
-    "dl_login",
-    "dl_sign_up",
-    "dl_route_change",
-];
-
 class DLEvent {
     constructor(dataLayerObject, schemaExample, dataLayer) {
+        this._dlEventName = schemaExample.event;
+        if (dataLayer) this.setShouldBePrecededByDLUserData(dataLayer);
         this._schemaExample = schemaExample;
         this._dataLayerObject = dataLayerObject;
         this._errors = [];
@@ -1167,8 +1161,6 @@ class DLEvent {
         this._isValid;
         this._userIsLoggedIn =
             dataLayerObject.user_properties?.visitor_type === "logged_in";
-        this._dlEventName = schemaExample.event;
-        if (dataLayer) this.setShouldBePrecededByDLUserData(dataLayer);
         this.verify();
     }
 
@@ -1228,9 +1220,18 @@ class DLEvent {
 
     eventRequiresUserProperties() {
         return (
-            eventsRequiringUserPropertiesSchema.includes(this._dlEventName) ===
-            true
+            this.eventsRequiringUserPropertiesSchema().includes(
+                this._dlEventName
+            ) === true
         );
+    }
+
+    eventsRequiringUserPropertiesSchema() {
+        return ["dl_user_data", "dl_login", "dl_sign_up"];
+    }
+
+    eventsNotRequiringUserDataToPrecedeThem() {
+        return ["dl_user_data", "dl_login", "dl_sign_up", "dl_route_change"];
     }
 
     eventRequiresMarketingProperties() {
@@ -1283,16 +1284,23 @@ class DLEvent {
     }
 
     eventMustBePrecededByUserData() {
-        return !eventsNotRequiringUserDataToPrecedeThem.includes(
+        return !this.eventsNotRequiringUserDataToPrecedeThem().includes(
             this._dlEventName
         );
     }
 
-    eventWasPrecededByUserData(dataLayerSnapshot) {
+    eventWasPrecededByUserData(dataLayerSnapshot, eventName) {
         // First find the index of the earliest event by this name in the DL
-        const indexOfEvent = dataLayerSnapshot.findIndex((event) => this.getEventName() === event.event);
-        if(indexOfEvent === -1) throw new Error(`Could not find event ${this.getEventName()} in the data layer`);
-        const indexOfDlUserData = dataLayerSnapshot.findIndex((event) => event.event === "dl_user_data");
+        const indexOfEvent = dataLayerSnapshot.findIndex(
+            (event) => eventName === event.event
+        );
+        if (indexOfEvent === -1)
+            throw new Error(
+                `Could not find event ${eventName} in the data layer`
+            );
+        const indexOfDlUserData = dataLayerSnapshot.findIndex(
+            (event) => event.event === "dl_user_data"
+        );
         if (indexOfDlUserData === -1) return false;
         return indexOfDlUserData < indexOfEvent;
     }
@@ -1302,7 +1310,7 @@ class DLEvent {
         if (!this.eventMustBePrecededByUserData())
             return this.setMissingUserData(false);
         // If we're here we know it's required
-        if (this.eventWasPrecededByUserData(dataLayerSnapshot)) {
+        if (this.eventWasPrecededByUserData(dataLayerSnapshot, this.getEventName())) {
             this.setMissingUserData(false);
         } else {
             this.setMissingUserData(true);
@@ -1344,7 +1352,7 @@ class DLEvent {
         };
     }
 
-    static dlEventFactory(dlEventObject, dataLayer){
+    static dlEventFactory(dlEventObject, dataLayer) {
         const dlEvent = DLEvent.getEventMap()[dlEventObject.event];
         const event = new dlEvent(dlEventObject, dataLayer);
         return event;
@@ -1685,7 +1693,7 @@ setInterval(function () {
     }
 }, 1000);
 
-// Listen for db reset event from panael.js
+// Listen for db reset event from panel.js
 window.addEventListener("__elever_reset_db", async function () {
     // console.log("Reset DB called");
     dataLayerDB.clear();

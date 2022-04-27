@@ -1,4 +1,4 @@
-import joi, { object } from "joi";
+import joi from "joi";
 import { Logger } from "../logger.js";
 import {
     eventId,
@@ -29,21 +29,10 @@ import { dl_login_schema_example } from "../exampleSchemaObjects/dl_login.js";
 import { dl_sign_up_schema_example } from "../exampleSchemaObjects/dl_sign_up.js";
 import { dl_route_change_schema_example } from "../exampleSchemaObjects/dl_route_change";
 
-const eventsRequiringUserPropertiesSchema = [
-    "dl_user_data",
-    "dl_login",
-    "dl_sign_up",
-];
-
-const eventsNotRequiringUserDataToPrecedeThem = [
-    "dl_user_data",
-    "dl_login",
-    "dl_sign_up",
-    "dl_route_change",
-];
-
 export class DLEvent {
     constructor(dataLayerObject, schemaExample, dataLayer) {
+        this._dlEventName = schemaExample.event;
+        if (dataLayer) this.setShouldBePrecededByDLUserData(dataLayer);
         this._schemaExample = schemaExample;
         this._dataLayerObject = dataLayerObject;
         this._errors = [];
@@ -51,8 +40,6 @@ export class DLEvent {
         this._isValid;
         this._userIsLoggedIn =
             dataLayerObject.user_properties?.visitor_type === "logged_in";
-        this._dlEventName = schemaExample.event;
-        if (dataLayer) this.setShouldBePrecededByDLUserData(dataLayer);
         this.verify();
     }
 
@@ -112,9 +99,18 @@ export class DLEvent {
 
     eventRequiresUserProperties() {
         return (
-            eventsRequiringUserPropertiesSchema.includes(this._dlEventName) ===
-            true
+            this.eventsRequiringUserPropertiesSchema().includes(
+                this._dlEventName
+            ) === true
         );
+    }
+
+    eventsRequiringUserPropertiesSchema() {
+        return ["dl_user_data", "dl_login", "dl_sign_up"];
+    }
+
+    eventsNotRequiringUserDataToPrecedeThem() {
+        return ["dl_user_data", "dl_login", "dl_sign_up", "dl_route_change"];
     }
 
     eventRequiresMarketingProperties() {
@@ -167,16 +163,23 @@ export class DLEvent {
     }
 
     eventMustBePrecededByUserData() {
-        return !eventsNotRequiringUserDataToPrecedeThem.includes(
+        return !this.eventsNotRequiringUserDataToPrecedeThem().includes(
             this._dlEventName
         );
     }
 
-    eventWasPrecededByUserData(dataLayerSnapshot) {
+    eventWasPrecededByUserData(dataLayerSnapshot, eventName) {
         // First find the index of the earliest event by this name in the DL
-        const indexOfEvent = dataLayerSnapshot.findIndex((event) => this.getEventName() === event.event);
-        if(indexOfEvent === -1) throw new Error(`Could not find event ${this.getEventName()} in the data layer`);
-        const indexOfDlUserData = dataLayerSnapshot.findIndex((event) => event.event === "dl_user_data");
+        const indexOfEvent = dataLayerSnapshot.findIndex(
+            (event) => eventName === event.event
+        );
+        if (indexOfEvent === -1)
+            throw new Error(
+                `Could not find event ${eventName} in the data layer`
+            );
+        const indexOfDlUserData = dataLayerSnapshot.findIndex(
+            (event) => event.event === "dl_user_data"
+        );
         if (indexOfDlUserData === -1) return false;
         return indexOfDlUserData < indexOfEvent;
     }
@@ -186,7 +189,7 @@ export class DLEvent {
         if (!this.eventMustBePrecededByUserData())
             return this.setMissingUserData(false);
         // If we're here we know it's required
-        if (this.eventWasPrecededByUserData(dataLayerSnapshot)) {
+        if (this.eventWasPrecededByUserData(dataLayerSnapshot, this.getEventName())) {
             this.setMissingUserData(false);
         } else {
             this.setMissingUserData(true);
@@ -228,7 +231,7 @@ export class DLEvent {
         };
     }
 
-    static dlEventFactory(dlEventObject, dataLayer){
+    static dlEventFactory(dlEventObject, dataLayer) {
         const dlEvent = DLEvent.getEventMap()[dlEventObject.event];
         const event = new dlEvent(dlEventObject, dataLayer);
         return event;
