@@ -1289,11 +1289,12 @@ class DLEvent {
     }
 
     eventWasPrecededByUserData(dataLayerSnapshot) {
-        return (
-            dataLayerSnapshot.filter(
-                (dlEvent) => dlEvent.event === "dl_user_data"
-            ).length > 0
-        );
+        // First find the index of the earliest event by this name in the DL
+        const indexOfEvent = dataLayerSnapshot.findIndex((event) => this.getEventName() === event.event);
+        if(indexOfEvent === -1) throw new Error(`Could not find event ${this.getEventName()} in the data layer`);
+        const indexOfDlUserData = dataLayerSnapshot.findIndex((event) => event.event === "dl_user_data");
+        if (indexOfDlUserData === -1) return false;
+        return indexOfDlUserData < indexOfEvent;
     }
 
     setShouldBePrecededByDLUserData(dataLayerSnapshot) {
@@ -1316,7 +1317,7 @@ class DLEvent {
     getProperties() {
         return {
             eventVerificationStatus: this.isValid() ? "verified" : "failed",
-            wasPrecededByUserData: this.isMissingUserData,
+            isMissingUserData: this.isMissingUserData(),
         };
     }
 
@@ -1611,7 +1612,7 @@ class DB {
         // 2 = unseen // 1 = valid // 0 = invalid all start at 2
         eventList.forEach((item) => initialDB.events[item] = {
             eventVerificationStatus: "unseen",
-            wasPrecededByUserData: "unseen",
+            isMissingUserData: "undetermined",
         });
         if (!window.localStorage.getItem(this._dbName)) {
             window.localStorage.setItem(
@@ -1637,7 +1638,7 @@ class DB {
         // 2 = unseen // 1 = valid // 0 = invalid all start at 2
         eventList.forEach((item) => initialDB.events[item] = {
             eventVerificationStatus: "unseen",
-            wasPrecededByUserData: "unseen",
+            isMissingUserData: "undetermined",
         });
         window.localStorage.setItem(
             this._dbName,
@@ -1659,12 +1660,11 @@ const sendUpdatedDB = () => {
     );
 };
 
-// Evaluate each event relevant event that's pushed to the DL
+// Evaluate each relevant event that's pushed to the DL
 const evaluateDLEvent = (dlEventObject) => {
     if (!DLEvent.shouldProcessEvent(dlEventObject)) return;
     const dlEvent = DLEvent.dlEventFactory(dlEventObject, window.dataLayer);
     try {
-        // If the event is not dl_user_data or route change, ensure it was preced by dl_user_data
         dlEvent.logVerificationOutcome();
         dataLayerDB.setEventValidityProperty(
             dlEvent.getEventName(),

@@ -29,34 +29,11 @@ import { dl_login_schema_example } from "./exampleSchemaObjects/dl_login.js";
 import { dl_sign_up_schema_example } from "./exampleSchemaObjects/dl_sign_up.js";
 import { dl_route_change_schema_example } from "./exampleSchemaObjects/dl_route_change.js";
 
-// describe("Anonymous and logged in users and user_properties", () => {
-//     test("The user_properties object for not logged in users should have the correct formatting.", () => {
-//         const dlEventUserData = new DLEventUserData(
-//             dl_user_data_schema_example
-//         );
-//         dlEventUserData.verify();
-//         expect(dlEventUserData.verify).toThrow(Error);
-//         expect(dlEventUserData.getErrors()).toHaveLength(0);
-//         expect(dlEventUserData.isValid()).toBe(true);
-//         expect(dlEventUserData.getVerificationSummary()).toContain("valid");
-//     });
-//     test("The user_properties object for logged in users should have the correct formatting", () => {
-//         const dlEventUserData = new DLEventUserData(
-//             dl_user_data_schema_example
-//         );
-//         dlEventUserData.verify();
-//         expect(dlEventUserData.verify).toThrow(Error);
-//         expect(dlEventUserData.getErrors()).toHaveLength(0);
-//         expect(dlEventUserData.isValid()).toBe(true);
-//         expect(dlEventUserData.getVerificationSummary()).toContain("valid");
-//     });
-// });
-
 describe("Events preceded or not preceded by dl_user_data events have correct properties set", () => {
     test("An event having dl_user_data precede it in the data layer is not set to missing user data", () => {
         const dlEventViewItem = new DLEventViewItem(
             dl_view_item_schema_example,
-            [{ event: "dl_user_data" }]
+            [{ event: "dl_user_data" }, { event: "dl_view_item" }]
         );
         // dlEventViewItem.verify();
         expect(dlEventViewItem.isMissingUserData()).toBe(false);
@@ -65,7 +42,7 @@ describe("Events preceded or not preceded by dl_user_data events have correct pr
     test("An event not having dl_user_data precede it in the data layer is set to missing user data", () => {
         const dlEventViewItem = new DLEventViewItem(
             dl_view_item_schema_example,
-            []
+            [{ event: "dl_view_item" }]
         );
         // dlEventViewItem.verify();
         expect(dlEventViewItem.isMissingUserData()).toBe(true);
@@ -79,6 +56,18 @@ describe("Events preceded or not preceded by dl_user_data events have correct pr
         expect(dlEventLogin.isMissingUserData()).toBe(false);
         expect(dlEventLogin.isValid()).toBe(true);
     });
+    test("If an event requiring to be preceded by dl_user_data preceded dl_user_data then missing user data is set to true", () => {
+        const dlEventViewItem = new DLEventViewItem(
+            dl_view_item_schema_example,
+            [
+                { event: "dl_view_item" },
+                { event: "dl_sign_up" },
+                { event: "dl_user_data" },
+            ]
+        );
+        expect(dlEventViewItem.isMissingUserData()).toBe(true);
+        expect(dlEventViewItem.isValid()).toBe(true);
+    });
 });
 
 describe("Event received has a recognizable event name and should be processed", () => {
@@ -89,7 +78,10 @@ describe("Event received has a recognizable event name and should be processed",
     });
     test("An event without a recognizable event name is marked as should be processed", () => {
         expect(
-            DLEvent.shouldProcessEvent({ event: "dl_not_standard_event" })
+            DLEvent.shouldProcessEvent(
+                { event: "dl_not_standard_event" },
+                { event: "dl_view_item" }
+            )
         ).toBe(false);
     });
 });
@@ -99,7 +91,7 @@ describe("Event factory builds appropriate event", () => {
         // expect(DLEvent.dlEventFactory("dl_view_item")).toBe(DLEventViewItem);
         const dlEventViewItem = DLEvent.dlEventFactory(
             dl_view_item_schema_example,
-            [{ event: "dl_user_data" }]
+            [{ event: "dl_user_data" }, { event: "dl_view_item" }]
         );
         expect(dlEventViewItem.isValid()).toBe(true);
         expect(dlEventViewItem.getEventName()).toBe("dl_view_item");
@@ -138,6 +130,7 @@ describe("dl_view_item shape verifier", () => {
         const dlEventViewItem = new DLEventAddToCart({});
         dlEventViewItem.setShouldBePrecededByDLUserData([
             { event: "dl_user_data" },
+            { event: "dl_add_to_cart" },
         ]);
         // dlEventViewItem.verify();
         expect(dlEventViewItem.isMissingUserData()).toBe(false);

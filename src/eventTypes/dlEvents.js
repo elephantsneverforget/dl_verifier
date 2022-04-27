@@ -173,11 +173,12 @@ export class DLEvent {
     }
 
     eventWasPrecededByUserData(dataLayerSnapshot) {
-        return (
-            dataLayerSnapshot.filter(
-                (dlEvent) => dlEvent.event === "dl_user_data"
-            ).length > 0
-        );
+        // First find the index of the earliest event by this name in the DL
+        const indexOfEvent = dataLayerSnapshot.findIndex((event) => this.getEventName() === event.event);
+        if(indexOfEvent === -1) throw new Error(`Could not find event ${this.getEventName()} in the data layer`);
+        const indexOfDlUserData = dataLayerSnapshot.findIndex((event) => event.event === "dl_user_data");
+        if (indexOfDlUserData === -1) return false;
+        return indexOfDlUserData < indexOfEvent;
     }
 
     setShouldBePrecededByDLUserData(dataLayerSnapshot) {
@@ -200,7 +201,7 @@ export class DLEvent {
     getProperties() {
         return {
             eventVerificationStatus: this.isValid() ? "verified" : "failed",
-            wasPrecededByUserData: this.isMissingUserData,
+            isMissingUserData: this.isMissingUserData(),
         };
     }
 

@@ -21,7 +21,7 @@ export class DB {
         // 2 = unseen // 1 = valid // 0 = invalid all start at 2
         eventList.forEach((item) => initialDB.events[item] = {
             eventVerificationStatus: "unseen",
-            wasPrecededByUserData: "unseen",
+            isMissingUserData: "undetermined",
         });
         if (!window.localStorage.getItem(this._dbName)) {
             window.localStorage.setItem(
@@ -47,7 +47,7 @@ export class DB {
         // 2 = unseen // 1 = valid // 0 = invalid all start at 2
         eventList.forEach((item) => initialDB.events[item] = {
             eventVerificationStatus: "unseen",
-            wasPrecededByUserData: "unseen",
+            isMissingUserData: "undetermined",
         });
         window.localStorage.setItem(
             this._dbName,

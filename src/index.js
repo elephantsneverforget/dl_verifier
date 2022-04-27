@@ -18,12 +18,11 @@ const sendUpdatedDB = () => {
     );
 };
 
-// Evaluate each event relevant event that's pushed to the DL
+// Evaluate each relevant event that's pushed to the DL
 const evaluateDLEvent = (dlEventObject) => {
     if (!DLEvent.shouldProcessEvent(dlEventObject)) return;
     const dlEvent = DLEvent.dlEventFactory(dlEventObject, window.dataLayer);
     try {
-        // If the event is not dl_user_data or route change, ensure it was preced by dl_user_data
         dlEvent.logVerificationOutcome();
         dataLayerDB.setEventValidityProperty(
             dlEvent.getEventName(),
