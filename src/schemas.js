@@ -191,22 +191,27 @@ export const userProperties = joi
         "any.required": `"user_properties" should be an object representing the Shopify user properties. See documentation for more details.`,
     });
 
-export const marketingSchema = joi
-    .object()
-    .keys({
-        // _fbp: fbp,
-        // _ga: ga,
-        // [joi.string()
-        // .pattern(new RegExp('^_ga_.*$'))]: ga4,
-        // ttclid: ttclid,
-        user_id: userId,
-        // crto_mapped_user_id: crtoMappedUserId,
-        // crto_is_user_optout: crtoIsUserOptout,
-    })
-    .required()
-    .messages({
-        "any.required": `"marketing" should be an object representing all marketing data. The minimal object will contain at least a user_id propert. See documentation for more details.`,
-    });
+export const getMarketingSchema = (cookies) => {
+    return joi
+        .object()
+        .keys({
+            user_id: userId,
+            ...(typeof cookies["_fbp"] !== "undefined" && { _fbp: fbp }),
+            // ...(cookies["_fbc"]) && {_fbc: fbc},
+            ...(typeof cookies["_ga"] !== "undefined") && {_ga: ga},
+            // ...(cookies["_gaexp"]) && {_gaexp: gaexp},
+            // _ga: ga,
+            // [joi.string()
+            // .pattern(new RegExp('^_ga_.*$'))]: ga4,
+            // ttclid: ttclid,
+            // crto_mapped_user_id: crtoMappedUserId,
+            // crto_is_user_optout: crtoIsUserOptout,
+        })
+        .required()
+        .messages({
+            "any.required": `"marketing" should be an object representing all relevant marketing cookie data. The minimal object will contain at least a user_id property. See documentation for more details.`,
+        });
+};
 
 export const impressions = joi
     .array()

@@ -69,6 +69,25 @@ describe("Events preceded or not preceded by dl_user_data events have correct pr
     });
 });
 
+describe("If cookies present in browser relevant to Elevar DL, make required in marketing object", () => {
+    test("If an event has relevant cookies associated, and they are passed in the marketing object the event should be marked as valid", () => {
+        const dlEventViewItem = new DLEventViewItem(
+            dl_view_item_schema_example,
+            [{ event: "dl_user_data" }, { event: "dl_view_item" }],
+            "_ga=GA1.2.162823682.1647884841; _gid=GA1.2.1425705106.1651249579"
+        );
+        expect(dlEventViewItem._cookies).toBeDefined();
+        expect(dlEventViewItem._cookies["_ga"]).toBe(
+            "GA1.2.162823682.1647884841"
+        );
+        expect(dlEventViewItem._cookies["_gid"]).toBe(
+            "GA1.2.1425705106.1651249579"
+        );
+        expect(dlEventViewItem._cookies["_fbp"]).toBeUndefined();
+        console.log(dlEventViewItem.isValid());
+    });
+});
+
 describe("Event received has a recognizable event name and should be processed", () => {
     test("An event with a recognizable event name is marked as should be processed", () => {
         expect(DLEvent.shouldProcessEvent(dl_view_item_schema_example)).toBe(

@@ -14,6 +14,7 @@ import {
     impressions,
     ecommerce,
     marketingSchema,
+    getMarketingSchema,
 } from "../schemas.js";
 
 import { dl_view_item_schema_example } from "../exampleSchemaObjects/dl_view_item.js";
@@ -30,7 +31,9 @@ import { dl_sign_up_schema_example } from "../exampleSchemaObjects/dl_sign_up.js
 import { dl_route_change_schema_example } from "../exampleSchemaObjects/dl_route_change";
 
 export class DLEvent {
-    constructor(dataLayerObject, schemaExample, dataLayer) {
+    constructor(dataLayerObject, schemaExample, dataLayer, rawCookieString) {
+        this._rawCookieString = rawCookieString;
+        this._cookies = this._getCookieValues(rawCookieString);
         this._dlEventName = schemaExample.event;
         if (dataLayer) this.setShouldBePrecededByDLUserData(dataLayer);
         this._schemaExample = schemaExample;
@@ -54,7 +57,7 @@ export class DLEvent {
             event: getEventNameSchema(this._dlEventName),
             // Marketing not required on route change
             ...(this.eventRequiresMarketingProperties() && {
-                marketing: marketingSchema,
+                marketing: getMarketingSchema(this._cookies),
             }),
             // user_properties only required on dl_user_data, dl_login, dl_signup
             ...(this.eventRequiresUserProperties() && {
@@ -127,6 +130,23 @@ export class DLEvent {
             : userPropertiesNotLoggedIn;
     }
 
+    _getCookie(name) {
+        const value = `; ${this._rawCookieString}`;
+        const parts = value.split(`; ${name}=`);
+        return parts.length === 2 ? parts.pop().split(";").shift() : "";
+    }
+
+    // Take a list of cookie names and return a list of cookie key value pairs
+    _getCookieValues() {
+        const cookieValues = {};
+        this._getRequiredCookieList().forEach((cookieName) => {
+            this._getCookie(cookieName)
+                ? (cookieValues[cookieName] = this._getCookie(cookieName))
+                : null;
+        });
+        return cookieValues;
+    }
+
     getEventName() {
         return this._dlEventName;
     }
@@ -189,7 +209,12 @@ export class DLEvent {
         if (!this.eventMustBePrecededByUserData())
             return this.setMissingUserData(false);
         // If we're here we know it's required
-        if (this.eventWasPrecededByUserData(dataLayerSnapshot, this.getEventName())) {
+        if (
+            this.eventWasPrecededByUserData(
+                dataLayerSnapshot,
+                this.getEventName()
+            )
+        ) {
             this.setMissingUserData(false);
         } else {
             this.setMissingUserData(true);
@@ -237,11 +262,26 @@ export class DLEvent {
         return event;
         // return new DLEvent.getEventMap()[dlEventObject.event](dlEventObject, dataLayer);
     }
+
+    _getRequiredCookieList() {
+        return [
+            "_fbp",
+            "_fbc",
+            // "_ga_XXXXX",
+            "_ga",
+            "_gaexp",
+            "_gid",
+            "__utma",
+            "ttclid",
+            "crto_mapped_user_id",
+            "crto_is_user_optout",
+        ];
+    }
 }
 
 export class DLEventUserData extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_user_data_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, cookies) {
+        super(dataLayerObject, dl_user_data_schema_example, dataLayer, cookies);
     }
 }
 
@@ -258,8 +298,8 @@ export class DLEventSignUp extends DLEvent {
 }
 
 export class DLEventViewItem extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_view_item_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_view_item_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {

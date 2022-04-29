@@ -21,7 +21,7 @@ const sendUpdatedDB = () => {
 // Evaluate each relevant event that's pushed to the DL
 const evaluateDLEvent = (dlEventObject) => {
     if (!DLEvent.shouldProcessEvent(dlEventObject)) return;
-    const dlEvent = DLEvent.dlEventFactory(dlEventObject, window.dataLayer);
+    const dlEvent = DLEvent.dlEventFactory(dlEventObject, window.dataLayer, document.cookie);
     try {
         dlEvent.logVerificationOutcome();
         dataLayerDB.setEventValidityProperty(
