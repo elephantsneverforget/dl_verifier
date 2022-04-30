@@ -191,21 +191,33 @@ export const userProperties = joi
         "any.required": `"user_properties" should be an object representing the Shopify user properties. See documentation for more details.`,
     });
 
+const cookieMatch = (cookieName, cookieValue) => {
+    return joi
+        .string()
+        .valid(cookieValue)
+        .required()
+        .messages({
+            "any.required": `"${cookieName}" is a required field on the user_properties object and should contain the string "${cookieValue}"`,
+        });
+};
+
 export const getMarketingSchema = (cookies) => {
     return joi
         .object()
         .keys({
             user_id: userId,
-            ...(typeof cookies["_fbp"] !== "undefined" && { _fbp: fbp }),
-            // ...(cookies["_fbc"]) && {_fbc: fbc},
-            ...(typeof cookies["_ga"] !== "undefined") && {_ga: ga},
-            // ...(cookies["_gaexp"]) && {_gaexp: gaexp},
+            ...(typeof cookies["_fbp"] !== "undefined" && { _fbp: cookieMatch("_fbp", cookies["_fbp"]) }),
+            ...(typeof cookies["_fbc"] !== "undefined" && { _fbc: cookieMatch("_fbc", cookies["_fbc"]) }),
+            ...(typeof cookies["_ga"] !== "undefined" && { _ga: cookieMatch("_ga", cookies["_ga"]) }),
+            ...(typeof cookies["_gaexp"] !== "undefined" && { _gaexp: cookieMatch("_gaexp", cookies["_gaexp"]) }),
+            ...(typeof cookies["_gid"] !== "undefined" && { _gid: cookieMatch("_gid", cookies["_gid"]) }),
+            ...(typeof cookies["_utma"] !== "undefined" && { _utma: cookieMatch("_utma", cookies["_utma"]) }),
+            ...(typeof cookies["ttclid"] !== "undefined" && { ttclid: cookieMatch("ttclid", cookies["ttclid"]) }),
+            ...(typeof cookies["crto_mapped_user_id"] !== "undefined" && { crto_mapped_user_id: cookieMatch("crto_mapped_user_id", cookies["crto_mapped_user_id"]) }),
+            ...(typeof cookies["crto_is_user_optout"] !== "undefined" && { crto_is_user_optout: cookieMatch("crto_is_user_optout", cookies["crto_is_user_optout"]) }),
             // _ga: ga,
             // [joi.string()
             // .pattern(new RegExp('^_ga_.*$'))]: ga4,
-            // ttclid: ttclid,
-            // crto_mapped_user_id: crtoMappedUserId,
-            // crto_is_user_optout: crtoIsUserOptout,
         })
         .required()
         .messages({
