@@ -501,7 +501,7 @@ class Logger {
             } catch (e) {}
             console.log(dataLayerObjectModified);
             console.groupEnd();
-            console.group("Reference object with correct shape");
+            console.group("Reference object with correct shape. Cookie values are samples and not accurate for your this site.");
             console.log(schemaExample);
             console.groupEnd();
             console.groupEnd();
@@ -609,6 +609,10 @@ const inventory = joi.string().allow("").messages({
 
 const userId = joi.string().required().messages({
     "any.required": `"user_id" is a required field on the user_properties object and should contain a unique identifier for your user that is persisted across sessions.`,
+});
+
+const userIdMarketing = joi.string().required().messages({
+    "any.required": `"user_id" is a required field on the marketing object and should contain a unique identifier for your user that is persisted across sessions.`,
 });
 
 const userConsent = joi.string().allow("").messages({
@@ -723,7 +727,7 @@ const getMarketingSchema = (cookies) => {
     return joi
         .object()
         .keys({
-            user_id: userId,
+            user_id: userIdMarketing,
             ...(typeof cookies["_fbp"] !== "undefined" && { _fbp: cookieMatch("_fbp", cookies["_fbp"]) }),
             ...(typeof cookies["_fbc"] !== "undefined" && { _fbc: cookieMatch("_fbc", cookies["_fbc"]) }),
             ...(typeof cookies["_ga"] !== "undefined" && { _ga: cookieMatch("_ga", cookies["_ga"]) }),
@@ -1218,14 +1222,14 @@ class DLEvent {
             this._errors = validation.error.details;
             this._verificationSummary = `${
                 this._dlEventName
-            } event_id ${this.formatEventID(
+            } event_id ${this._formatEventID(
                 this._dataLayerObject.event_id
             )} is invalid`;
         } else {
             this._isValid = true;
             this._verificationSummary = `${
                 this._dlEventName
-            } event_id: ${this.formatEventID(
+            } event_id: ${this._formatEventID(
                 this._dataLayerObject.event_id
             )} is valid.`;
         }
@@ -1276,7 +1280,7 @@ class DLEvent {
     // Take a list of cookie names and return a list of cookie key value pairs
     _getCookieValues() {
         const cookieValues = {};
-        this._getRequiredCookieList().forEach((cookieName) => {
+        this._getRequiredCookieList(this._rawCookieString).forEach((cookieName) => {
             this._getCookie(cookieName)
                 ? (cookieValues[cookieName] = this._getCookie(cookieName))
                 : null;
@@ -1358,7 +1362,7 @@ class DLEvent {
         }
     }
 
-    formatEventID(eventID) {
+    _formatEventID(eventID) {
         if (eventID === undefined) return "N/A";
         return `${eventID.slice(0, 5)}...`;
     }
@@ -1400,11 +1404,18 @@ class DLEvent {
         // return new DLEvent.getEventMap()[dlEventObject.event](dlEventObject, dataLayer);
     }
 
-    _getRequiredCookieList() {
+    static getGA4Cookie(rawCookieString){
+        if (rawCookieString === undefined) return null;
+        const regex = new RegExp("(?<=_ga_).*?(?==)").exec(rawCookieString);
+        return regex ? `_ga_${regex[0]}` : null;
+    }
+
+    _getRequiredCookieList(rawCookieString) {
+        // GA4 cookies have a dynamic format, find the format before determining required list
+        // GA4 cookies present?
         return [
             "_fbp",
             "_fbc",
-            // "_ga_XXXXX",
             "_ga",
             "_gaexp",
             "_gid",
@@ -1412,25 +1423,26 @@ class DLEvent {
             "ttclid",
             "crto_mapped_user_id",
             "crto_is_user_optout",
+            (DLEvent.getGA4Cookie(rawCookieString) ? DLEvent.getGA4Cookie(rawCookieString) : []),
         ];
     }
 }
 
 class DLEventUserData extends DLEvent {
-    constructor(dataLayerObject, dataLayer, cookies) {
-        super(dataLayerObject, dl_user_data_schema_example, dataLayer, cookies);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_user_data_schema_example, dataLayer, rawCookieString);
     }
 }
 
 class DLEventLogin extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_login_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_login_schema_example, dataLayer, rawCookieString);
     }
 }
 
 class DLEventSignUp extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_sign_up_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_sign_up_schema_example, dataLayer, rawCookieString);
     }
 }
 
@@ -1466,8 +1478,8 @@ class DLEventViewItem extends DLEvent {
 }
 
 class DLEventAddToCart extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_add_to_cart_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_add_to_cart_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -1496,8 +1508,8 @@ class DLEventAddToCart extends DLEvent {
 }
 
 class DLEventBeginCheckout extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_begin_checkout_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_begin_checkout_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -1526,8 +1538,8 @@ class DLEventBeginCheckout extends DLEvent {
 }
 
 class DLEventRemoveFromCart extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_remove_from_cart_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_remove_from_cart_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -1552,8 +1564,8 @@ class DLEventRemoveFromCart extends DLEvent {
 }
 
 class DLEventSelectItem extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_select_item_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_select_item_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -1576,8 +1588,8 @@ class DLEventSelectItem extends DLEvent {
 }
 
 class DLEventSearchResults extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_search_results_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_search_results_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -1597,8 +1609,8 @@ class DLEventSearchResults extends DLEvent {
 }
 
 class DLEventViewCart extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_view_cart_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_view_cart_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -1619,8 +1631,8 @@ class DLEventViewCart extends DLEvent {
 }
 
 class DLEventViewItemList extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_view_item_list_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_view_item_list_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -1634,8 +1646,8 @@ class DLEventViewItemList extends DLEvent {
 }
 
 class DLEventRouteChange extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_route_change_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_route_change_schema_example, dataLayer, rawCookieString);
     }
 }
 

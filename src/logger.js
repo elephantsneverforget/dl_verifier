@@ -54,7 +54,7 @@ export class Logger {
             } catch (e) {}
             console.log(dataLayerObjectModified);
             console.groupEnd();
-            console.group("Reference object with correct shape");
+            console.group("Reference object with correct shape. Cookie values are samples and not accurate for your this site.");
             console.log(schemaExample);
             console.groupEnd();
             console.groupEnd();

@@ -93,6 +93,10 @@ export const userId = joi.string().required().messages({
     "any.required": `"user_id" is a required field on the user_properties object and should contain a unique identifier for your user that is persisted across sessions.`,
 });
 
+export const userIdMarketing = joi.string().required().messages({
+    "any.required": `"user_id" is a required field on the marketing object and should contain a unique identifier for your user that is persisted across sessions.`,
+});
+
 export const userConsent = joi.string().allow("").messages({
     "any.required": `"user_consent" is a required field on the user_properties object and should contain an empty string if no consent is present.`,
 });
@@ -205,7 +209,7 @@ export const getMarketingSchema = (cookies) => {
     return joi
         .object()
         .keys({
-            user_id: userId,
+            user_id: userIdMarketing,
             ...(typeof cookies["_fbp"] !== "undefined" && { _fbp: cookieMatch("_fbp", cookies["_fbp"]) }),
             ...(typeof cookies["_fbc"] !== "undefined" && { _fbc: cookieMatch("_fbc", cookies["_fbc"]) }),
             ...(typeof cookies["_ga"] !== "undefined" && { _ga: cookieMatch("_ga", cookies["_ga"]) }),
@@ -215,9 +219,6 @@ export const getMarketingSchema = (cookies) => {
             ...(typeof cookies["ttclid"] !== "undefined" && { ttclid: cookieMatch("ttclid", cookies["ttclid"]) }),
             ...(typeof cookies["crto_mapped_user_id"] !== "undefined" && { crto_mapped_user_id: cookieMatch("crto_mapped_user_id", cookies["crto_mapped_user_id"]) }),
             ...(typeof cookies["crto_is_user_optout"] !== "undefined" && { crto_is_user_optout: cookieMatch("crto_is_user_optout", cookies["crto_is_user_optout"]) }),
-            // _ga: ga,
-            // [joi.string()
-            // .pattern(new RegExp('^_ga_.*$'))]: ga4,
         })
         .required()
         .messages({
