@@ -709,22 +709,39 @@ joi
         "any.required": `"user_properties" should be an object representing the Shopify user properties. See documentation for more details.`,
     });
 
-const marketingSchema = joi
-    .object()
-    .keys({
-        // _fbp: fbp,
-        // _ga: ga,
-        // [joi.string()
-        // .pattern(new RegExp('^_ga_.*$'))]: ga4,
-        // ttclid: ttclid,
-        user_id: userId,
-        // crto_mapped_user_id: crtoMappedUserId,
-        // crto_is_user_optout: crtoIsUserOptout,
-    })
-    .required()
-    .messages({
-        "any.required": `"marketing" should be an object representing all marketing data. See documentation for more details.`,
-    });
+const cookieMatch = (cookieName, cookieValue) => {
+    return joi
+        .string()
+        .valid(cookieValue)
+        .required()
+        .messages({
+            "any.required": `"${cookieName}" is a required field on the user_properties object and should contain the string "${cookieValue}"`,
+        });
+};
+
+const getMarketingSchema = (cookies) => {
+    return joi
+        .object()
+        .keys({
+            user_id: userId,
+            ...(typeof cookies["_fbp"] !== "undefined" && { _fbp: cookieMatch("_fbp", cookies["_fbp"]) }),
+            ...(typeof cookies["_fbc"] !== "undefined" && { _fbc: cookieMatch("_fbc", cookies["_fbc"]) }),
+            ...(typeof cookies["_ga"] !== "undefined" && { _ga: cookieMatch("_ga", cookies["_ga"]) }),
+            ...(typeof cookies["_gaexp"] !== "undefined" && { _gaexp: cookieMatch("_gaexp", cookies["_gaexp"]) }),
+            ...(typeof cookies["_gid"] !== "undefined" && { _gid: cookieMatch("_gid", cookies["_gid"]) }),
+            ...(typeof cookies["_utma"] !== "undefined" && { _utma: cookieMatch("_utma", cookies["_utma"]) }),
+            ...(typeof cookies["ttclid"] !== "undefined" && { ttclid: cookieMatch("ttclid", cookies["ttclid"]) }),
+            ...(typeof cookies["crto_mapped_user_id"] !== "undefined" && { crto_mapped_user_id: cookieMatch("crto_mapped_user_id", cookies["crto_mapped_user_id"]) }),
+            ...(typeof cookies["crto_is_user_optout"] !== "undefined" && { crto_is_user_optout: cookieMatch("crto_is_user_optout", cookies["crto_is_user_optout"]) }),
+            // _ga: ga,
+            // [joi.string()
+            // .pattern(new RegExp('^_ga_.*$'))]: ga4,
+        })
+        .required()
+        .messages({
+            "any.required": `"marketing" should be an object representing all relevant marketing cookie data. The minimal object will contain at least a user_id property. See documentation for more details.`,
+        });
+};
 
 const impressions = joi
     .array()
@@ -813,7 +830,7 @@ const marketingObject = {
     // This is the GA4 cookie ID. The XXX... portion of the cookie will differ for every client
     "_ga_XXXXXXXXXX": "GS1.1.1649714540.17.0.1.60", // GA4 Cookie ID
     _fbp: "fb.1.1649615616201.121355119", // FB cookie id
-    _ga: "GA1.2.162823682.1647884841", // GA cookie id
+    _ga: "GA1.2.1173945483.1649615616", // GA cookie id
     user_id: "bc574dca-c842-4de7-98a1-dd9529729456", // UUID uniqe per user, should be persisted as long as possible and kept consistent between sessions
     crto_mapped_user_id: "dlkjla38uj", // Criteo cookie id if using Criteo
     crto_is_user_optout: "false", // Criteo opt out status
@@ -1151,7 +1168,9 @@ const dl_route_change_schema_example = {
 };
 
 class DLEvent {
-    constructor(dataLayerObject, schemaExample, dataLayer) {
+    constructor(dataLayerObject, schemaExample, dataLayer, rawCookieString) {
+        this._rawCookieString = rawCookieString;
+        this._cookies = this._getCookieValues(rawCookieString);
         this._dlEventName = schemaExample.event;
         if (dataLayer) this.setShouldBePrecededByDLUserData(dataLayer);
         this._schemaExample = schemaExample;
@@ -1175,7 +1194,7 @@ class DLEvent {
             event: getEventNameSchema(this._dlEventName),
             // Marketing not required on route change
             ...(this.eventRequiresMarketingProperties() && {
-                marketing: marketingSchema,
+                marketing: getMarketingSchema(this._cookies),
             }),
             // user_properties only required on dl_user_data, dl_login, dl_signup
             ...(this.eventRequiresUserProperties() && {
@@ -1248,6 +1267,23 @@ class DLEvent {
             : userPropertiesNotLoggedIn$1;
     }
 
+    _getCookie(name) {
+        const value = `; ${this._rawCookieString}`;
+        const parts = value.split(`; ${name}=`);
+        return parts.length === 2 ? parts.pop().split(";").shift() : "";
+    }
+
+    // Take a list of cookie names and return a list of cookie key value pairs
+    _getCookieValues() {
+        const cookieValues = {};
+        this._getRequiredCookieList().forEach((cookieName) => {
+            this._getCookie(cookieName)
+                ? (cookieValues[cookieName] = this._getCookie(cookieName))
+                : null;
+        });
+        return cookieValues;
+    }
+
     getEventName() {
         return this._dlEventName;
     }
@@ -1310,7 +1346,12 @@ class DLEvent {
         if (!this.eventMustBePrecededByUserData())
             return this.setMissingUserData(false);
         // If we're here we know it's required
-        if (this.eventWasPrecededByUserData(dataLayerSnapshot, this.getEventName())) {
+        if (
+            this.eventWasPrecededByUserData(
+                dataLayerSnapshot,
+                this.getEventName()
+            )
+        ) {
             this.setMissingUserData(false);
         } else {
             this.setMissingUserData(true);
@@ -1358,11 +1399,26 @@ class DLEvent {
         return event;
         // return new DLEvent.getEventMap()[dlEventObject.event](dlEventObject, dataLayer);
     }
+
+    _getRequiredCookieList() {
+        return [
+            "_fbp",
+            "_fbc",
+            // "_ga_XXXXX",
+            "_ga",
+            "_gaexp",
+            "_gid",
+            "__utma",
+            "ttclid",
+            "crto_mapped_user_id",
+            "crto_is_user_optout",
+        ];
+    }
 }
 
 class DLEventUserData extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_user_data_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, cookies) {
+        super(dataLayerObject, dl_user_data_schema_example, dataLayer, cookies);
     }
 }
 
@@ -1379,8 +1435,8 @@ class DLEventSignUp extends DLEvent {
 }
 
 class DLEventViewItem extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_view_item_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_view_item_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -1671,7 +1727,7 @@ const sendUpdatedDB = () => {
 // Evaluate each relevant event that's pushed to the DL
 const evaluateDLEvent = (dlEventObject) => {
     if (!DLEvent.shouldProcessEvent(dlEventObject)) return;
-    const dlEvent = DLEvent.dlEventFactory(dlEventObject, window.dataLayer);
+    const dlEvent = DLEvent.dlEventFactory(dlEventObject, window.dataLayer, document.cookie);
     try {
         dlEvent.logVerificationOutcome();
         dataLayerDB.setEventValidityProperty(

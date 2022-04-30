@@ -67,8 +67,49 @@ describe("Events preceded or not preceded by dl_user_data events have correct pr
     });
 });
 
+describe("Test whether dynamic GA4 cookie is present and test for correct value added to marketing cookie.", () => {
+    test("When passed a string with a GA4 cookie value the correct cookie key is retrieved", () => {
+        const cookieValue = DLEvent.getGA4Cookie(
+            "_gid=GA1.2.280273853.1651332781; lsContextID=sBQBJ0D8PE2xC2HBn7kcog; _clck=1qf7nvo|1|f12|0; shopify_pay_redirect=pending; fsb_previous_pathname=/; _ga_J5PDW7F86W=GS1.1.1651332780.10.1.1651332796.44; _ga=GA1.2.1694597000.1650891257; lsSema-=1651332796889"
+        );
+        expect(cookieValue).toBe("_ga_J5PDW7F86W");
+    });
+    test("When passed a string without a GA4 cookie value the cookie key should be set to null", () => {
+        const cookieValue = DLEvent.getGA4Cookie(
+            "_gid=GA1.2.280273853.1651332781; lsContextID=sBQBJ0D8PE2xC2HBn7kcog; _clck=1qf7nvo|1|f12|0; shopify_pay_redirect=pending; fsb_previous_pathname=/; _ga=GA1.2.1694597000.1650891257; lsSema-=1651332796889"
+        );
+        expect(cookieValue).toBe(null);
+    });
+    test("If an event has a GA4 cookie, and it's added to the marketing object correctly, the event should be marked as valid", () => {
+        const dlEventViewItem = new DLEventViewItem(
+            {
+                ...dl_view_item_schema_example,
+                // override the base marketing object with a marketing object that has the relevant cookies
+                marketing: {
+                    _ga: "GA1.2.1694597000.1650891257",
+                    _gid: "GA1.2.280273853.1651332781",
+                    user_id: "5b8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f",
+                    _ga_J5PDW7F86W: "GS1.1.1651332780.10.1.1651332796.44"
+                },
+            },
+            [{ event: "dl_user_data" }, { event: "dl_view_item" }],
+            "_gid=GA1.2.280273853.1651332781; lsContextID=sBQBJ0D8PE2xC2HBn7kcog; _clck=1qf7nvo|1|f12|0; shopify_pay_redirect=pending; fsb_previous_pathname=/; _ga_J5PDW7F86W=GS1.1.1651332780.10.1.1651332796.44; _ga=GA1.2.1694597000.1650891257; lsSema-=1651332796889"
+        );
+        expect(dlEventViewItem._cookies["_ga"]).toBe(
+            "GA1.2.1694597000.1650891257"
+        );
+        expect(dlEventViewItem._cookies["_gid"]).toBe(
+            "GA1.2.280273853.1651332781"
+        ); 
+        expect(dlEventViewItem._cookies["_ga_J5PDW7F86W"]).toBe(
+            "GS1.1.1651332780.10.1.1651332796.44"
+        );  
+        expect(dlEventViewItem.isValid()).toBe(true);
+    });
+});
+
 describe("If cookies present in browser relevant to Elevar DL, make required in marketing object", () => {
-    test("If an event has relevant cookies associated, and they are passed in the marketing object the event should be marked as valid", () => {
+    test("If an event has relevant cookies associated, and they are passed correctly in the marketing object the event should be marked as valid", () => {
         const dlEventViewItem = new DLEventViewItem(
             {
                 ...dl_view_item_schema_example,

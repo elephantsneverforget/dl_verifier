@@ -13,7 +13,6 @@ import {
     buildStepSchema,
     impressions,
     ecommerce,
-    marketingSchema,
     getMarketingSchema,
 } from "../schemas.js";
 
@@ -81,14 +80,14 @@ export class DLEvent {
             this._errors = validation.error.details;
             this._verificationSummary = `${
                 this._dlEventName
-            } event_id ${this.formatEventID(
+            } event_id ${this._formatEventID(
                 this._dataLayerObject.event_id
             )} is invalid`;
         } else {
             this._isValid = true;
             this._verificationSummary = `${
                 this._dlEventName
-            } event_id: ${this.formatEventID(
+            } event_id: ${this._formatEventID(
                 this._dataLayerObject.event_id
             )} is valid.`;
         }
@@ -139,7 +138,7 @@ export class DLEvent {
     // Take a list of cookie names and return a list of cookie key value pairs
     _getCookieValues() {
         const cookieValues = {};
-        this._getRequiredCookieList().forEach((cookieName) => {
+        this._getRequiredCookieList(this._rawCookieString).forEach((cookieName) => {
             this._getCookie(cookieName)
                 ? (cookieValues[cookieName] = this._getCookie(cookieName))
                 : null;
@@ -221,7 +220,7 @@ export class DLEvent {
         }
     }
 
-    formatEventID(eventID) {
+    _formatEventID(eventID) {
         if (eventID === undefined) return "N/A";
         return `${eventID.slice(0, 5)}...`;
     }
@@ -263,11 +262,18 @@ export class DLEvent {
         // return new DLEvent.getEventMap()[dlEventObject.event](dlEventObject, dataLayer);
     }
 
-    _getRequiredCookieList() {
+    static getGA4Cookie(rawCookieString){
+        if (rawCookieString === undefined) return null;
+        const regex = new RegExp("(?<=_ga_).*?(?==)").exec(rawCookieString);
+        return regex ? `_ga_${regex[0]}` : null;
+    }
+
+    _getRequiredCookieList(rawCookieString) {
+        // GA4 cookies have a dynamic format, find the format before determining required list
+        // GA4 cookies present?
         return [
             "_fbp",
             "_fbc",
-            // "_ga_XXXXX",
             "_ga",
             "_gaexp",
             "_gid",
@@ -275,25 +281,26 @@ export class DLEvent {
             "ttclid",
             "crto_mapped_user_id",
             "crto_is_user_optout",
+            (DLEvent.getGA4Cookie(rawCookieString) ? DLEvent.getGA4Cookie(rawCookieString) : []),
         ];
     }
 }
 
 export class DLEventUserData extends DLEvent {
-    constructor(dataLayerObject, dataLayer, cookies) {
-        super(dataLayerObject, dl_user_data_schema_example, dataLayer, cookies);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_user_data_schema_example, dataLayer, rawCookieString);
     }
 }
 
 export class DLEventLogin extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_login_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_login_schema_example, dataLayer, rawCookieString);
     }
 }
 
 export class DLEventSignUp extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_sign_up_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_sign_up_schema_example, dataLayer, rawCookieString);
     }
 }
 
@@ -329,8 +336,8 @@ export class DLEventViewItem extends DLEvent {
 }
 
 export class DLEventAddToCart extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_add_to_cart_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_add_to_cart_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -359,8 +366,8 @@ export class DLEventAddToCart extends DLEvent {
 }
 
 export class DLEventBeginCheckout extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_begin_checkout_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_begin_checkout_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -389,8 +396,8 @@ export class DLEventBeginCheckout extends DLEvent {
 }
 
 export class DLEventRemoveFromCart extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_remove_from_cart_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_remove_from_cart_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -415,8 +422,8 @@ export class DLEventRemoveFromCart extends DLEvent {
 }
 
 export class DLEventSelectItem extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_select_item_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_select_item_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -439,8 +446,8 @@ export class DLEventSelectItem extends DLEvent {
 }
 
 export class DLEventSearchResults extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_search_results_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_search_results_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -460,8 +467,8 @@ export class DLEventSearchResults extends DLEvent {
 }
 
 export class DLEventViewCart extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_view_cart_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_view_cart_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -482,8 +489,8 @@ export class DLEventViewCart extends DLEvent {
 }
 
 export class DLEventViewItemList extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_view_item_list_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_view_item_list_schema_example, dataLayer, rawCookieString);
     }
 
     verify() {
@@ -497,7 +504,7 @@ export class DLEventViewItemList extends DLEvent {
 }
 
 export class DLEventRouteChange extends DLEvent {
-    constructor(dataLayerObject, dataLayer) {
-        super(dataLayerObject, dl_route_change_schema_example, dataLayer);
+    constructor(dataLayerObject, dataLayer, rawCookieString) {
+        super(dataLayerObject, dl_route_change_schema_example, dataLayer, rawCookieString);
     }
 }
