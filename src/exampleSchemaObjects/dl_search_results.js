@@ -1,9 +1,11 @@
+import { userPropertiesLoggedIn } from "../schemas";
 import { marketingObject } from "./marketing_object";
 marketingObject
 export const dl_search_results_schema_example = {
     event: "dl_search_results",
     event_id: "ee8eb7ca-8db2-4cc6-b875-2398b66b8ffe",
     marketing: marketingObject,
+    user_properties: userPropertiesLoggedIn,
     ecommerce: {
         currencyCode: "USD",
         actionField: {

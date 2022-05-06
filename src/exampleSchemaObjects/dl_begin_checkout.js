@@ -1,9 +1,11 @@
+import { userPropertiesLoggedIn } from "../schemas";
 import { marketingObject } from "./marketing_object";
 
 export const dl_begin_checkout_schema_example = {
     event: "dl_begin_checkout",
     event_id: "4b2be7b2-bf61-4959-b340-065d262da12a",
     marketing: marketingObject,
+    user_properties: userPropertiesLoggedIn,
     ecommerce: {
         currencyCode: "USD",
         checkout: {

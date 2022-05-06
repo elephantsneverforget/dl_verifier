@@ -1,9 +1,11 @@
+import { userPropertiesLoggedIn } from "../schemas";
 import { marketingObject } from "./marketing_object";
 
 export const dl_add_to_cart_schema_example = {
     event: "dl_add_to_cart",
     event_id: "887cb1e5-27ea-47c3-95a3-fdca8299e719",
     marketing: marketingObject,
+    user_properties: userPropertiesLoggedIn,
     ecommerce: {
         currencyCode: "USD",
         add: {

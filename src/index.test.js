@@ -403,9 +403,10 @@ describe("dl_select_item shape verifier", () => {
 
 describe("dl_user_data shape verifier", () => {
     test("A properly formatted dl_user_data object should not throw any errors", () => {
-        const dlEventUserData = new DLEventUserData(
-            dl_user_data_schema_example
-        );
+        const dlEventUserData = new DLEventUserData({
+            ...dl_user_data_schema_example,
+            cart_total: "100",
+            });
         expect(dlEventUserData.getErrors()).toHaveLength(0);
         expect(dlEventUserData.isValid()).toBe(true);
         expect(dlEventUserData.getVerificationSummary()).toContain("valid");
@@ -416,6 +417,14 @@ describe("dl_user_data shape verifier", () => {
             user_properties: {},
         });
         expect(dlEventUserData.isValid()).toBe(false);
+    });
+    test("dl_user_data requires the cart_total property and should throw and error if not present", () => {
+        const dlEventUserData = new DLEventUserData({
+            ...dl_user_data_schema_example,
+        });
+        expect(dlEventUserData.isValid()).toBe(false);
+        expect(dlEventUserData.getErrors()[0].message).toContain("cart_total");
+        expect(dlEventUserData.getErrors()).toHaveLength(1);
     });
     test("A improperly formatted dl_user_data object should throw errors", () => {
         const dlEventUserData = new DLEventUserData(
@@ -469,6 +478,17 @@ describe("dl_sign_up shape verifier", () => {
         );
         expect(dlEventSignUp.getErrors()).toBeDefined();
         expect(dlEventSignUp.isValid()).toBe(false);
+    });
+});
+
+describe("Verify user_properties verificaton adjusts for logged in and not logged in users", () => {
+    test("If a user is logged in some personal userIsLoggedIn should be true", () => {
+        const dlEventSignUp = new DLEventSignUp(dl_sign_up_schema_example);
+        expect(dlEventSignUp.userIsLoggedIn()).toBe(true);
+    });
+    test("If a user isn't logged in some personal userIsLoggedIn should be false", () => {
+        const dlEventViewItem = new DLEventSignUp(dl_view_cart_schema_example);
+        expect(dlEventViewItem.userIsLoggedIn()).toBe(false);
     });
 });
 
