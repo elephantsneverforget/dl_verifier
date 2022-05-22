@@ -6,6 +6,7 @@ export const dl_view_cart_schema_example = {
     event_id: "e06ba901-57c9-41ee-89f0-28ea91258230",
     marketing: marketingObject,
     cart_total: "26.99",
+    event_time: "2022-05-22T22:56:52.748Z",
     user_properties: userPropertiesNotLoggedIn,
     ecommerce: {
         currencyCode: "USD",

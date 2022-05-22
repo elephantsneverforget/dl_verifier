@@ -15,7 +15,8 @@ import {
     ecommerce,
     getMarketingSchema,
     device,
-    page
+    page,
+    event_time
 } from "../schemas.js";
 
 import { dl_view_item_schema_example } from "../exampleSchemaObjects/dl_view_item.js";
@@ -60,6 +61,10 @@ export class DLEvent {
         // Build the schema for the event
         const dlEventSchema = joi.object({
             event: getEventNameSchema(this._dlEventName),
+            // Event requires event_time
+            ...(this.eventRequiresEventTime() && {
+                event_time: event_time,
+            }), 
             // Marketing not required on route change
             ...(this.eventRequiresMarketingProperties() && {
                 marketing: getMarketingSchema(this._cookies),
@@ -117,6 +122,10 @@ export class DLEvent {
         return this._errors;
     }
 
+    eventRequiresEventTime() {
+        return this._dlEventName !== "dl_route_change";
+    }
+    
     eventRequiresCartTotal() {
         return this._dlEventName === "dl_user_data";
     }

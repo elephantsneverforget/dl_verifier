@@ -5,6 +5,7 @@ export const dl_search_results_schema_example = {
     event: "dl_search_results",
     event_id: "ee8eb7ca-8db2-4cc6-b875-2398b66b8ffe",
     marketing: marketingObject,
+    event_time: "2022-05-22T22:56:52.748Z",
     user_properties: userPropertiesLoggedIn,
     ecommerce: {
         currencyCode: "USD",

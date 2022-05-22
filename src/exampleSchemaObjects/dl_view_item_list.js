@@ -6,6 +6,7 @@ export const dl_view_item_list_schema_example = {
     event_id: "2b0c5796-7abe-4465-8e24-0ffade4699df",
     marketing: marketingObject,
     userProperties: userPropertiesNotLoggedIn,
+    event_time: "2022-05-22T22:56:52.748Z",
     ecommerce: {
         currencyCode: "USD",
         impressions: [

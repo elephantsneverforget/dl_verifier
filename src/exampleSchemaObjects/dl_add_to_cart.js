@@ -5,6 +5,7 @@ export const dl_add_to_cart_schema_example = {
     event: "dl_add_to_cart",
     event_id: "887cb1e5-27ea-47c3-95a3-fdca8299e719",
     marketing: marketingObject,
+    event_time: "2022-05-22T22:56:52.748Z",
     user_properties: userPropertiesLoggedIn,
     ecommerce: {
         currencyCode: "USD",

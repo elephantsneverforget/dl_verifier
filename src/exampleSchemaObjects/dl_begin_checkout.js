@@ -6,6 +6,7 @@ export const dl_begin_checkout_schema_example = {
     event_id: "4b2be7b2-bf61-4959-b340-065d262da12a",
     marketing: marketingObject,
     user_properties: userPropertiesLoggedIn,
+    event_time: "2022-05-22T22:56:52.748Z",
     ecommerce: {
         currencyCode: "USD",
         checkout: {

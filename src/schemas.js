@@ -379,3 +379,7 @@ export const page = joi
     .messages({
         "any.required": `"page" is a required field`,
     });
+
+export const event_time = joi.string().isoDate().required().messages({
+    "any.required": `"event_time" is a required field on the data layer object and should contain a string such as "2020-01-01T00:00:00.000Z"`,
+});

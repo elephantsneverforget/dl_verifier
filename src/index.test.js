@@ -403,17 +403,9 @@ describe("dl_select_item shape verifier", () => {
 
 describe("dl_user_data shape verifier", () => {
     test("A properly formatted dl_user_data object should not throw any errors", () => {
-        const dlEventUserData = new DLEventUserData({
-            ...dl_user_data_schema_example,
-            cart_total: "100",
-            device: {
-                screen_resolution: "3008x1692",
-                viewport_size: "1311x2834",
-                encoding: "UTF-8",
-                language: "en-US",
-                colors: "24-bit",
-            },
-        });
+        const dlEventUserData = new DLEventUserData(
+            dl_user_data_schema_example
+        );
         expect(dlEventUserData.getErrors()).toHaveLength(0);
         expect(dlEventUserData.isValid()).toBe(true);
         expect(dlEventUserData.getVerificationSummary()).toContain("valid");
@@ -421,7 +413,6 @@ describe("dl_user_data shape verifier", () => {
     test("An iproperly formatted device object on the dl_user_data object throws an error", () => {
         const dlEventUserData = new DLEventUserData({
             ...dl_user_data_schema_example,
-            cart_total: "100",
             device: {
                 // missing encoding property
                 screen_resolution: "3008x1692",
@@ -447,15 +438,7 @@ describe("dl_user_data shape verifier", () => {
     test("dl_user_data requires the the page property to be present", () => {
         const dlEventUserData = new DLEventUserData({
             ...dl_user_data_schema_example,
-            device: {
-                screen_resolution: "3008x1692",
-                viewport_size: "1311x2834",
-                encoding: "UTF-8",
-                language: "en-US",
-                colors: "24-bit",
-            },
-            cart_total: "100",
-            page: {}
+            page: {},
         });
         expect(dlEventUserData.isValid()).toBe(false);
         expect(dlEventUserData.getErrors()[0].message).toContain("page");
@@ -464,15 +447,25 @@ describe("dl_user_data shape verifier", () => {
     test("dl_user_data requires the cart_total property and should throw and error if not present", () => {
         const dlEventUserData = new DLEventUserData({
             ...dl_user_data_schema_example,
+            cart_total: undefined,
         });
         expect(dlEventUserData.isValid()).toBe(false);
         expect(dlEventUserData.getErrors()[0].message).toContain("cart_total");
-        expect(dlEventUserData.getErrors()).toHaveLength(2);
+        expect(dlEventUserData.getErrors()).toHaveLength(1);
     });
     test("A improperly formatted dl_user_data object should throw errors", () => {
         const dlEventUserData = new DLEventUserData(
             dl_remove_from_cart_schema_example
         );
+        expect(dlEventUserData.getErrors()).toBeDefined();
+        expect(dlEventUserData.isValid()).toBe(false);
+    });
+    test("The dl_user_data object should throw error if it does not have an event_time property", () => {
+        const dlEventUserData = new DLEventUserData({
+            ...dl_user_data_schema_example,
+            event_time: undefined,
+        });
+        expect(dlEventUserData.getErrors()[0].message).toContain("event_time");
         expect(dlEventUserData.getErrors()).toBeDefined();
         expect(dlEventUserData.isValid()).toBe(false);
     });
