@@ -14,6 +14,7 @@ import {
     impressions,
     ecommerce,
     getMarketingSchema,
+    device
 } from "../schemas.js";
 
 import { dl_view_item_schema_example } from "../exampleSchemaObjects/dl_view_item.js";
@@ -74,6 +75,10 @@ export class DLEvent {
             ...(this.eventRequiresCartTotal() && {
                 cart_total: cartTotal,
             }),
+            // Device for some events
+            ...(this.eventRequiresDevice() && {
+                device: device,
+            }),
             ...additionalSchemas,
         });
 
@@ -108,6 +113,10 @@ export class DLEvent {
     }
 
     eventRequiresCartTotal() {
+        return this._dlEventName === "dl_user_data";
+    }
+
+    eventRequiresDevice() {
         return this._dlEventName === "dl_user_data";
     }
 

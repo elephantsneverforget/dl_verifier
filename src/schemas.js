@@ -210,15 +210,39 @@ export const getMarketingSchema = (cookies) => {
         .object()
         .keys({
             user_id: userIdMarketing,
-            ...(typeof cookies["_fbp"] !== "undefined" && { _fbp: cookieMatch("_fbp", cookies["_fbp"]) }),
-            ...(typeof cookies["_fbc"] !== "undefined" && { _fbc: cookieMatch("_fbc", cookies["_fbc"]) }),
-            ...(typeof cookies["_ga"] !== "undefined" && { _ga: cookieMatch("_ga", cookies["_ga"]) }),
-            ...(typeof cookies["_gaexp"] !== "undefined" && { _gaexp: cookieMatch("_gaexp", cookies["_gaexp"]) }),
-            ...(typeof cookies["_gid"] !== "undefined" && { _gid: cookieMatch("_gid", cookies["_gid"]) }),
-            ...(typeof cookies["_utma"] !== "undefined" && { _utma: cookieMatch("_utma", cookies["_utma"]) }),
-            ...(typeof cookies["ttclid"] !== "undefined" && { ttclid: cookieMatch("ttclid", cookies["ttclid"]) }),
-            ...(typeof cookies["crto_mapped_user_id"] !== "undefined" && { crto_mapped_user_id: cookieMatch("crto_mapped_user_id", cookies["crto_mapped_user_id"]) }),
-            ...(typeof cookies["crto_is_user_optout"] !== "undefined" && { crto_is_user_optout: cookieMatch("crto_is_user_optout", cookies["crto_is_user_optout"]) }),
+            ...(typeof cookies["_fbp"] !== "undefined" && {
+                _fbp: cookieMatch("_fbp", cookies["_fbp"]),
+            }),
+            ...(typeof cookies["_fbc"] !== "undefined" && {
+                _fbc: cookieMatch("_fbc", cookies["_fbc"]),
+            }),
+            ...(typeof cookies["_ga"] !== "undefined" && {
+                _ga: cookieMatch("_ga", cookies["_ga"]),
+            }),
+            ...(typeof cookies["_gaexp"] !== "undefined" && {
+                _gaexp: cookieMatch("_gaexp", cookies["_gaexp"]),
+            }),
+            ...(typeof cookies["_gid"] !== "undefined" && {
+                _gid: cookieMatch("_gid", cookies["_gid"]),
+            }),
+            ...(typeof cookies["_utma"] !== "undefined" && {
+                _utma: cookieMatch("_utma", cookies["_utma"]),
+            }),
+            ...(typeof cookies["ttclid"] !== "undefined" && {
+                ttclid: cookieMatch("ttclid", cookies["ttclid"]),
+            }),
+            ...(typeof cookies["crto_mapped_user_id"] !== "undefined" && {
+                crto_mapped_user_id: cookieMatch(
+                    "crto_mapped_user_id",
+                    cookies["crto_mapped_user_id"]
+                ),
+            }),
+            ...(typeof cookies["crto_is_user_optout"] !== "undefined" && {
+                crto_is_user_optout: cookieMatch(
+                    "crto_is_user_optout",
+                    cookies["crto_is_user_optout"]
+                ),
+            }),
         })
         .required()
         .messages({
@@ -307,4 +331,36 @@ export const userPropertiesNotLoggedIn = joi
     .required()
     .messages({
         "any.required": `"user_properties" is a required field on the data layer object`,
+    });
+const screenResolution = joi.string().required().messages({
+    "any.required": `"screen_resolution" is a required field on the device object and should contain a string such as "3008x1692"`,
+});
+
+const viewportSize = joi.string().required().messages({
+    "any.required": `"viewport_size" is a required field on the device object and should contain a string such as "1131*2834"`,
+});
+
+const encoding = joi.string().required().messages({
+    "any.required": `"encoding" is a required field on the device object and should contain a string such as "UTF-8"`,
+});
+
+const language = joi.string().required().messages({
+    "any.required": `"language" is a required field on the device object and should contain a string such as "en-US"`,
+});
+
+const colors = joi.string().required().messages({
+    "any.required": `"colors" is a required field on the device object and should contain a string such as "24-bit"`,
+});
+export const device = joi
+    .object()
+    .keys({
+        screen_resolution: screenResolution,
+        viewport_size: viewportSize,
+        encoding: encoding,
+        language: language,
+        colors: colors,
+    })
+    .required()
+    .messages({
+        "any.required": `"device" is a required field`,
     });

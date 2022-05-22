@@ -89,7 +89,7 @@ describe("Test whether dynamic GA4 cookie is present and test for correct value 
                     _ga: "GA1.2.1694597000.1650891257",
                     _gid: "GA1.2.280273853.1651332781",
                     user_id: "5b8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f",
-                    _ga_J5PDW7F86W: "GS1.1.1651332780.10.1.1651332796.44"
+                    _ga_J5PDW7F86W: "GS1.1.1651332780.10.1.1651332796.44",
                 },
             },
             [{ event: "dl_user_data" }, { event: "dl_view_item" }],
@@ -100,10 +100,10 @@ describe("Test whether dynamic GA4 cookie is present and test for correct value 
         );
         expect(dlEventViewItem._cookies["_gid"]).toBe(
             "GA1.2.280273853.1651332781"
-        ); 
+        );
         expect(dlEventViewItem._cookies["_ga_J5PDW7F86W"]).toBe(
             "GS1.1.1651332780.10.1.1651332796.44"
-        );  
+        );
         expect(dlEventViewItem.isValid()).toBe(true);
     });
 });
@@ -406,10 +406,34 @@ describe("dl_user_data shape verifier", () => {
         const dlEventUserData = new DLEventUserData({
             ...dl_user_data_schema_example,
             cart_total: "100",
-            });
+            device: {
+                screen_resolution: "3008x1692",
+                viewport_size: "1311x2834",
+                encoding: "UTF-8",
+                language: "en-US",
+                colors: "24-bit",
+            },
+        });
         expect(dlEventUserData.getErrors()).toHaveLength(0);
         expect(dlEventUserData.isValid()).toBe(true);
         expect(dlEventUserData.getVerificationSummary()).toContain("valid");
+    });
+    test("An iproperly formatted device object on the dl_user_data object throws an error", () => {
+        const dlEventUserData = new DLEventUserData({
+            ...dl_user_data_schema_example,
+            cart_total: "100",
+            device: {
+                // missing encoding property
+                screen_resolution: "3008x1692",
+                viewport_size: "1311x2834",
+                language: "en-US",
+                colors: "24-bit",
+            },
+        });
+        expect(dlEventUserData.getErrors()).toHaveLength(1);
+        expect(dlEventUserData.isValid()).toBe(false);
+        expect(dlEventUserData.getVerificationSummary()).toContain("invalid");
+        expect(dlEventUserData.getErrors()[0].message).toContain(`"encoding" is a required field`);
     });
     test("dl_user_data requires the user_properties field and should throw an error if not present", () => {
         const dlEventUserData = new DLEventUserData({
@@ -418,13 +442,14 @@ describe("dl_user_data shape verifier", () => {
         });
         expect(dlEventUserData.isValid()).toBe(false);
     });
+
     test("dl_user_data requires the cart_total property and should throw and error if not present", () => {
         const dlEventUserData = new DLEventUserData({
             ...dl_user_data_schema_example,
         });
         expect(dlEventUserData.isValid()).toBe(false);
         expect(dlEventUserData.getErrors()[0].message).toContain("cart_total");
-        expect(dlEventUserData.getErrors()).toHaveLength(1);
+        expect(dlEventUserData.getErrors()).toHaveLength(2);
     });
     test("A improperly formatted dl_user_data object should throw errors", () => {
         const dlEventUserData = new DLEventUserData(
