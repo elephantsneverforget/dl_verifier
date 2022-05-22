@@ -728,18 +728,39 @@ const getMarketingSchema = (cookies) => {
         .object()
         .keys({
             user_id: userIdMarketing,
-            ...(typeof cookies["_fbp"] !== "undefined" && { _fbp: cookieMatch("_fbp", cookies["_fbp"]) }),
-            ...(typeof cookies["_fbc"] !== "undefined" && { _fbc: cookieMatch("_fbc", cookies["_fbc"]) }),
-            ...(typeof cookies["_ga"] !== "undefined" && { _ga: cookieMatch("_ga", cookies["_ga"]) }),
-            ...(typeof cookies["_gaexp"] !== "undefined" && { _gaexp: cookieMatch("_gaexp", cookies["_gaexp"]) }),
-            ...(typeof cookies["_gid"] !== "undefined" && { _gid: cookieMatch("_gid", cookies["_gid"]) }),
-            ...(typeof cookies["_utma"] !== "undefined" && { _utma: cookieMatch("_utma", cookies["_utma"]) }),
-            ...(typeof cookies["ttclid"] !== "undefined" && { ttclid: cookieMatch("ttclid", cookies["ttclid"]) }),
-            ...(typeof cookies["crto_mapped_user_id"] !== "undefined" && { crto_mapped_user_id: cookieMatch("crto_mapped_user_id", cookies["crto_mapped_user_id"]) }),
-            ...(typeof cookies["crto_is_user_optout"] !== "undefined" && { crto_is_user_optout: cookieMatch("crto_is_user_optout", cookies["crto_is_user_optout"]) }),
-            // _ga: ga,
-            // [joi.string()
-            // .pattern(new RegExp('^_ga_.*$'))]: ga4,
+            ...(typeof cookies["_fbp"] !== "undefined" && {
+                _fbp: cookieMatch("_fbp", cookies["_fbp"]),
+            }),
+            ...(typeof cookies["_fbc"] !== "undefined" && {
+                _fbc: cookieMatch("_fbc", cookies["_fbc"]),
+            }),
+            ...(typeof cookies["_ga"] !== "undefined" && {
+                _ga: cookieMatch("_ga", cookies["_ga"]),
+            }),
+            ...(typeof cookies["_gaexp"] !== "undefined" && {
+                _gaexp: cookieMatch("_gaexp", cookies["_gaexp"]),
+            }),
+            ...(typeof cookies["_gid"] !== "undefined" && {
+                _gid: cookieMatch("_gid", cookies["_gid"]),
+            }),
+            ...(typeof cookies["_utma"] !== "undefined" && {
+                _utma: cookieMatch("_utma", cookies["_utma"]),
+            }),
+            ...(typeof cookies["ttclid"] !== "undefined" && {
+                ttclid: cookieMatch("ttclid", cookies["ttclid"]),
+            }),
+            ...(typeof cookies["crto_mapped_user_id"] !== "undefined" && {
+                crto_mapped_user_id: cookieMatch(
+                    "crto_mapped_user_id",
+                    cookies["crto_mapped_user_id"]
+                ),
+            }),
+            ...(typeof cookies["crto_is_user_optout"] !== "undefined" && {
+                crto_is_user_optout: cookieMatch(
+                    "crto_is_user_optout",
+                    cookies["crto_is_user_optout"]
+                ),
+            }),
         })
         .required()
         .messages({
@@ -829,6 +850,53 @@ const userPropertiesNotLoggedIn$1 = joi
     .messages({
         "any.required": `"user_properties" is a required field on the data layer object`,
     });
+const screenResolution = joi.string().required().messages({
+    "any.required": `"screen_resolution" is a required field on the device object and should contain a string such as "3008x1692"`,
+});
+
+const viewportSize = joi.string().required().messages({
+    "any.required": `"viewport_size" is a required field on the device object and should contain a string such as "1131*2834"`,
+});
+
+const encoding = joi.string().required().messages({
+    "any.required": `"encoding" is a required field on the device object and should contain a string such as "UTF-8"`,
+});
+
+const language = joi.string().required().messages({
+    "any.required": `"language" is a required field on the device object and should contain a string such as "en-US"`,
+});
+
+const colors = joi.string().required().messages({
+    "any.required": `"colors" is a required field on the device object and should contain a string such as "24-bit"`,
+});
+
+const title = joi.string().required().messages({
+    "any.required": `"title" is a required field on the page object and should contain the page title such as "T - Shirts - T Store"`,
+});
+
+const device = joi
+    .object()
+    .keys({
+        screen_resolution: screenResolution,
+        viewport_size: viewportSize,
+        encoding: encoding,
+        language: language,
+        colors: colors,
+    })
+    .required()
+    .messages({
+        "any.required": `"device" is a required field`,
+    });
+
+const page = joi
+    .object()
+    .keys({
+        title: title,
+    })
+    .required()
+    .messages({
+        "any.required": `"page" is a required field`,
+    });
 
 const marketingObject = {
     // This is the GA4 cookie ID. The XXX... portion of the cookie will differ for every client
@@ -844,6 +912,7 @@ const dl_view_item_schema_example = {
     event: "dl_view_item",
     event_id: "231f2c91-c2f3-421f-9d20-bb46a956e87a",
     marketing: marketingObject,
+    user_properties: userPropertiesNotLoggedIn$1,
     ecommerce: {
         currencyCode: "USD",
         detail: {
@@ -875,6 +944,7 @@ const dl_add_to_cart_schema_example = {
     event: "dl_add_to_cart",
     event_id: "887cb1e5-27ea-47c3-95a3-fdca8299e719",
     marketing: marketingObject,
+    user_properties: userPropertiesLoggedIn$1,
     ecommerce: {
         currencyCode: "USD",
         add: {
@@ -905,6 +975,7 @@ const dl_begin_checkout_schema_example = {
     event: "dl_begin_checkout",
     event_id: "4b2be7b2-bf61-4959-b340-065d262da12a",
     marketing: marketingObject,
+    user_properties: userPropertiesLoggedIn$1,
     ecommerce: {
         currencyCode: "USD",
         checkout: {
@@ -935,6 +1006,7 @@ const dl_remove_from_cart_schema_example = {
     event: "dl_remove_from_cart",
     event_id: "07df1ccc-7a89-4be2-a863-b0a238080280",
     marketing: marketingObject,
+    user_properties: userPropertiesLoggedIn$1,
     ecommerce: {
         currencyCode: "USD",
         remove: {
@@ -964,6 +1036,7 @@ const dl_search_results_schema_example = {
     event: "dl_search_results",
     event_id: "ee8eb7ca-8db2-4cc6-b875-2398b66b8ffe",
     marketing: marketingObject,
+    user_properties: userPropertiesLoggedIn$1,
     ecommerce: {
         currencyCode: "USD",
         actionField: {
@@ -1012,6 +1085,7 @@ const dl_view_cart_schema_example = {
     event_id: "e06ba901-57c9-41ee-89f0-28ea91258230",
     marketing: marketingObject,
     cart_total: "26.99",
+    user_properties: userPropertiesNotLoggedIn$1,
     ecommerce: {
         currencyCode: "USD",
         actionField: {
@@ -1050,6 +1124,7 @@ const dl_view_item_list_schema_example = {
     event: "dl_view_item_list",
     event_id: "2b0c5796-7abe-4465-8e24-0ffade4699df",
     marketing: marketingObject,
+    userProperties: userPropertiesNotLoggedIn$1,
     ecommerce: {
         currencyCode: "USD",
         impressions: [
@@ -1094,6 +1169,7 @@ const dl_select_item_schema_example = {
     event: "dl_select_item",
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312",
     marketing: marketingObject,
+    user_properties: userPropertiesLoggedIn$1,
     ecommerce: {
         currencyCode: "USD",
         click: {
@@ -1128,8 +1204,8 @@ const dl_user_data_schema_example = {
     event: "dl_user_data",
     event_id: "8ff28e85-0503-484e-bb86-53110aba98fb",
     marketing: marketingObject,
-    cart_total: "85.0",
-    user_properties: userPropertiesNotLoggedIn
+    user_properties: userPropertiesNotLoggedIn,
+    page: { title: "Page Title" },
 };
 
 const userPropertiesLoggedIn = {
@@ -1157,7 +1233,8 @@ const dl_login_schema_example = {
     event: "dl_login",
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312", // unique uuid for FB conversion API
     marketing: marketingObject,
-    user_properties: userPropertiesLoggedIn
+    user_properties: userPropertiesLoggedIn,
+    page: {title: "Page Title"}
 };
 
 const dl_sign_up_schema_example = {
@@ -1165,6 +1242,7 @@ const dl_sign_up_schema_example = {
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312", // unique uuid for FB conversion API
     marketing: marketingObject,
     user_properties: userPropertiesLoggedIn,
+    page: { title: "Page Title" },
 };
 
 const dl_route_change_schema_example = {
@@ -1187,6 +1265,10 @@ class DLEvent {
         this.verify();
     }
 
+    // Verify the shape of the event.
+    // If the event is not valid, return the error message.
+    // The the event is not preceded by dl_user_data at it is required to be it will still be valid.
+    // However, missing isMissingUserData() will be set to true.
     verify(additionalSchemas) {
         if (this._verificationhasBeenRun)
             throw new Error(
@@ -1207,6 +1289,18 @@ class DLEvent {
             // No event_id for dl_route_change
             ...(this.eventRequiresEventId() && {
                 event_id: eventId,
+            }),
+            // Current cart total for some events
+            ...(this.eventRequiresCartTotal() && {
+                cart_total: cartTotal,
+            }),
+            // Device for some events
+            ...(this.eventRequiresDevice() && {
+                device: device,
+            }),
+            // Page is required for some events
+            ...(this.eventRequiresPage() && {
+                page: page,
             }),
             ...additionalSchemas,
         });
@@ -1239,6 +1333,19 @@ class DLEvent {
 
     getErrors() {
         return this._errors;
+    }
+
+    eventRequiresCartTotal() {
+        return this._dlEventName === "dl_user_data";
+    }
+
+    eventRequiresPage() {
+        return this._dlEventName === "dl_user_data" || this._dlEventName === "dl_login" || this._dlEventName === "dl_sign_up";
+    }
+
+
+    eventRequiresDevice() {
+        return this._dlEventName === "dl_user_data";
     }
 
     eventRequiresUserProperties() {
@@ -1280,11 +1387,13 @@ class DLEvent {
     // Take a list of cookie names and return a list of cookie key value pairs
     _getCookieValues() {
         const cookieValues = {};
-        this._getRequiredCookieList(this._rawCookieString).forEach((cookieName) => {
-            this._getCookie(cookieName)
-                ? (cookieValues[cookieName] = this._getCookie(cookieName))
-                : null;
-        });
+        this._getRequiredCookieList(this._rawCookieString).forEach(
+            (cookieName) => {
+                this._getCookie(cookieName)
+                    ? (cookieValues[cookieName] = this._getCookie(cookieName))
+                    : null;
+            }
+        );
         return cookieValues;
     }
 
@@ -1404,7 +1513,7 @@ class DLEvent {
         // return new DLEvent.getEventMap()[dlEventObject.event](dlEventObject, dataLayer);
     }
 
-    static getGA4Cookie(rawCookieString){
+    static getGA4Cookie(rawCookieString) {
         if (rawCookieString === undefined) return null;
         const regex = new RegExp("(?<=_ga_).*?(?==)").exec(rawCookieString);
         return regex ? `_ga_${regex[0]}` : null;
@@ -1423,32 +1532,54 @@ class DLEvent {
             "ttclid",
             "crto_mapped_user_id",
             "crto_is_user_optout",
-            (DLEvent.getGA4Cookie(rawCookieString) ? DLEvent.getGA4Cookie(rawCookieString) : []),
+            DLEvent.getGA4Cookie(rawCookieString)
+                ? DLEvent.getGA4Cookie(rawCookieString)
+                : [],
         ];
     }
 }
 
 class DLEventUserData extends DLEvent {
     constructor(dataLayerObject, dataLayer, rawCookieString) {
-        super(dataLayerObject, dl_user_data_schema_example, dataLayer, rawCookieString);
+        super(
+            dataLayerObject,
+            dl_user_data_schema_example,
+            dataLayer,
+            rawCookieString
+        );
     }
 }
 
 class DLEventLogin extends DLEvent {
     constructor(dataLayerObject, dataLayer, rawCookieString) {
-        super(dataLayerObject, dl_login_schema_example, dataLayer, rawCookieString);
+        super(
+            dataLayerObject,
+            dl_login_schema_example,
+            dataLayer,
+            rawCookieString
+        );
     }
 }
 
 class DLEventSignUp extends DLEvent {
     constructor(dataLayerObject, dataLayer, rawCookieString) {
-        super(dataLayerObject, dl_sign_up_schema_example, dataLayer, rawCookieString);
+        super(
+            dataLayerObject,
+            dl_sign_up_schema_example,
+            dataLayer,
+            rawCookieString
+        );
     }
 }
 
 class DLEventViewItem extends DLEvent {
     constructor(dataLayerObject, dataLayer, rawCookieString) {
-        super(dataLayerObject, dl_view_item_schema_example, dataLayer, rawCookieString);
+        super(
+            dataLayerObject,
+            dl_view_item_schema_example,
+            dataLayer,
+            rawCookieString
+        );
     }
 
     verify() {
@@ -1479,7 +1610,12 @@ class DLEventViewItem extends DLEvent {
 
 class DLEventAddToCart extends DLEvent {
     constructor(dataLayerObject, dataLayer, rawCookieString) {
-        super(dataLayerObject, dl_add_to_cart_schema_example, dataLayer, rawCookieString);
+        super(
+            dataLayerObject,
+            dl_add_to_cart_schema_example,
+            dataLayer,
+            rawCookieString
+        );
     }
 
     verify() {
@@ -1509,7 +1645,12 @@ class DLEventAddToCart extends DLEvent {
 
 class DLEventBeginCheckout extends DLEvent {
     constructor(dataLayerObject, dataLayer, rawCookieString) {
-        super(dataLayerObject, dl_begin_checkout_schema_example, dataLayer, rawCookieString);
+        super(
+            dataLayerObject,
+            dl_begin_checkout_schema_example,
+            dataLayer,
+            rawCookieString
+        );
     }
 
     verify() {
@@ -1539,7 +1680,12 @@ class DLEventBeginCheckout extends DLEvent {
 
 class DLEventRemoveFromCart extends DLEvent {
     constructor(dataLayerObject, dataLayer, rawCookieString) {
-        super(dataLayerObject, dl_remove_from_cart_schema_example, dataLayer, rawCookieString);
+        super(
+            dataLayerObject,
+            dl_remove_from_cart_schema_example,
+            dataLayer,
+            rawCookieString
+        );
     }
 
     verify() {
@@ -1565,7 +1711,12 @@ class DLEventRemoveFromCart extends DLEvent {
 
 class DLEventSelectItem extends DLEvent {
     constructor(dataLayerObject, dataLayer, rawCookieString) {
-        super(dataLayerObject, dl_select_item_schema_example, dataLayer, rawCookieString);
+        super(
+            dataLayerObject,
+            dl_select_item_schema_example,
+            dataLayer,
+            rawCookieString
+        );
     }
 
     verify() {
@@ -1589,7 +1740,12 @@ class DLEventSelectItem extends DLEvent {
 
 class DLEventSearchResults extends DLEvent {
     constructor(dataLayerObject, dataLayer, rawCookieString) {
-        super(dataLayerObject, dl_search_results_schema_example, dataLayer, rawCookieString);
+        super(
+            dataLayerObject,
+            dl_search_results_schema_example,
+            dataLayer,
+            rawCookieString
+        );
     }
 
     verify() {
@@ -1610,7 +1766,12 @@ class DLEventSearchResults extends DLEvent {
 
 class DLEventViewCart extends DLEvent {
     constructor(dataLayerObject, dataLayer, rawCookieString) {
-        super(dataLayerObject, dl_view_cart_schema_example, dataLayer, rawCookieString);
+        super(
+            dataLayerObject,
+            dl_view_cart_schema_example,
+            dataLayer,
+            rawCookieString
+        );
     }
 
     verify() {
@@ -1632,7 +1793,12 @@ class DLEventViewCart extends DLEvent {
 
 class DLEventViewItemList extends DLEvent {
     constructor(dataLayerObject, dataLayer, rawCookieString) {
-        super(dataLayerObject, dl_view_item_list_schema_example, dataLayer, rawCookieString);
+        super(
+            dataLayerObject,
+            dl_view_item_list_schema_example,
+            dataLayer,
+            rawCookieString
+        );
     }
 
     verify() {
@@ -1647,7 +1813,12 @@ class DLEventViewItemList extends DLEvent {
 
 class DLEventRouteChange extends DLEvent {
     constructor(dataLayerObject, dataLayer, rawCookieString) {
-        super(dataLayerObject, dl_route_change_schema_example, dataLayer, rawCookieString);
+        super(
+            dataLayerObject,
+            dl_route_change_schema_example,
+            dataLayer,
+            rawCookieString
+        );
     }
 }
 

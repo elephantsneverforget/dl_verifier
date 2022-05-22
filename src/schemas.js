@@ -351,6 +351,11 @@ const language = joi.string().required().messages({
 const colors = joi.string().required().messages({
     "any.required": `"colors" is a required field on the device object and should contain a string such as "24-bit"`,
 });
+
+const title = joi.string().required().messages({
+    "any.required": `"title" is a required field on the page object and should contain the page title such as "T - Shirts - T Store"`,
+});
+
 export const device = joi
     .object()
     .keys({
@@ -363,4 +368,14 @@ export const device = joi
     .required()
     .messages({
         "any.required": `"device" is a required field`,
+    });
+
+export const page = joi
+    .object()
+    .keys({
+        title: title,
+    })
+    .required()
+    .messages({
+        "any.required": `"page" is a required field`,
     });

@@ -433,7 +433,9 @@ describe("dl_user_data shape verifier", () => {
         expect(dlEventUserData.getErrors()).toHaveLength(1);
         expect(dlEventUserData.isValid()).toBe(false);
         expect(dlEventUserData.getVerificationSummary()).toContain("invalid");
-        expect(dlEventUserData.getErrors()[0].message).toContain(`"encoding" is a required field`);
+        expect(dlEventUserData.getErrors()[0].message).toContain(
+            `"encoding" is a required field`
+        );
     });
     test("dl_user_data requires the user_properties field and should throw an error if not present", () => {
         const dlEventUserData = new DLEventUserData({
@@ -441,6 +443,22 @@ describe("dl_user_data shape verifier", () => {
             user_properties: {},
         });
         expect(dlEventUserData.isValid()).toBe(false);
+    });
+    test("dl_user_data requires the the page property to be present", () => {
+        const dlEventUserData = new DLEventUserData({
+            ...dl_user_data_schema_example,
+            device: {
+                screen_resolution: "3008x1692",
+                viewport_size: "1311x2834",
+                encoding: "UTF-8",
+                language: "en-US",
+                colors: "24-bit",
+            },
+            cart_total: "100",
+            page: {}
+        });
+        expect(dlEventUserData.isValid()).toBe(false);
+        expect(dlEventUserData.getErrors()[0].message).toContain("page");
     });
 
     test("dl_user_data requires the cart_total property and should throw and error if not present", () => {
