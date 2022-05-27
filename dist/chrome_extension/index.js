@@ -898,6 +898,36 @@ const page = joi
         "any.required": `"page" is a required field`,
     });
 
+const event_time = joi.string().isoDate().required().messages({
+    "any.required": `"event_time" is a required field on the data layer object and should contain a string such as "2020-01-01T00:00:00.000Z"`,
+});
+
+const quantity = joi.string().required().messages({
+    "any.required": `"quantity" is a required field on the ecommerce object and should contain a string such as "2"`,
+});
+
+const ecommerceDLUserDataItems = joi
+    .array()
+    .items({
+        name: name,
+        id: SKU,
+        product_id: productId,
+        variant_id: variantId,
+        brand: brand,
+        category: category,
+        price: price,
+        list: list,
+        image: image,
+        quantity: quantity,
+        variant: variant,
+        inventory: inventory
+    })
+    .min(0)
+    .required()
+    .messages({
+        "any.required": `The ecommerce array is required on dl_user_data.`,
+    });
+
 const marketingObject = {
     // This is the GA4 cookie ID. The XXX... portion of the cookie will differ for every client
     "_ga_XXXXXXXXXX": "GS1.1.1649714540.17.0.1.60", // GA4 Cookie ID
@@ -913,6 +943,7 @@ const dl_view_item_schema_example = {
     event_id: "231f2c91-c2f3-421f-9d20-bb46a956e87a",
     marketing: marketingObject,
     user_properties: userPropertiesNotLoggedIn$1,
+    event_time: "2022-05-22T22:56:52.748Z",
     ecommerce: {
         currencyCode: "USD",
         detail: {
@@ -944,6 +975,7 @@ const dl_add_to_cart_schema_example = {
     event: "dl_add_to_cart",
     event_id: "887cb1e5-27ea-47c3-95a3-fdca8299e719",
     marketing: marketingObject,
+    event_time: "2022-05-22T22:56:52.748Z",
     user_properties: userPropertiesLoggedIn$1,
     ecommerce: {
         currencyCode: "USD",
@@ -976,6 +1008,7 @@ const dl_begin_checkout_schema_example = {
     event_id: "4b2be7b2-bf61-4959-b340-065d262da12a",
     marketing: marketingObject,
     user_properties: userPropertiesLoggedIn$1,
+    event_time: "2022-05-22T22:56:52.748Z",
     ecommerce: {
         currencyCode: "USD",
         checkout: {
@@ -1006,6 +1039,7 @@ const dl_remove_from_cart_schema_example = {
     event: "dl_remove_from_cart",
     event_id: "07df1ccc-7a89-4be2-a863-b0a238080280",
     marketing: marketingObject,
+    event_time: "2022-05-22T22:56:52.748Z",
     user_properties: userPropertiesLoggedIn$1,
     ecommerce: {
         currencyCode: "USD",
@@ -1036,6 +1070,7 @@ const dl_search_results_schema_example = {
     event: "dl_search_results",
     event_id: "ee8eb7ca-8db2-4cc6-b875-2398b66b8ffe",
     marketing: marketingObject,
+    event_time: "2022-05-22T22:56:52.748Z",
     user_properties: userPropertiesLoggedIn$1,
     ecommerce: {
         currencyCode: "USD",
@@ -1085,6 +1120,7 @@ const dl_view_cart_schema_example = {
     event_id: "e06ba901-57c9-41ee-89f0-28ea91258230",
     marketing: marketingObject,
     cart_total: "26.99",
+    event_time: "2022-05-22T22:56:52.748Z",
     user_properties: userPropertiesNotLoggedIn$1,
     ecommerce: {
         currencyCode: "USD",
@@ -1125,6 +1161,7 @@ const dl_view_item_list_schema_example = {
     event_id: "2b0c5796-7abe-4465-8e24-0ffade4699df",
     marketing: marketingObject,
     userProperties: userPropertiesNotLoggedIn$1,
+    event_time: "2022-05-22T22:56:52.748Z",
     ecommerce: {
         currencyCode: "USD",
         impressions: [
@@ -1170,6 +1207,7 @@ const dl_select_item_schema_example = {
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312",
     marketing: marketingObject,
     user_properties: userPropertiesLoggedIn$1,
+    event_time: "2022-05-22T22:56:52.748Z",
     ecommerce: {
         currencyCode: "USD",
         click: {
@@ -1201,11 +1239,40 @@ const userPropertiesNotLoggedIn = {
 };
 
 const dl_user_data_schema_example = {
+    cart_total: "100.00",
     event: "dl_user_data",
     event_id: "8ff28e85-0503-484e-bb86-53110aba98fb",
     marketing: marketingObject,
     user_properties: userPropertiesNotLoggedIn,
+    event_time: "2022-05-22T22:56:52.748Z",
     page: { title: "Page Title" },
+    device: {
+        screen_resolution: "3008x1692",
+        viewport_size: "1311x2834",
+        encoding: "UTF-8",
+        language: "en-US",
+        colors: "24-bit",
+    },
+    ecommerce: {
+        cart_contents: {
+            products: [{
+                id: "LB00161-34689553170476", // SKU
+                name: "Lovebox Original Color & Photo", // Product title
+                brand: "Lovebox INC",
+                category: "Home,Living,Art & Objects,Tabletop",
+                variant: "USA wall plug",
+                price: "119.99",
+                quantity: "1",
+                list: "/art/wallhangings", // The list the product was discovered from or is displayed in
+                product_id: "6979886940352", // The product_id
+                variant_id: "41141193965760", // id or variant_id
+                compare_at_price: "139.99", // If available on dl_view_item & dl_add_to_cart otherwise use an empty string
+                image: "//cdn.shopify.com/small.png", // If available, otherwise use an empty string
+                inventory: "5", // If available, only required on dl_view_item
+            }],
+        },
+        currency_code: "USD",
+    },
 };
 
 const userPropertiesLoggedIn = {
@@ -1233,6 +1300,7 @@ const dl_login_schema_example = {
     event: "dl_login",
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312", // unique uuid for FB conversion API
     marketing: marketingObject,
+    event_time: "2022-05-22T22:56:52.748Z",
     user_properties: userPropertiesLoggedIn,
     page: {title: "Page Title"}
 };
@@ -1242,6 +1310,7 @@ const dl_sign_up_schema_example = {
     event_id: "0446f7d6-070d-44e7-b355-06a27d0fc312", // unique uuid for FB conversion API
     marketing: marketingObject,
     user_properties: userPropertiesLoggedIn,
+    event_time: "2022-05-22T22:56:52.748Z",
     page: { title: "Page Title" },
 };
 
@@ -1278,6 +1347,10 @@ class DLEvent {
         // Build the schema for the event
         const dlEventSchema = joi.object({
             event: getEventNameSchema(this._dlEventName),
+            // Event requires event_time
+            ...(this.eventRequiresEventTime() && {
+                event_time: event_time,
+            }),
             // Marketing not required on route change
             ...(this.eventRequiresMarketingProperties() && {
                 marketing: getMarketingSchema(this._cookies),
@@ -1335,14 +1408,25 @@ class DLEvent {
         return this._errors;
     }
 
+    eventRequiresEventTime() {
+        return this._dlEventName !== "dl_route_change";
+    }
+
+    eventRequiresEcommerceObject() {
+        return this._dlEventName === "dl_user_data";
+    }
+
     eventRequiresCartTotal() {
         return this._dlEventName === "dl_user_data";
     }
 
     eventRequiresPage() {
-        return this._dlEventName === "dl_user_data" || this._dlEventName === "dl_login" || this._dlEventName === "dl_sign_up";
+        return (
+            this._dlEventName === "dl_user_data" ||
+            this._dlEventName === "dl_login" ||
+            this._dlEventName === "dl_sign_up"
+        );
     }
-
 
     eventRequiresDevice() {
         return this._dlEventName === "dl_user_data";
@@ -1547,6 +1631,17 @@ class DLEventUserData extends DLEvent {
             dataLayer,
             rawCookieString
         );
+    }
+
+    verify() {
+        return super.verify({
+            ecommerce: ecommerce({
+                cart_contents: joi.object().keys({
+                    products: ecommerceDLUserDataItems,
+                }),
+                currency_code: currencyCode
+            }),
+        });
     }
 }
 

@@ -383,3 +383,29 @@ export const page = joi
 export const event_time = joi.string().isoDate().required().messages({
     "any.required": `"event_time" is a required field on the data layer object and should contain a string such as "2020-01-01T00:00:00.000Z"`,
 });
+
+export const quantity = joi.string().required().messages({
+    "any.required": `"quantity" is a required field on the ecommerce object and should contain a string such as "2"`,
+})
+
+export const ecommerceDLUserDataItems = joi
+    .array()
+    .items({
+        name: name,
+        id: SKU,
+        product_id: productId,
+        variant_id: variantId,
+        brand: brand,
+        category: category,
+        price: price,
+        list: list,
+        image: image,
+        quantity: quantity,
+        variant: variant,
+        inventory: inventory
+    })
+    .min(0)
+    .required()
+    .messages({
+        "any.required": `The ecommerce array is required on dl_user_data.`,
+    });

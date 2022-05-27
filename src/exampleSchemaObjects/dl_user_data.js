@@ -16,4 +16,24 @@ export const dl_user_data_schema_example = {
         language: "en-US",
         colors: "24-bit",
     },
+    ecommerce: {
+        cart_contents: {
+            products: [{
+                id: "LB00161-34689553170476", // SKU
+                name: "Lovebox Original Color & Photo", // Product title
+                brand: "Lovebox INC",
+                category: "Home,Living,Art & Objects,Tabletop",
+                variant: "USA wall plug",
+                price: "119.99",
+                quantity: "1",
+                list: "/art/wallhangings", // The list the product was discovered from or is displayed in
+                product_id: "6979886940352", // The product_id
+                variant_id: "41141193965760", // id or variant_id
+                compare_at_price: "139.99", // If available on dl_view_item & dl_add_to_cart otherwise use an empty string
+                image: "//cdn.shopify.com/small.png", // If available, otherwise use an empty string
+                inventory: "5", // If available, only required on dl_view_item
+            }],
+        },
+        currency_code: "USD",
+    },
 };

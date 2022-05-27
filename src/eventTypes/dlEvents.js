@@ -16,7 +16,8 @@ import {
     getMarketingSchema,
     device,
     page,
-    event_time
+    event_time,
+    ecommerceDLUserDataItems,
 } from "../schemas.js";
 
 import { dl_view_item_schema_example } from "../exampleSchemaObjects/dl_view_item.js";
@@ -64,7 +65,7 @@ export class DLEvent {
             // Event requires event_time
             ...(this.eventRequiresEventTime() && {
                 event_time: event_time,
-            }), 
+            }),
             // Marketing not required on route change
             ...(this.eventRequiresMarketingProperties() && {
                 marketing: getMarketingSchema(this._cookies),
@@ -125,15 +126,22 @@ export class DLEvent {
     eventRequiresEventTime() {
         return this._dlEventName !== "dl_route_change";
     }
-    
+
+    eventRequiresEcommerceObject() {
+        return this._dlEventName === "dl_user_data";
+    }
+
     eventRequiresCartTotal() {
         return this._dlEventName === "dl_user_data";
     }
 
     eventRequiresPage() {
-        return this._dlEventName === "dl_user_data" || this._dlEventName === "dl_login" || this._dlEventName === "dl_sign_up";
+        return (
+            this._dlEventName === "dl_user_data" ||
+            this._dlEventName === "dl_login" ||
+            this._dlEventName === "dl_sign_up"
+        );
     }
-
 
     eventRequiresDevice() {
         return this._dlEventName === "dl_user_data";
@@ -338,6 +346,17 @@ export class DLEventUserData extends DLEvent {
             dataLayer,
             rawCookieString
         );
+    }
+
+    verify() {
+        return super.verify({
+            ecommerce: ecommerce({
+                cart_contents: joi.object().keys({
+                    products: ecommerceDLUserDataItems,
+                }),
+                currency_code: currencyCode
+            }),
+        });
     }
 }
 
