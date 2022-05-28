@@ -353,8 +353,8 @@ export class DLEventUserData extends DLEvent {
             ecommerce: ecommerce({
                 cart_contents: joi.object().keys({
                     products: ecommerceDLUserDataItems,
-                }),
-                currency_code: currencyCode
+                }).required(),
+                currencyCode: currencyCode
             }),
         });
     }

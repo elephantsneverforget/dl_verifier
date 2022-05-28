@@ -469,6 +469,19 @@ describe("dl_user_data shape verifier", () => {
         expect(dlEventUserData.getErrors()).toBeDefined();
         expect(dlEventUserData.isValid()).toBe(false);
     });
+
+    test("The dl_user_data object should throw error if ecommerce object is missing cart_contents", () => {
+        const dlEventUserData = new DLEventUserData({
+            ...dl_user_data_schema_example,
+            ecommerce: {
+                currencyCode: "USD",
+            },
+        });
+        expect(dlEventUserData.getErrors()[0].message).toContain("cart_contents");
+        console.log(dlEventUserData.getErrors());
+        expect(dlEventUserData.getErrors()).toBeDefined();
+        expect(dlEventUserData.isValid()).toBe(false);
+    });
 });
 
 describe("dl_login shape verifier", () => {

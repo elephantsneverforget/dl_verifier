@@ -34,6 +34,6 @@ export const dl_user_data_schema_example = {
                 inventory: "5", // If available, only required on dl_view_item
             }],
         },
-        currency_code: "USD",
+        currencyCode: "USD",
     },
 };
