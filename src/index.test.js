@@ -478,7 +478,6 @@ describe("dl_user_data shape verifier", () => {
             },
         });
         expect(dlEventUserData.getErrors()[0].message).toContain("cart_contents");
-        console.log(dlEventUserData.getErrors());
         expect(dlEventUserData.getErrors()).toBeDefined();
         expect(dlEventUserData.isValid()).toBe(false);
     });

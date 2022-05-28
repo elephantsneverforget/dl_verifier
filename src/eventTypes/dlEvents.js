@@ -70,25 +70,9 @@ export class DLEvent {
             ...(this.eventRequiresMarketingProperties() && {
                 marketing: getMarketingSchema(this._cookies),
             }),
-            // user_properties only required on dl_user_data, dl_login, dl_signup
-            ...(this.eventRequiresUserProperties() && {
-                user_properties: this.getUserPropertiesSchema(),
-            }),
             // No event_id for dl_route_change
             ...(this.eventRequiresEventId() && {
                 event_id: eventId,
-            }),
-            // Current cart total for some events
-            ...(this.eventRequiresCartTotal() && {
-                cart_total: cartTotal,
-            }),
-            // Device for some events
-            ...(this.eventRequiresDevice() && {
-                device: device,
-            }),
-            // Page is required for some events
-            ...(this.eventRequiresPage() && {
-                page: page,
             }),
             ...additionalSchemas,
         });
@@ -350,11 +334,18 @@ export class DLEventUserData extends DLEvent {
 
     verify() {
         return super.verify({
+            cart_total: cartTotal,
+            user_properties: this.getUserPropertiesSchema(),
+            device: device,
+            page: page,
             ecommerce: ecommerce({
-                cart_contents: joi.object().keys({
-                    products: ecommerceDLUserDataItems,
-                }).required(),
-                currencyCode: currencyCode
+                cart_contents: joi
+                    .object()
+                    .keys({
+                        products: ecommerceDLUserDataItems,
+                    })
+                    .required(),
+                currencyCode: currencyCode,
             }),
         });
     }
@@ -369,6 +360,12 @@ export class DLEventLogin extends DLEvent {
             rawCookieString
         );
     }
+    verify() {
+        return super.verify({
+            user_properties: this.getUserPropertiesSchema(),
+            page: page,
+        });
+    }
 }
 
 export class DLEventSignUp extends DLEvent {
@@ -379,6 +376,13 @@ export class DLEventSignUp extends DLEvent {
             dataLayer,
             rawCookieString
         );
+    }
+
+    verify() {
+        return super.verify({
+            user_properties: this.getUserPropertiesSchema(),
+            page: page,
+        });
     }
 }
 
