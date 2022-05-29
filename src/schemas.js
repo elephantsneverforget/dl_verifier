@@ -57,7 +57,7 @@ const position = joi.number().required().messages({
     "any.required": `"position" is a required field on the impressions array constituent objects. It should contain the position in the list for each array element. For example, the first element should be have the value 1(integer), the next, 2 etc...`,
 });
 
-const list = joi.string().required().optional().messages({
+const list = joi.string().messages({
     "any.required": `"list" is a required field on the impressions array constituent objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
 });
 
@@ -165,7 +165,7 @@ export const eventId = joi.string().min(5).required().messages({
     "any.required": `"event_id" is a required field. It should be a UUID like value.`,
 });
 
-export const cartTotal = joi.string().min(2).required().messages({
+export const cartTotal = joi.string().min(1).required().messages({
     "any.required": `"cart_total" is a required field. It should be a string representing the total value of the cart, for example "26.99".`,
 });
 

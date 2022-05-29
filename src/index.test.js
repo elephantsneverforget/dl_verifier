@@ -132,7 +132,7 @@ describe("If cookies present in browser relevant to Elevar DL, make required in 
         expect(dlEventViewItem._cookies["_fbp"]).toBeUndefined();
         expect(dlEventViewItem.isValid()).toBe(true);
     });
-    test("If an event has relevant cookies associated, but the values passed to the marketing obect are incorrect the event should be marked as valid", () => {
+    test("If an event has relevant cookies associated, but the values passed to the marketing obect are incorrect the event should be marked as invalid", () => {
         const dlEventViewItem = new DLEventViewItem(
             {
                 ...dl_view_item_schema_example,

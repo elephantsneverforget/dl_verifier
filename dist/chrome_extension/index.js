@@ -575,7 +575,7 @@ const position = joi.number().required().messages({
     "any.required": `"position" is a required field on the impressions array constituent objects. It should contain the position in the list for each array element. For example, the first element should be have the value 1(integer), the next, 2 etc...`,
 });
 
-const list = joi.string().required().optional().messages({
+const list = joi.string().messages({
     "any.required": `"list" is a required field on the impressions array constituent objects. It should contain the path to the collection the product is from. For example "/collections/toys"`,
 });
 
@@ -683,7 +683,7 @@ const eventId = joi.string().min(5).required().messages({
     "any.required": `"event_id" is a required field. It should be a UUID like value.`,
 });
 
-const cartTotal = joi.string().min(2).required().messages({
+const cartTotal = joi.string().min(1).required().messages({
     "any.required": `"cart_total" is a required field. It should be a string representing the total value of the cart, for example "26.99".`,
 });
 
@@ -1271,7 +1271,7 @@ const dl_user_data_schema_example = {
                 inventory: "5", // If available, only required on dl_view_item
             }],
         },
-        currency_code: "USD",
+        currencyCode: "USD",
     },
 };
 
@@ -1355,25 +1355,9 @@ class DLEvent {
             ...(this.eventRequiresMarketingProperties() && {
                 marketing: getMarketingSchema(this._cookies),
             }),
-            // user_properties only required on dl_user_data, dl_login, dl_signup
-            ...(this.eventRequiresUserProperties() && {
-                user_properties: this.getUserPropertiesSchema(),
-            }),
             // No event_id for dl_route_change
             ...(this.eventRequiresEventId() && {
                 event_id: eventId,
-            }),
-            // Current cart total for some events
-            ...(this.eventRequiresCartTotal() && {
-                cart_total: cartTotal,
-            }),
-            // Device for some events
-            ...(this.eventRequiresDevice() && {
-                device: device,
-            }),
-            // Page is required for some events
-            ...(this.eventRequiresPage() && {
-                page: page,
             }),
             ...additionalSchemas,
         });
@@ -1635,11 +1619,18 @@ class DLEventUserData extends DLEvent {
 
     verify() {
         return super.verify({
+            cart_total: cartTotal,
+            user_properties: this.getUserPropertiesSchema(),
+            device: device,
+            page: page,
             ecommerce: ecommerce({
-                cart_contents: joi.object().keys({
-                    products: ecommerceDLUserDataItems,
-                }),
-                currency_code: currencyCode
+                cart_contents: joi
+                    .object()
+                    .keys({
+                        products: ecommerceDLUserDataItems,
+                    })
+                    .required(),
+                currencyCode: currencyCode,
             }),
         });
     }
@@ -1654,6 +1645,12 @@ class DLEventLogin extends DLEvent {
             rawCookieString
         );
     }
+    verify() {
+        return super.verify({
+            user_properties: this.getUserPropertiesSchema(),
+            page: page,
+        });
+    }
 }
 
 class DLEventSignUp extends DLEvent {
@@ -1664,6 +1661,13 @@ class DLEventSignUp extends DLEvent {
             dataLayer,
             rawCookieString
         );
+    }
+
+    verify() {
+        return super.verify({
+            user_properties: this.getUserPropertiesSchema(),
+            page: page,
+        });
     }
 }
 
